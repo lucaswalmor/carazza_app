@@ -9,13 +9,42 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo/metro-runtime": "~4.0.0",
+    "@joaosousa/react-native-progress-steps": "^0.4.0",
+    "@mercadopago/sdk-js": "^0.0.3",
+    "@react-native-async-storage/async-storage": "1.23.1",
+    "@react-navigation/bottom-tabs": "^7.2.0",
+    "@react-navigation/native": "^7.0.14",
+    "@react-navigation/native-stack": "^7.2.0",
+    "@stripe/stripe-react-native": "0.38.6",
+    "axios": "^1.7.9",
     "expo": "~52.0.23",
+    "expo-background-fetch": "~13.0.4",
+    "expo-image-picker": "~16.0.4",
+    "expo-location": "~18.0.5",
+    "expo-notifications": "^0.29.12",
     "expo-status-bar": "~2.0.0",
+    "expo-web-browser": "~14.0.2",
+    "mercadopago": "^2.2.0",
     "react": "18.3.1",
-    "react-native": "0.76.5"
+    "react-dom": "18.3.1",
+    "react-native": "0.76.5",
+    "react-native-gesture-handler": "^2.21.2",
+    "react-native-maps": "1.18.0",
+    "react-native-mask-text": "^0.14.2",
+    "react-native-masked-text": "^1.13.0",
+    "react-native-paper": "^5.13.1",
+    "react-native-screens": "^4.4.0",
+    "react-native-vector-icons": "^10.2.0",
+    "react-native-web": "~0.19.13",
+    "react-native-webview": "13.12.5",
+    "react-native-youtube-iframe": "^2.3.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "^7.20.0",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.5.0",
+    "tailwindcss": "^3.4.17"
   },
   "private": true
 }

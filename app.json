@@ -13,12 +13,50 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "config": {
+        "googleMapsApiKey": "AIzaSyAPOMVj_GA0krJ0XYq4Ui0CxiB7CGZ5kmQ"
+      },
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "myapp",
+              "host": "checkout",
+              "pathPrefix": "/success",
+              "pathPrefix": "/failure",
+              "pathPrefix": "/pending"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
+      },
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyB2PKyiPLwysX53zSFx7Vv2wgIFb88oTL4"
+        },
+        "intentFilters": [
+          {
+            "action": "VIEW",
+            "data": [
+              {
+                "scheme": "myapp",
+                "host": "checkout",
+                "pathPrefix": "/success",
+                "pathPrefix": "/failure",
+                "pathPrefix": "/pending"
+              }
+            ],
+            "category": ["BROWSABLE", "DEFAULT"]
+          }
+        ]
       }
     },
     "web": {
