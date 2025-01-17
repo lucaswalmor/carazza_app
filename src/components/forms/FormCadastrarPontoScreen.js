@@ -19,7 +19,6 @@ import * as ImagePicker from 'expo-image-picker';
 
 const CadastrarPonto = ({ navigation }) => {
     const [isLoading, setIsLoading] = useState(false);
-    const [visible, setVisible] = useState(false);
     const [errors, setErrors] = useState({});
     const [images, setImages] = useState([]);
     const [form, setForm] = useState({
@@ -42,8 +41,6 @@ const CadastrarPonto = ({ navigation }) => {
     });
 
     const isDisabled = images.length >= 3;
-
-    const hideDialog = () => setVisible(false);
 
     const handleInputChange = (field, value) => {
         setForm({ ...form, [field]: value });
@@ -99,7 +96,6 @@ const CadastrarPonto = ({ navigation }) => {
                 horaFechamento: '',
             });
             setImages([]);
-            setVisible(true);
 
         } catch (error) {
             console.error('Erro ao enviar o formulário:', error);
@@ -154,19 +150,6 @@ const CadastrarPonto = ({ navigation }) => {
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
-
-            <Portal>
-                <Dialog visible={visible} onDismiss={hideDialog} theme={{ colors: { primary: 'green' } }}>
-                    <Dialog.Title>Sucesso!</Dialog.Title>
-                    <Dialog.Content>
-                        <Text variant="bodyMedium">Este Ponto foi cadastrado com sucesso!</Text>
-                    </Dialog.Content>
-                    <Dialog.Actions>
-                        <Button onPress={hideDialog}>Fechar</Button>
-                    </Dialog.Actions>
-                </Dialog>
-            </Portal>
-
             <TextInput
                 style={styles.input}
                 placeholder="Nome do local"
@@ -371,7 +354,7 @@ const CadastrarPonto = ({ navigation }) => {
             </View>
 
             <TouchableOpacity
-                style={[styles.button, isDisabled && { backgroundColor: '#ccc' }, {flex: 1}]}
+                style={[styles.button, isDisabled && { backgroundColor: '#ccc' }, { flex: 1 }]}
                 onPress={pickImage}
                 disabled={isDisabled}
             >

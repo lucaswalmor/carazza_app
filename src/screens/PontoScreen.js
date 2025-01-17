@@ -53,10 +53,6 @@ const PontoScreen = ({ route }) => {
         );
     }
 
-    const handleCenterMap = () => {
-        openMap();
-    };
-
     const openMap = async () => {
         const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${ponto.latitude},${ponto.longitude}`;
         Linking.openURL(googleMapsUrl);
@@ -64,7 +60,22 @@ const PontoScreen = ({ route }) => {
 
     return (
         <ScrollView style={styles.container}>
-            {/* Card 2: Informações */}
+            {/* Card 3: Vídeo */}
+            <Card style={[styles.card, { marginBottom: 30 }]}>
+                <Card.Title title="Vídeo" />
+                <Card.Content>
+                    <View style={{ flex: 1, padding: 10 }}>
+                        <YoutubePlayer
+                            height={200}
+                            play={false}
+                            videoId={ponto.codigo_video}
+                            onChangeState={(state) => console.log(state)}
+                            forceAndroidAutoplay={true}
+                        />
+                    </View>
+                </Card.Content>
+            </Card>
+
             <Card style={styles.card}>
                 <Card.Title title="Informações" />
                 <Card.Content>
@@ -121,47 +132,26 @@ const PontoScreen = ({ route }) => {
                     </Button>
 
                     {ponto.latitude && ponto.longitude ? (
-                        <>
-                            <MapView
-                                style={{ height: 200, marginTop: 10 }}
-                                initialRegion={{
+                        <MapView
+                            style={{ height: 200, marginTop: 10 }}
+                            initialRegion={{
+                                latitude: parseFloat(ponto.latitude),
+                                longitude: parseFloat(ponto.longitude),
+                                latitudeDelta: 0.01,
+                                longitudeDelta: 0.01,
+                            }}
+                        >
+                            <Marker
+                                coordinate={{
                                     latitude: parseFloat(ponto.latitude),
                                     longitude: parseFloat(ponto.longitude),
-                                    latitudeDelta: 0.01,
-                                    longitudeDelta: 0.01,
                                 }}
-                            >
-                                <Marker
-                                    coordinate={{
-                                        latitude: parseFloat(ponto.latitude),
-                                        longitude: parseFloat(ponto.longitude),
-                                    }}
-                                    title="Ponto Localização"
-                                />
-                            </MapView>
-
-                            <Button mode="contained" onPress={handleCenterMap} style={styles.button}>
-                                Voltar para o local
-                            </Button>
-                        </>
+                                title="Ponto Localização"
+                            />
+                        </MapView>
                     ) : (
                         <Text style={styles.errorText}>Coordenadas inválidas</Text>
                     )}
-                </Card.Content>
-            </Card>
-
-            {/* Card 3: Vídeo */}
-            <Card style={[styles.card, {marginBottom: 30}]}>
-                <Card.Title title="Vídeo" />
-                <Card.Content>
-                    <View style={{ flex: 1, padding: 10 }}>
-                        <YoutubePlayer
-                            height={200}
-                            play={true}
-                            videoId={ponto.codigo_video}
-                            onChangeState={(state) => console.log(state)}
-                        />
-                    </View>
                 </Card.Content>
             </Card>
         </ScrollView>
