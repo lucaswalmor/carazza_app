@@ -6,6 +6,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import * as Notifications from 'expo-notifications';
 import * as BackgroundFetch from 'expo-background-fetch';
 import * as TaskManager from 'expo-task-manager';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const TASK_NAME = 'background-fetch-task';
 
@@ -37,7 +38,7 @@ export default function TrackingScreen() {
                 );
                 return;
             }
-    
+
             let currentLocation = await Location.getCurrentPositionAsync({});
             if (currentLocation) {
                 const { latitude, longitude } = currentLocation.coords;
@@ -50,10 +51,10 @@ export default function TrackingScreen() {
                 });
             }
         };
-    
+
         getLocationPermission();
     }, []);
-    
+
     useEffect(() => {
         const fetchLocation = async () => {
             if (isTracking && !isPaused) {
@@ -65,14 +66,14 @@ export default function TrackingScreen() {
                     },
                     (newLocation) => {
                         const { latitude, longitude } = newLocation.coords;
-    
+
                         setLocation({ latitude, longitude });
                         setRegion((prevRegion) => ({
                             ...prevRegion,
                             latitude,
                             longitude,
                         }));
-    
+
                         setRoute((prevRoute) => {
                             if (prevRoute.length > 0) {
                                 const lastPoint = prevRoute[prevRoute.length - 1];
@@ -88,7 +89,7 @@ export default function TrackingScreen() {
                         });
                     }
                 );
-    
+
                 // Iniciar cronômetro
                 timerRef.current = setInterval(() => {
                     setTimer((prev) => prev + 1);
@@ -101,9 +102,9 @@ export default function TrackingScreen() {
                 clearInterval(timerRef.current);
             }
         };
-    
+
         fetchLocation();
-    
+
         return () => {
             if (watchPositionRef.current && typeof watchPositionRef.current.remove === "function") {
                 watchPositionRef.current.remove();
@@ -203,44 +204,52 @@ export default function TrackingScreen() {
 
     return (
         <View style={styles.container}>
-            <MapView
-                style={styles.map}
-                region={region}
-                showsUserLocation
+            <LinearGradient
+                // Button Linear Gradient
+                colors={['#3b5998', '#3b5998' ,'#3b5998', '#3b5998', '#001933']}
+                style={styles.gradientContainer}
             >
-                {route.length > 1 && <Polyline coordinates={route} strokeWidth={4} strokeColor="blue" />}
-                {location && (
-                    <Marker coordinate={location} title="Você está aqui" description="Localização atual" />
-                )}
-            </MapView>
-
-            <View style={styles.controls}>
-                <TouchableOpacity
-                    style={[styles.button, { backgroundColor: isTracking && !isPaused ? "#ddd" : "#0f0" }]}
-                    onPress={isTracking ? (isPaused ? resumeTracking : pauseTracking) : startTracking}
+                <MapView
+                    style={styles.map}
+                    region={region}
+                    showsUserLocation
                 >
-                    <MaterialIcons name="play-arrow" size={24} color="white" />
-                </TouchableOpacity>
+                    {route.length > 1 && <Polyline coordinates={route} strokeWidth={4} strokeColor="blue" />}
+                    {location && (
+                        <Marker coordinate={location} title="Você está aqui" description="Localização atual" />
+                    )}
+                </MapView>
+                
+                <View style={styles.controlsContainer}>
+                    <View style={styles.controls}>
+                        <TouchableOpacity
+                            style={[styles.button, { backgroundColor: isTracking && !isPaused ? "#80bdff" : "#007BFF" }]}
+                            onPress={isTracking ? (isPaused ? resumeTracking : pauseTracking) : startTracking}
+                        >
+                            <MaterialIcons name="play-arrow" size={24} color="white" />
+                        </TouchableOpacity>
 
-                <TouchableOpacity
-                    style={[styles.button, { backgroundColor: (!isTracking && !isPaused) || isPaused ? "#ddd" : "#0f0" }]}
-                    onPress={pauseTracking}
-                >
-                    <MaterialIcons name="pause" size={24} color="white" />
-                </TouchableOpacity>
+                        <TouchableOpacity
+                            style={[styles.button, { backgroundColor: (!isTracking && !isPaused) || isPaused ? "#80bdff" : "#EACB21" }]}
+                            onPress={pauseTracking}
+                        >
+                            <MaterialIcons name="pause" size={24} color="white" />
+                        </TouchableOpacity>
 
-                <TouchableOpacity
-                    style={[styles.button, { backgroundColor: isTracking ? "#f00" : "#ddd" }]}
-                    onPress={isTracking ? stopTracking : null}
-                >
-                    <MaterialIcons name="stop" size={24} color="white" />
-                </TouchableOpacity>
-            </View>
+                        <TouchableOpacity
+                            style={[styles.button, { backgroundColor: isTracking ? "#f00" : "#80bdff" }]}
+                            onPress={isTracking ? stopTracking : null}
+                        >
+                            <MaterialIcons name="stop" size={24} color="white" />
+                        </TouchableOpacity>
+                    </View>
 
-            <Text style={styles.timer}>
-                Distância: {(isPaused ? distanciaAtualPausada : distance).toFixed(2)} km
-            </Text>
-            <Text style={styles.timer}>Tempo: {formatTime(timer)}</Text>
+                    <Text style={styles.timer}>
+                        Distância: {(isPaused ? distanciaAtualPausada : distance).toFixed(2)} km
+                    </Text>
+                    <Text style={styles.timer}>Tempo: {formatTime(timer)}</Text>
+                </View>
+            </LinearGradient>
         </View>
     );
 }
@@ -252,6 +261,9 @@ const styles = StyleSheet.create({
     map: {
         width: "100%",
         height: "70%",
+    },
+    controlsContainer: {
+        flex: 1,
     },
     controls: {
         flexDirection: "row",
@@ -265,11 +277,15 @@ const styles = StyleSheet.create({
         borderRadius: 30,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#ddd",
+        backgroundColor: "#80bdff",
     },
     timer: {
-        textAlign: "center",
         fontSize: 20,
+        paddingLeft: 30,
         fontWeight: "bold",
+        color: '#cce5ff'
+    },
+    gradientContainer: {
+        flex: 1,
     },
 });

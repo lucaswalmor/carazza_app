@@ -1,107 +1,208 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
-import ProgressSteps, { Title, Content, ProgressStep } from '@joaosousa/react-native-progress-steps';
-import FormDadosPessoas from '../components/forms/user/FormDadosPessoais'
-import FormEndereco from '../components/forms/user/FormEndereco'
-import PaymentScreen from './PaymentScreen';
-import FormDadosLogin from '../components/forms/user/FormDadosLogin'
-import { handleIntegration } from '../utils/MercadoPago';
-import { openBrowserAsync } from 'expo-web-browser';
+import { View, Text, TouchableOpacity, Image, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator, TextInput } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import { initPaymentSheet, presentPaymentSheet } from '@stripe/stripe-react-native';
+import { TextInputMask } from 'react-native-masked-text';
+import styles from '../assets/css/styles';
+import api from '../services/api'
 
 const RegisterScreen = ({ navigation }) => {
     const [profileImage, setProfileImage] = useState(null);
+    const [nome, setNome] = useState('Lucas Stinbach');
+    const [telefone, setTelefone] = useState('(34) 9 9202-1394');
+    const [cpf, setCpf] = useState('122.947.976-71');
+
+    const [cep, setCep] = useState('38080-615');
+    const [rua, setRua] = useState('Rua A');
+    const [bairro, setBairro] = useState('Bairro A');
+    const [numero, setNumero] = useState('147');
+    const [complemento, setComplemento] = useState(null);
+    const [estado, setEstado] = useState('MG');
+    const [cidade, setCidade] = useState('Cidade A');
+
+    const [email, setEmail] = useState('lucaswsb52@gmail.com');
+    const [password, setPassword] = useState('32329585');
+
+    const [subscriptionId, setSubscriptionId] = useState(null);
+    const [customer, setCustomer] = useState(null);
+    const [userId, setUserId] = useState(null);
+
     const [errors, setErrors] = useState({});
     const [dados, setDados] = useState({});
-    const [step, setStep] = useState(0);
+    const [isLoading, setIsLoading] = useState(false);
+    const [currentStep, setCurrentStep] = useState(1);
+    const [showSteps, setShowSteps] = useState(true);
 
-    const handleInputChange = (key, value) => {
-        if (key === 'cep' && value.length === 9) {
-            pesquisacep(value);
-        } else {
-            setDados((prevState) => ({
-                ...prevState,
-                [key]: value,
-            }));
-        }
+    const handleNext = () => {
+        setCurrentStep((prevStep) => prevStep + 1);
     };
 
-    const handleProfileImageChange = (imageUri) => {
-        setProfileImage(imageUri);
+    const handlePrevious = () => {
+        setCurrentStep((prevStep) => prevStep - 1);
+    };
+
+    const handleProfileImageChange = async () => {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+            alert('Permissão para acessar a galeria é necessária!');
+            return;
+        }
+
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 0.8,
+        });
+
+        if (!result.canceled) {
+            setProfileImage(result.assets[0].uri);
+        }
     };
 
     const pesquisacep = async (valor) => {
         const cep = valor.replace(/\D/g, '');
-
+        setCep(valor)
         try {
+            if (cep.length != 8) return;
+
             const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
             const data = await response.json();
-            setDados((prevState) => ({
-                ...prevState,
-                cep: data.cep,
-                rua: data.logradouro || '',
-                bairro: data.bairro || '',
-                cidade: data.localidade || '',
-                estado: data.uf || '',
-            }));
+
+            if (data.logradouro) setRua(data.logradouro)
+            if (data.bairro) setBairro(data.bairro)
+            if (data.uf) setEstado(data.uf)
+            if (data.localidade) setCidade(data.localidade)
         } catch (error) {
             console.error('Erro ao buscar o CEP:', error);
         }
     };
 
-    const handlePayment = async () => {
-        console.log(dados)
-        const data = await handleIntegration(dados.email);
-        console.log(data)
+    const handleRegister = async () => {
+        setIsLoading(true);
 
-        if (!data) {
-            console.log('Erro ao criar plano');
-            return;
+        const formData = new FormData();
+
+        // Adicionar campos ao FormData
+        formData.append('nome', nome);
+        formData.append('telefone', telefone);
+        formData.append('cpf', cpf);
+
+        formData.append('cep', cep);
+        formData.append('rua', rua);
+        formData.append('bairro', bairro);
+        formData.append('numero', numero);
+        formData.append('complemento', complemento);
+        formData.append('estado', estado);
+        formData.append('cidade', cidade);
+
+        formData.append('email', email);
+        formData.append('password', password);
+
+        // Adicionar imagem ao FormData (se existir)
+        if (profileImage) {
+            const fileName = profileImage.split('/').pop();
+            const fileType = fileName.split('.').pop();
+            formData.append('img_perfil', {
+                uri: profileImage,
+                name: fileName,
+                type: `image/${fileType}`,
+            });
         }
-    
-        const subscriptionId = data.id; // ID da assinatura
-        const customerData = {
-            name: dados.name,
-            email: dados.email,
-            subscriptionId,
-        };
 
-        const url = `https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=${data}`;
-        await openBrowserAsync(url);
+        try {
+            const response = await api.post('/user/store', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            handlePayment(response.data.data.id);
+            setUserId(response.data.data.id)
+        } catch (err) {
+            if (err.response && err.response.data) {
+                console.log('Erros de validação:', err.response.data.errors);
+                setErrors(err.response.data.errors);
+                setIsLoading(false);
+            } else {
+                console.log('Erro:', err.message);
+                setIsLoading(false);
+            }
+        }
     };
 
-    const handleRegister = async () => {
-        console.log(dados)
-        // const formData = new FormData();
+    const handlePayment = async (userId) => {
+        try {
+            const response = await fetch('/stripe/subscription', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: email }),
+            });
 
-        // Object.keys(dados).forEach((key) => {
-        //     formData.append(key, dados[key]);
-        // });
+            const { paymentIntent, ephemeralKey, customer, subscriptionId } = await response.json();
 
-        // // Adicionar imagem ao FormData
-        // if (profileImage) {
-        //     const fileName = profileImage.split('/').pop();
-        //     const fileType = fileName.split('.').pop();
-        //     formData.append('imagem', {
-        //         uri: profileImage,
-        //         name: fileName,
-        //         type: `image/${fileType}`,
-        //     });
-        // }
+            const initSheet = await initPaymentSheet({
+                merchantDisplayName: 'Carazza',
+                customerId: customer,
+                customerEphemeralKeySecret: ephemeralKey,
+                paymentIntentClientSecret: paymentIntent,
+                googlePay: {
+                    merchantCountryCode: 'BR', // Seu código de país
+                    testEnv: true, // Altere para false em produção
+                },
+            });
 
-        // api.post('/user/store', formData, {
-        //     headers: {
-        //         'Content-Type': 'multipart/form-data',
-        //     },
-        // }).then(res => {
-        //     console.log(res)
-        // }).catch(err => {
-        //     if (err.response && err.response.data) {
-        //         console.log('Erros de validação:', err.response.data.errors);
-        //         setErrors(err.response.data.errors);
-        //     } else {
-        //         console.log('Erro:', err.message);
-        //     }
-        // })
+            if (initSheet.error) {
+                console.error(initSheet.error);
+                return;
+            }
+
+            // Exibir o modal do Payment Sheet
+            const paymentResult = await presentPaymentSheet();
+
+            if (paymentResult.error) {
+                setShowSteps(false)
+                console.error('Erro ao processar pagamento:', paymentResult.error.message);
+            } else {
+                setCustomer(customer)
+                setSubscriptionId(subscriptionId)
+
+                if (customer && subscriptionId) {
+                    await handleUpdateUserPayment(customer, subscriptionId, userId);
+                }
+            }
+        } catch (error) {
+            setIsLoading(false);
+            console.error('Erro ao inicializar o pagamento:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleUpdateUserPayment = async (customer, subscriptionId, userId) => {
+        const dados = {
+            stripe_subscription_id: subscriptionId,
+            stripe_customer_id: customer,
+        }
+
+        try {
+            const response = await api.put(`/user/update-payment/${userId}`, dados);
+
+            if (response.status == 201) {
+                navigation.replace('Login');
+            }
+
+        } catch (err) {
+            if (err.response && err.response.data) {
+                setErrors(err.response.data.errors);
+            } else {
+                console.log('Erro:', err.message);
+            }
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const backToLogin = () => {
@@ -117,202 +218,230 @@ const RegisterScreen = ({ navigation }) => {
                 contentContainerStyle={styles.container}
                 keyboardShouldPersistTaps="handled"
             >
-                <ProgressSteps
-                    currentStep={step}
-                    orientation="horizontal"
-                    steps={[
-                        {
-                            id: 1,
-                            title: <Title>Dados Pessoais</Title>,
-                            content: <Content>
-                                <FormDadosPessoas
-                                    dados={dados}
-                                    onInputChange={handleInputChange}
-                                    handleProfileImageChange={handleProfileImageChange}
-                                />
-
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
-                                    <TouchableOpacity style={styles.buttonVoltar} onPress={() => backToLogin()}>
-                                        <Text style={styles.buttonText}>Voltar</Text>
+                {!showSteps ? (
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                        <Text style={{ textAlign: 'center', margin: 20 }}>
+                            Parece que você não finalizou o pagamento.
+                        </Text>
+                        <TouchableOpacity
+                            style={styles.button}
+                            onPress={() => handlePayment(userId)}>
+                            <Text style={styles.buttonText}>Realizar Pagamento</Text>
+                        </TouchableOpacity>
+                    </View>
+                ) : (
+                    <>
+                        {currentStep === 1 && (
+                            <View style={{ flex: 1 }}>
+                                <Text style={{ textAlign: 'center', margin: 20, fontSize: 16, fontWeight: 'bold' }}>
+                                    Dados Pessoais
+                                </Text>
+                                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                                    <TouchableOpacity style={styles.imageContainer} onPress={handleProfileImageChange}>
+                                        {profileImage ? (
+                                            <Image source={{ uri: profileImage }} style={styles.image} />
+                                        ) : (
+                                            <Text style={styles.imagePlaceholder}>Foto de Perfil</Text>
+                                        )}
                                     </TouchableOpacity>
-
-                                    <TouchableOpacity style={styles.button} onPress={() => setStep(1)}>
-                                        <Text style={styles.buttonText}>Próximo</Text>
-                                    </TouchableOpacity>
+                                    {errors.img_perfil && <Text style={styles.errorText}>{errors.img_perfil[0]}</Text>}
                                 </View>
-                            </Content>,
-                        },
-                        {
-                            id: 2,
-                            title: <Title>Endereço</Title>,
-                            content: <Content>
-                                <FormEndereco
-                                    dados={dados}
-                                    onInputChange={handleInputChange}
-                                />
 
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
-                                    <TouchableOpacity style={styles.buttonVoltar} onPress={() => setStep(0)}>
-                                        <Text style={styles.buttonText}>Voltar</Text>
-                                    </TouchableOpacity>
-
-                                    <TouchableOpacity style={styles.button} onPress={() => setStep(2)}>
-                                        <Text style={styles.buttonText}>Próximo</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </Content>,
-                        },
-                        {
-                            id: 3,
-                            title: <Title>Login</Title>,
-                            content: <Content>
-                                <View>
-                                    <FormDadosLogin
-                                        dados={dados}
-                                        onInputChange={handleInputChange}
+                                <View style={styles.inputView}>
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="Nome Completo"
+                                        value={nome}
+                                        onChangeText={(text) => setNome(text)}
                                     />
-
-                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
-                                        <TouchableOpacity style={styles.buttonVoltar} onPress={() => setStep(1)}>
-                                            <Text style={styles.buttonText}>Voltar</Text>
-                                        </TouchableOpacity>
-
-                                        <TouchableOpacity style={styles.button} onPress={() => handlePayment()}>
-                                            <Text style={styles.buttonText}>Finalizar Cadastro</Text>
-                                        </TouchableOpacity>
-                                    </View>
+                                    {errors.nome && <Text style={styles.errorText}>{errors.nome[0]}</Text>}
                                 </View>
-                            </Content>,
-                        },
-                    ]}
-                    colors={{
-                        title: {
-                            text: {
-                                normal: '#66b0ff',
-                                active: '#007bff',
-                                completed: '#007bff',
-                            },
-                        },
-                        marker: {
-                            text: {
-                                normal: '#66b0ff',
-                                active: '#007bff',
-                                completed: '#f4f3ee',
-                            },
-                            line: {
-                                normal: '#66b0ff',
-                                active: '#007bff',
-                                completed: '#007bff',
-                            },
-                        },
-                    }}
-                />
+
+                                <View style={styles.inputView}>
+                                    <TextInputMask
+                                        style={styles.input}
+                                        type={'cpf'}
+                                        value={cpf}
+                                        onChangeText={(text) => setCpf(text)}
+                                        placeholder="CPF"
+                                    />
+                                    {errors.cpf && <Text style={styles.errorText}>{errors.cpf[0]}</Text>}
+                                </View>
+
+                                <View style={styles.inputView}>
+                                    <TextInputMask
+                                        style={styles.input}
+                                        type={'cel-phone'}
+                                        options={{
+                                            maskType: 'BRL',
+                                            withDDD: true,
+                                            dddMask: '(99) '
+                                        }}
+                                        value={telefone}
+                                        placeholder="Telefone"
+                                        onChangeText={(text) => setTelefone(text)}
+                                    />
+                                    {errors.telefone && <Text style={styles.errorText}>{errors.telefone[0]}</Text>}
+                                </View>
+                            </View>
+                        )}
+
+                        {currentStep === 2 && (
+                            <View style={{ flex: 1 }}>
+                                <Text style={{ textAlign: 'center', margin: 20, fontSize: 16, fontWeight: 'bold' }}>
+                                    Endereço
+                                </Text>
+
+                                <View style={styles.inputView}>
+                                    <TextInputMask
+                                        style={styles.input}
+                                        type={'zip-code'}
+                                        value={cep}
+                                        placeholder="CEP"
+                                        onChangeText={(text) => pesquisacep(text)}
+                                    />
+                                    {errors.cep && <Text style={styles.errorText}>{errors.cep[0]}</Text>}
+                                </View>
+
+                                <View style={styles.inputView}>
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="Rua"
+                                        value={rua}
+                                        onChangeText={(text) => setRua(text)}
+                                    />
+                                    {errors.rua && <Text style={styles.errorText}>{errors.rua[0]}</Text>}
+                                </View>
+
+                                <View style={styles.inputView}>
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="Bairro"
+                                        value={bairro}
+                                        onChangeText={(text) => setBairro(text)}
+                                    />
+                                    {errors.bairro && <Text style={styles.errorText}>{errors.bairro[0]}</Text>}
+                                </View>
+
+                                <View style={styles.inputView}>
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="Número"
+                                        value={numero}
+                                        onChangeText={(text) => setNumero(text)}
+                                    />
+                                    {errors.numero && <Text style={styles.errorText}>{errors.numero[0]}</Text>}
+                                </View>
+
+                                <View style={styles.inputView}>
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="Complemento"
+                                        value={complemento}
+                                        onChangeText={(text) => setComplemento(text)}
+                                    />
+                                    {errors.complemento && <Text style={styles.errorText}>{errors.complemento[0]}</Text>}
+                                </View>
+
+                                <View style={styles.inputView}>
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="Cidade"
+                                        value={cidade}
+                                        onChangeText={(text) => setCidade(text)}
+                                    />
+                                    {errors.cidade && <Text style={styles.errorText}>{errors.cidade[0]}</Text>}
+                                </View>
+
+                                <View style={styles.inputView}>
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="Estado"
+                                        value={estado}
+                                        onChangeText={(text) => setEstado(text)}
+                                    />
+                                    {errors.estado && <Text style={styles.errorText}>{errors.estado[0]}</Text>}
+                                </View>
+                            </View>
+                        )}
+
+                        {currentStep === 3 && (
+                            <View>
+                                <Text style={{ textAlign: 'center', margin: 20, fontSize: 16, fontWeight: 'bold' }}>
+                                    Dados de Login
+                                </Text>
+
+                                <View style={styles.inputView}>
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="E-mail"
+                                        value={email}
+                                        onChangeText={(text) => setEmail(text)}
+                                    />
+                                    {errors.email && <Text style={styles.errorText}>{errors.email[0]}</Text>}
+                                </View>
+
+                                <View style={styles.inputView}>
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="Senha"
+                                        secureTextEntry
+                                        value={password}
+                                        onChangeText={(text) => setPassword(text)}
+                                    />
+                                    {errors.password && <Text style={styles.errorText}>{errors.password[0]}</Text>}
+                                </View>
+                            </View>
+                        )}
+
+                        <View style={styles.buttonContainer}>
+                            {currentStep == 1 && (
+                                <TouchableOpacity
+                                    style={styles.buttonVoltar}
+                                    onPress={backToLogin}
+                                >
+                                    <Text style={styles.buttonText}>Voltar</Text>
+                                </TouchableOpacity>
+                            )}
+                            {currentStep > 1 && (
+                                <TouchableOpacity
+                                    style={styles.buttonVoltar}
+                                    onPress={handlePrevious}
+                                >
+                                    <Text style={styles.buttonText}>Voltar</Text>
+                                </TouchableOpacity>
+                            )}
+                            {currentStep < 3 && (
+                                <TouchableOpacity style={styles.button} onPress={handleNext}>
+                                    <View style={styles.buttonContent}>
+                                        <Text style={styles.buttonText}>Próximo</Text>
+                                    </View>
+                                </TouchableOpacity>
+                            )}
+                            {currentStep === 3 && (
+                                <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={isLoading}>
+                                    <View style={styles.buttonContent}>
+                                        {isLoading ? (
+                                            <>
+                                                <ActivityIndicator
+                                                    style={styles.loadingIndicator}
+                                                    size="small"
+                                                    color="#fff"
+                                                />
+                                                <Text style={styles.buttonText}>Aguarde</Text>
+                                            </>
+                                        ) : (
+                                            <Text style={styles.buttonText}>Finalizar Cadastro</Text>
+                                        )}
+                                    </View>
+                                </TouchableOpacity>
+                            )}
+                        </View>
+                    </>
+                )}
             </ScrollView>
         </KeyboardAvoidingView>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        flexGrow: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-        padding: 20,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-    },
-    imageContainer: {
-        width: 120,
-        height: 120,
-        borderRadius: 60,
-        backgroundColor: '#e0e0e0',
-        alignItems: 'center',
-        justifyContent: 'center',
-        overflow: 'hidden',
-        marginBottom: 20,
-    },
-    image: {
-        width: '100%',
-        height: '100%',
-    },
-    imagePlaceholder: {
-        color: '#7d7d7d',
-        fontSize: 14,
-        textAlign: 'center',
-    },
-    input: {
-        width: '100%',
-        padding: 10,
-        marginBottom: 10,
-        borderWidth: 1,
-        borderRadius: 5,
-        borderColor: '#ccc',
-    },
-    button: {
-        backgroundColor: '#007BFF',
-        padding: 10,
-        borderRadius: 5,
-        marginLeft: 10,
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-        textAlign: 'center',
-    },
-    buttonVoltar: {
-        backgroundColor: '#6c757d',
-        padding: 10,
-        borderRadius: 5,
-        marginRight: 10,
-    },
-    buttonTextVoltar: {
-        color: '#DDDDDD',
-        fontSize: 16,
-        fontWeight: 'bold',
-        textAlign: 'center',
-    },
-    registerContainer: {
-        flexDirection: 'row',
-        marginBottom: 5,
-    },
-    registerText: {
-        fontSize: 14,
-    },
-    registerLink: {
-        fontSize: 14,
-        fontWeight: 'bold',
-        color: '#007BFF',
-        marginLeft: 5,
-    },
-    buttonsContainer: {
-        flexDirection: 'row',
-        marginTop: 5,
-    },
-    inputView: {
-        width: '100%',
-    },
-    errorText: {
-        marginBottom: 5,
-        color: 'red'
-    },
-    select: {
-        borderWidth: 1,
-        marginTop: 10,
-        paddingHorizontal: 10,
-        height: 50,
-        backgroundColor: '#f5f5f5',
-        borderRadius: 5,
-    },
-    label: {
-        marginBottom: 5,
-        fontSize: 16,
-        color: '#333',
-    },
-});
 
 export default RegisterScreen;

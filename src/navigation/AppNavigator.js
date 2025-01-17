@@ -2,13 +2,14 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import LoginScreen from '../screens/LoginScreen';
-import PointsScreen from '../screens/PontoScreen';
+import PontoScreen from '../screens/PontoScreen';
 import EventosScreen from '../screens/EventosScreen';
-import RastreamentoScreen from '../screens/RastreamentoScreen'; // Novo componente de Rastreamento
+import RastreamentoScreen from '../screens/RastreamentoScreen';
 import RegisterScreen from '../screens/RegisterScreen';
-import CadastrarPontoScreen from '../screens/points/CadastrarPontoScreen'
-import { Text } from 'react-native';
+import FormCadastrarPontoScreen from '../components/forms/FormCadastrarPontoScreen'
+import PerfilScreen from '../screens/PerfilScreen';
 import { Ionicons } from '@expo/vector-icons';
+import PontosListScreen from '../screens/PontosListScreen'
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -26,7 +27,10 @@ function BottomTabNavigator() {
             iconName = 'calendar-outline';
           } else if (route.name === 'Rastreamento') {
             iconName = 'map-outline';
+          } else if (route.name === 'Perfil') {
+            iconName = 'person-outline';
           }
+
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: '#fff', // Cor dos ícones ativos
@@ -44,9 +48,10 @@ function BottomTabNavigator() {
         },
       })}
     >
-      <Tab.Screen name="Points" component={PointsScreen} />
+      <Tab.Screen name="Pontos" component={PontosListScreen} />
       <Tab.Screen name="Eventos" component={EventosScreen} />
       <Tab.Screen name="Rastreamento" component={RastreamentoScreen} />
+      <Tab.Screen name="Perfil" component={PerfilScreen} />
     </Tab.Navigator>
   );
 }
@@ -85,8 +90,13 @@ export default function AppNavigator() {
       />
       <Stack.Screen
         name="CadastrarPonto"
-        component={CadastrarPontoScreen}
+        component={FormCadastrarPontoScreen}
         options={{ headerShown: true, title: "Cadastrar Ponto" }}
+      />
+      <Stack.Screen
+        name="PontoScreen"
+        component={PontoScreen}
+        options={{ title: 'Detalhes do Ponto' }}
       />
     </Stack.Navigator>
   );

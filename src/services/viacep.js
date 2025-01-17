@@ -1,16 +1,16 @@
 const pesquisacep = async (valor) => {
-    var cep = valor.replace(/\D/g, '');
+    const cep = valor.replace(/\D/g, '');
 
-    if (cep != "") {
-        var validacep = /^[0-9]{8}$/;
+    try {
+        if (cep.length != 8) return;
 
-        //Valida o formato do CEP.
-        if(validacep.test(cep)) {
-            document.getElementById('rua').value="...";
-            document.getElementById('bairro').value="...";
-            document.getElementById('cidade').value="...";
-            document.getElementById('uf').value="...";
-            document.getElementById('ibge').value="...";
-        }
+        const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        const data = await response.json();
+        
+        return data;
+    } catch (error) {
+        console.error('Erro ao buscar o CEP:', error);
     }
 };
+
+export default pesquisacep;

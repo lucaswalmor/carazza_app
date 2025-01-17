@@ -17,9 +17,9 @@ export const handleIntegration = async (emailDoUsuario) => {
             ]
         },
         "preapproval_plan_id": "2c938084726fca480172750000000000",
-        "back_url": "https://3e66-2804-1e68-c209-4131-257c-2895-c349-d7b3.ngrok-free.app/api/mercadopago-webhook"
+        "back_url": "/mercadopago-webhook"
     };
- 
+
     try {
         const response = await fetch('https://api.mercadopago.com/preapproval_plan', {
             method: 'POST',
@@ -29,7 +29,7 @@ export const handleIntegration = async (emailDoUsuario) => {
             },
             body: JSON.stringify(plano)
         });
-        
+
         const data = await response.json();
 
         console.log(data)
@@ -44,3 +44,24 @@ export const criarAssinatura = async (idDoPlano) => {
     const url = `https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=${idDoPlano}`;
     await openBrowserAsync(url);
 };
+
+// const handlePayment = async () => {
+//     console.log(dados)
+//     const data = await handleIntegration(dados.email);
+//     console.log(data)
+
+//     if (!data) {
+//         console.log('Erro ao criar plano');
+//         return;
+//     }
+
+//     const subscriptionId = data.id; // ID da assinatura
+//     const customerData = {
+//         name: dados.name,
+//         email: dados.email,
+//         subscriptionId,
+//     };
+
+//     const url = `https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=${data}`;
+//     await openBrowserAsync(url);
+// };
