@@ -71,7 +71,7 @@ const PontoScreen = ({ route }) => {
     if (isLoading) {
         return (
             <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#007bff" />
+                <ActivityIndicator size="large" color="#007BFF" />
             </View>
         );
     }
@@ -91,6 +91,7 @@ const PontoScreen = ({ route }) => {
 
     return (
         <ScrollView style={styles.container}>
+            {/* Card 1: Video */}
             <View style={{}}>
                 <WebView
                     originWhitelist={['*']}
@@ -113,6 +114,7 @@ const PontoScreen = ({ route }) => {
                 />
             </View>
 
+            {/* Card 2: Informações */}
             <Card style={styles.card}>
                 <Card.Title title="Informações" />
                 <Card.Content>
@@ -123,7 +125,7 @@ const PontoScreen = ({ route }) => {
                 </Card.Content>
             </Card>
 
-            {/* Card 2: Informações */}
+            {/* Card 3: Horários */}
             <Card style={styles.card}>
                 <Card.Title title="Horários" />
                 <Card.Content>
@@ -132,6 +134,7 @@ const PontoScreen = ({ route }) => {
                 </Card.Content>
             </Card>
 
+            {/* Card 4: Valores */}
             <Card style={styles.card}>
                 <Card.Title title="Valors do local" />
                 <Card.Content>
@@ -147,22 +150,16 @@ const PontoScreen = ({ route }) => {
                 </Card.Content>
             </Card>
 
-            {/* Card 1: Localização */}
+            {/* Card 5: Localização */}
             <Card style={[styles.card, {marginBottom: 50}]}>
                 <Card.Title title="Localização" />
                 <Card.Content>
                     <Text style={styles.infoLabel}>CEP:</Text>
                     <Text style={styles.infoText}>{ponto.cep}</Text>
                     <Text style={styles.infoLabel}>Rua:</Text>
-                    <Text style={styles.infoText}>{ponto.rua}</Text>
-                    <Text style={styles.infoLabel}>Bairro:</Text>
-                    <Text style={styles.infoText}>{ponto.bairro}</Text>
-                    <Text style={styles.infoLabel}>Cidade:</Text>
-                    <Text style={styles.infoText}>{ponto.cidade}</Text>
-                    <Text style={styles.infoLabel}>Estado:</Text>
-                    <Text style={styles.infoText}>{ponto.estado}</Text>
-                    <Text style={styles.infoLabel}>Número:</Text>
-                    <Text style={styles.infoText}>{ponto.numero}</Text>
+                    <Text style={styles.infoText}>{ponto.rua}, nº {ponto.numero}, {ponto.bairro}</Text>
+                    <Text style={styles.infoLabel}>Cidade - Estado</Text>
+                    <Text style={styles.infoText}>{ponto.cidade} - {ponto.estado}</Text>
 
                     <Button mode="contained" onPress={openMap} style={styles.button}>
                         Ver no Mapa
@@ -264,7 +261,7 @@ const styles = StyleSheet.create({
     },
     button: {
         marginTop: 10,
-        backgroundColor: '#007bff',
+        backgroundColor: '#007BFF',
     },
 });
 

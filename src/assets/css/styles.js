@@ -50,6 +50,15 @@ const styles = StyleSheet.create({
         marginTop: 10,
         padding: 10
     },
+    buttonDanger: {
+        height: 50,
+        backgroundColor: '#E8003F',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 5,
+        marginTop: 10,
+        padding: 10
+    },
     buttonSelectImage: {
         height: 50,
         backgroundColor: '#9333EA',
@@ -130,6 +139,19 @@ const styles = StyleSheet.create({
         borderBottomWidth: 5,
         borderBottomColor: '#007BFF',
     },
+    cardDanger: {
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        padding: 15,
+        marginBottom: 10,
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.2,
+        shadowRadius: 1,
+        borderBottomWidth: 5,
+        borderBottomColor: '#E8003F',
+    },
     h1: {
         fontSize: 32,
         fontWeight: 'bold'
@@ -157,7 +179,27 @@ const styles = StyleSheet.create({
     p: {
         fontSize: 16,
         fontWeight: 'normal'
-    }
+    },
+    textDanger: {
+        color: '#E8003F'
+    },
+    avatar: {
+        width: 60,
+        height: 60,
+        borderRadius: 50,
+        resizeMode: 'cover',
+    },
+    infoLabel: {
+        fontSize: 14,
+        color: '#777',
+        marginTop: 8,
+        fontWeight: 'bold',
+    },
+    infoText: {
+        fontSize: 16,
+        color: '#333',
+        marginBottom: 8,
+    },
 })
 
 export default styles

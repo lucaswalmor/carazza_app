@@ -60,7 +60,7 @@ const PointsScreen = ({ navigation }) => {
     if (isLoading) {
         return (
             <View style={stylesPontoListScreen.loadingContainer}>
-                <ActivityIndicator size="large" color="#007bff" />
+                <ActivityIndicator size="large" color="#007BFF" />
             </View>
         );
     }

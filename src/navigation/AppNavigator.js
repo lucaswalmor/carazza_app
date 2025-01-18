@@ -10,6 +10,7 @@ import FormCadastrarPontoScreen from '../components/forms/FormCadastrarPontoScre
 import PerfilScreen from '../screens/PerfilScreen';
 import { Ionicons } from '@expo/vector-icons';
 import PontosListScreen from '../screens/PontosListScreen'
+import EncontrosScreen from '../screens/EncontrosScreen'
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -29,6 +30,8 @@ function BottomTabNavigator() {
             iconName = 'map-outline';
           } else if (route.name === 'Perfil') {
             iconName = 'person-outline';
+          } else if (route.name === 'Encontros') {
+            iconName = 'location-outline';
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
@@ -36,11 +39,11 @@ function BottomTabNavigator() {
         tabBarActiveTintColor: '#fff', // Cor dos ícones ativos
         tabBarInactiveTintColor: '#000c19', // Cor dos ícones inativos
         tabBarStyle: {
-          backgroundColor: '#007bff', // Cor de fundo da aba
+          backgroundColor: '#007BFF', // Cor de fundo da aba
           borderTopWidth: 0,         // Remove a borda superior
         },
         headerStyle: {
-          backgroundColor: '#007bff', // Cor de fundo do cabeçalho
+          backgroundColor: '#007BFF', // Cor de fundo do cabeçalho
         },
         headerTintColor: '#FFFFFF', // Cor do texto no cabeçalho
         headerTitleStyle: {
@@ -50,7 +53,8 @@ function BottomTabNavigator() {
     >
       <Tab.Screen name="Pontos" component={PontosListScreen} />
       <Tab.Screen name="Eventos" component={EventosScreen} />
-      <Tab.Screen name="Rastreamento" component={RastreamentoScreen} />
+      <Tab.Screen name="Encontros" component={EncontrosScreen} />
+      {/* <Tab.Screen name="Rastreamento" component={RastreamentoScreen} /> */}
       <Tab.Screen name="Perfil" component={PerfilScreen} />
     </Tab.Navigator>
   );
@@ -62,7 +66,7 @@ export default function AppNavigator() {
     <Stack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: '#007bff', // Cor de fundo do cabeçalho
+          backgroundColor: '#007BFF', // Cor de fundo do cabeçalho
         },
         headerTintColor: '#FFFFFF', // Cor do texto no cabeçalho
         headerTitleStyle: {

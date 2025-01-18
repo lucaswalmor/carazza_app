@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "carazza_app",
-    "slug": "carazza_app",
+    "name": "Carazza",
+    "slug": "Carazza",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -59,13 +59,19 @@
             ]
           }
         ]
-      }
+      },
+      "package": "com.lucassteinbach.Carazza"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-video"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "46342c8e-a108-467a-a99b-c3040353a164"
+      }
+    }
   }
 }

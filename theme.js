@@ -39,7 +39,7 @@ const customTheme = {
             "level2": "#4da3ff",
             "level3": "#3395ff",
             "level4": "#1a88ff",
-            "level5": "#007bff"
+            "level5": "#007BFF"
         },
         "surfaceDisabled": "rgba(29, 27, 30, 0.12)",
         "onSurfaceDisabled": "rgba(29, 27, 30, 0.38)",

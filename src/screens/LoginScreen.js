@@ -1,27 +1,69 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, ActivityIndicator, Alert } from 'react-native';
 import styles from '../assets/css/styles';
 import api from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Modal, Portal } from 'react-native-paper';
+import * as LocalAuthentication from 'expo-local-authentication';
 
 export default function LoginScreen({ navigation }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
+    const [visible, setVisible] = useState(false);
 
-    const handleLogin = async () => {
+    useEffect(() => {
+        checkBiometricAuth();
+    }, []);
+
+    const showModal = () => setVisible(true);
+    const hideModal = () => setVisible(false);
+    const containerStyle = { backgroundColor: 'white', padding: 20, margin: 20 };
+
+    const checkBiometricAuth = async () => {
+        const storedEmail = await AsyncStorage.getItem('email');
+        const storedPassword = await AsyncStorage.getItem('password');
+        if (storedEmail && storedPassword) {
+            handleBiometricLogin();
+        }
+    };
+
+    const handleBiometricLogin = async () => {
+        const compatible = await LocalAuthentication.hasHardwareAsync();
+        if (!compatible) {
+            Alert.alert('Este dispositivo não tem suporte para autenticação biométrica.');
+            return;
+        }
+
+        const result = await LocalAuthentication.authenticateAsync();
+
+        if (result.success) {
+            const storedEmail = await AsyncStorage.getItem('email');
+            const storedPassword = await AsyncStorage.getItem('password');
+
+            if (storedEmail != null && storedPassword != null) {
+                handleLogin(storedEmail, storedPassword);
+            }
+        } else {
+            Alert.alert('Falha na autenticação biométrica');
+        }
+    };
+
+    const handleLogin = async (emailBiometria, passwordBiometria) => {
         setIsLoading(true);
-
         try {
-            const response = await api.post('/login', { email: email, password: password });
-
+            const response = await api.post('/login', { email: email || emailBiometria, password: password || passwordBiometria });
             const data = response.data;
+            await AsyncStorage.setItem('email', email || emailBiometria);
+            await AsyncStorage.setItem('password', password || passwordBiometria);
 
             if (data && data.user.subscription_status) {
                 await AsyncStorage.setItem('user', JSON.stringify(data.user));
                 await AsyncStorage.setItem('token', data.token);
                 navigation.replace('Main');
+            } else {
+                showModal();
             }
         } catch (error) {
             if (error.response && error.response.data) {
@@ -37,6 +79,28 @@ export default function LoginScreen({ navigation }) {
 
     const handleRegisterNavigation = () => {
         navigation.navigate('Register');
+    };
+
+    const handlePauseSubscription = async () => {
+        const token = await AsyncStorage.getItem('token');
+        const user = JSON.parse(await AsyncStorage.getItem('user'));
+
+        if (!email) {
+            Alert.alert('Porfavor Digite seu E-MAIL');
+        }
+
+        if (user && token) {
+            try {
+                setIsLoading(true);
+                const response = await api.get(`/stripe/subscription/resume?email=${email}`);
+                hideModal();
+                handleLogin();
+            } catch (error) {
+                console.error('Erro ao enviar o formulário:', error);
+            } finally {
+                setIsLoading(false)
+            }
+        }
     };
 
     return (
@@ -85,6 +149,31 @@ export default function LoginScreen({ navigation }) {
                     )}
                 </View>
             </TouchableOpacity>
+
+            <Portal style={{ margin: 20 }}>
+                <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={containerStyle}>
+                    <Text style={{ fontSize: 18 }}>
+                        Seu plano está pausado, gostaria de reativa-lo?
+                    </Text>
+
+                    <TouchableOpacity style={styles.button} onPress={handlePauseSubscription} disabled={isLoading}>
+                        <View style={styles.buttonContent}>
+                            {isLoading ? (
+                                <>
+                                    <ActivityIndicator
+                                        style={styles.loadingIndicator}
+                                        size="small"
+                                        color="#fff"
+                                    />
+                                    <Text style={styles.buttonText}>Aguarde</Text>
+                                </>
+                            ) : (
+                                <Text style={styles.buttonText}>Reativar Assinatura</Text>
+                            )}
+                        </View>
+                    </TouchableOpacity>
+                </Modal>
+            </Portal>
         </View>
     );
 }

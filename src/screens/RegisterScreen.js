@@ -149,8 +149,8 @@ const RegisterScreen = ({ navigation }) => {
                 customerEphemeralKeySecret: ephemeralKey,
                 paymentIntentClientSecret: paymentIntent,
                 googlePay: {
-                    merchantCountryCode: 'BR', // Seu código de país
-                    testEnv: true, // Altere para false em produção
+                    merchantCountryCode: 'BR',
+                    testEnv: true,
                 },
             });
 
@@ -159,7 +159,6 @@ const RegisterScreen = ({ navigation }) => {
                 return;
             }
 
-            // Exibir o modal do Payment Sheet
             const paymentResult = await presentPaymentSheet();
 
             if (paymentResult.error) {
