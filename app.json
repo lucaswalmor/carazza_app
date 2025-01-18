@@ -24,12 +24,13 @@
             {
               "scheme": "myapp",
               "host": "checkout",
-              "pathPrefix": "/success",
-              "pathPrefix": "/failure",
               "pathPrefix": "/pending"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ]
     },
@@ -49,18 +50,22 @@
               {
                 "scheme": "myapp",
                 "host": "checkout",
-                "pathPrefix": "/success",
-                "pathPrefix": "/failure",
                 "pathPrefix": "/pending"
               }
             ],
-            "category": ["BROWSABLE", "DEFAULT"]
+            "category": [
+              "BROWSABLE",
+              "DEFAULT"
+            ]
           }
         ]
       }
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-video"
+    ]
   }
 }

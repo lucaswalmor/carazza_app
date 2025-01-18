@@ -9,13 +9,13 @@ import {
     Image
 } from 'react-native';
 import { MaskedTextInput } from "react-native-mask-text";
-import { Button, Dialog, Portal, Snackbar } from 'react-native-paper';
 import styles from '../../assets/css/styles';
 import pesquisacep from '../../services/viacep';
 import { TextInputMask } from 'react-native-masked-text';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../../services/api';
 import * as ImagePicker from 'expo-image-picker';
+import { Ionicons } from '@expo/vector-icons';
 
 const CadastrarPonto = ({ navigation }) => {
     const [isLoading, setIsLoading] = useState(false);
@@ -354,18 +354,15 @@ const CadastrarPonto = ({ navigation }) => {
             </View>
 
             <TouchableOpacity
-                style={[styles.button, isDisabled && { backgroundColor: '#ccc' }, { flex: 1 }]}
+                style={[styles.buttonSelectImage, isDisabled && { backgroundColor: '#ccc' }]}
                 onPress={pickImage}
                 disabled={isDisabled}
             >
+                <Ionicons name="cloud-upload-outline" size={20} color="#fff" style={{ marginRight: 8 }} />
                 <Text style={styles.buttonText}>Fotos do Local</Text>
             </TouchableOpacity>
 
-            <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
-                <TouchableOpacity style={styles.buttonVoltar} onPress={voltar}>
-                    <Text style={styles.buttonText}>Voltar</Text>
-                </TouchableOpacity>
-
+            <View style={{ flex: 1 }}>
                 <TouchableOpacity style={styles.button} onPress={handleSubmit}>
                     <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                         {isLoading ? (

@@ -50,6 +50,16 @@ const styles = StyleSheet.create({
         marginTop: 10,
         padding: 10
     },
+    buttonSelectImage: {
+        height: 50,
+        backgroundColor: '#9333EA',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'row',
+        borderRadius: 5,
+        marginTop: 10,
+        padding: 10
+    },
     buttonVoltar: {
         height: 50,
         backgroundColor: '#6c757d',

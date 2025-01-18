@@ -6,14 +6,12 @@ import api from '../services/api';
 import styles from '../assets/css/styles';
 
 const PointsScreen = ({ navigation }) => {
-    const [playing, setPlaying] = useState(false);
-    const [token, setToken] = useState('');
     const [user, setUser] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [pontos, setPontos] = useState([]);
 
     const CadastrarPonto = () => {
-        navigation.replace('CadastrarPonto');
+        navigation.navigate('CadastrarPonto');
     };
 
     const getUser = async () => {
@@ -85,15 +83,6 @@ const PointsScreen = ({ navigation }) => {
                     />
                 </View>
             )}
-
-            {/* <View style={{ flex: 1, padding: 10 }}>
-                <YoutubePlayer
-                    height={200}
-                    play={true}
-                    videoId="XVstIx75NS8"
-                    onChangeState={(state) => console.log(state)}
-                />
-            </View> */}
         </View>
     );
 };

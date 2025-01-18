@@ -7,12 +7,43 @@ import { Button, Card } from 'react-native-paper';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location'; // Importa a biblioteca de localização do Expo
 // import styles from '../assets/css/styles';
+import { useEvent } from 'expo';
+import { WebView } from 'react-native-webview';
 
 const PontoScreen = ({ route }) => {
+    const embedHTML = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          </head>
+          <body style="margin:0;padding:0;">
+            <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@brunocarazza3/video/7418940621391547654" data-video-id="7418940621391547654" style="max-width: 605px;min-width: 325px;" > <section> <a target="_blank" title="@brunocarazza3" href="https://www.tiktok.com/@brunocarazza3?refer=embed">@brunocarazza3</a> <p>Me siga pra mais videos ..</p> <a target="_blank" title="♬ som original - Bruno Carazza" href="https://www.tiktok.com/music/som-original-7418940659736709894?refer=embed">♬ som original - Bruno Carazza</a> </section> </blockquote> <script async src="https://www.tiktok.com/embed.js"></script>
+          <script async src="https://www.tiktok.com/embed.js"></script>
+          </body>
+        </html>
+      `;
     const { id } = route.params;
     const [ponto, setPonto] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
-    const mapRef = useRef(null);
+
+    const handleNavigation = (event) => {
+        const url = event.url;
+
+        // Verifica se é uma URL desconhecida ou um esquema externo
+        if (url.startsWith('http') || url.startsWith('https')) {
+            // Permite links regulares
+            return true;
+        } else {
+            // Impede carregamento de esquemas desconhecidos e tenta abrir no app nativo
+            try {
+                Linking.openURL(url); // Abre no app correspondente
+            } catch (e) {
+                console.warn('Erro ao tentar abrir o link:', url);
+            }
+            return false; // Bloqueia o carregamento da URL na WebView
+        }
+    };
 
     useEffect(() => {
         const fetchPonto = async () => {
@@ -60,21 +91,27 @@ const PontoScreen = ({ route }) => {
 
     return (
         <ScrollView style={styles.container}>
-            {/* Card 3: Vídeo */}
-            <Card style={[styles.card, { marginBottom: 30 }]}>
-                <Card.Title title="Vídeo" />
-                <Card.Content>
-                    <View style={{ flex: 1, padding: 10 }}>
-                        <YoutubePlayer
-                            height={200}
-                            play={false}
-                            videoId={ponto.codigo_video}
-                            onChangeState={(state) => console.log(state)}
-                            forceAndroidAutoplay={true}
-                        />
-                    </View>
-                </Card.Content>
-            </Card>
+            <View style={{}}>
+                <WebView
+                    originWhitelist={['*']}
+                    source={{
+                        html:
+                            `
+                            <!DOCTYPE html>
+                            <html>
+                                <head>
+                                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                </head>
+                                <body style="margin:0;padding:0;">
+                                    ${ponto.codigo_video}
+                                </body>
+                            </html>
+                        `
+                    }}
+                    style={{ width: '100%', height: 750 }}
+                    onShouldStartLoadWithRequest={handleNavigation}
+                />
+            </View>
 
             <Card style={styles.card}>
                 <Card.Title title="Informações" />
@@ -111,7 +148,7 @@ const PontoScreen = ({ route }) => {
             </Card>
 
             {/* Card 1: Localização */}
-            <Card style={styles.card}>
+            <Card style={[styles.card, {marginBottom: 50}]}>
                 <Card.Title title="Localização" />
                 <Card.Content>
                     <Text style={styles.infoLabel}>CEP:</Text>
@@ -159,6 +196,20 @@ const PontoScreen = ({ route }) => {
 };
 
 const styles = StyleSheet.create({
+    contentContainer: {
+        flex: 1,
+        padding: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: 50,
+    },
+    video: {
+        width: 350,
+        height: 275,
+    },
+    controlsContainer: {
+        padding: 10,
+    },
     container: {
         flex: 1,
         backgroundColor: '#fff',

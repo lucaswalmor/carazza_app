@@ -21,7 +21,7 @@ function BottomTabNavigator() {
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
           let iconName;
-          if (route.name === 'Points') {
+          if (route.name === 'Pontos') {
             iconName = 'home-outline';
           } else if (route.name === 'Eventos') {
             iconName = 'calendar-outline';
