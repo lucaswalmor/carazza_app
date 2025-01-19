@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, ActivityIndicator, Button, Modal as RNModal, Alert } from 'react-native';
 import styles from '../assets/css/styles';
 import api from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Modal, Portal } from 'react-native-paper';
 import * as LocalAuthentication from 'expo-local-authentication';
 
 export default function LoginScreen({ navigation }) {
@@ -11,19 +10,17 @@ export default function LoginScreen({ navigation }) {
     const [password, setPassword] = useState('');
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
-    const [visible, setVisible] = useState(false);
+    const [modalVisible, setModalVisible] = React.useState(false);
 
     useEffect(() => {
+        Alert.alert('Entrou na tela de login')
         checkBiometricAuth();
     }, []);
-
-    const showModal = () => setVisible(true);
-    const hideModal = () => setVisible(false);
-    const containerStyle = { backgroundColor: 'white', padding: 20, margin: 20 };
 
     const checkBiometricAuth = async () => {
         const storedEmail = await AsyncStorage.getItem('email');
         const storedPassword = await AsyncStorage.getItem('password');
+        Alert.alert('Entrou funcao de checar a biometria')
         if (storedEmail && storedPassword) {
             handleBiometricLogin();
         }
@@ -46,7 +43,7 @@ export default function LoginScreen({ navigation }) {
                 handleLogin(storedEmail, storedPassword);
             }
         } else {
-            Alert.alert('Falha na autenticação biométrica');
+            // Alert.alert('Falha na autenticação biométrica');
         }
     };
 
@@ -63,7 +60,7 @@ export default function LoginScreen({ navigation }) {
                 await AsyncStorage.setItem('token', data.token);
                 navigation.replace('Main');
             } else {
-                showModal();
+                setModalVisible(true)
             }
         } catch (error) {
             if (error.response && error.response.data) {
@@ -86,14 +83,13 @@ export default function LoginScreen({ navigation }) {
         const user = JSON.parse(await AsyncStorage.getItem('user'));
 
         if (!email) {
-            Alert.alert('Porfavor Digite seu E-MAIL');
+            Alert.alert('Porfavor Digite seu e-mail');
         }
 
         if (user && token) {
             try {
                 setIsLoading(true);
                 const response = await api.get(`/stripe/subscription/resume?email=${email}`);
-                hideModal();
                 handleLogin();
             } catch (error) {
                 console.error('Erro ao enviar o formulário:', error);
@@ -150,30 +146,44 @@ export default function LoginScreen({ navigation }) {
                 </View>
             </TouchableOpacity>
 
-            <Portal style={{ margin: 20 }}>
-                <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={containerStyle}>
-                    <Text style={{ fontSize: 18 }}>
-                        Seu plano está pausado, gostaria de reativa-lo?
-                    </Text>
 
-                    <TouchableOpacity style={styles.button} onPress={handlePauseSubscription} disabled={isLoading}>
-                        <View style={styles.buttonContent}>
-                            {isLoading ? (
-                                <>
-                                    <ActivityIndicator
-                                        style={styles.loadingIndicator}
-                                        size="small"
-                                        color="#fff"
-                                    />
-                                    <Text style={styles.buttonText}>Aguarde</Text>
-                                </>
-                            ) : (
-                                <Text style={styles.buttonText}>Reativar Assinatura</Text>
-                            )}
+            <RNModal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View style={styles.modalCenteredView}>
+                    <View style={styles.modalView}>
+                        <Text style={styles.h4}>
+                            Sua assinatura expirou ou está pausada, gostaria de renovar sua assinatura ?
+                        </Text>
+
+                        <View style={{ flexDirection: 'row', gap: 20 }}>
+                            <TouchableOpacity style={styles.buttonSecondary} onPress={() => setModalVisible(false)} disabled={isLoading}>
+                                <Text style={styles.buttonText}>Cancelar</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity style={styles.button} onPress={handlePauseSubscription} disabled={isLoading}>
+                                <View style={[styles.buttonContent, { flex: 1 }]}>
+                                    {isLoading ? (
+                                        <>
+                                            <ActivityIndicator
+                                                style={styles.loadingIndicator}
+                                                size="small"
+                                                color="#fff"
+                                            />
+                                            <Text style={styles.buttonText}>Aguarde</Text>
+                                        </>
+                                    ) : (
+                                        <Text style={styles.buttonText}>Renovar</Text>
+                                    )}
+                                </View>
+                            </TouchableOpacity>
                         </View>
-                    </TouchableOpacity>
-                </Modal>
-            </Portal>
+                    </View>
+                </View>
+            </RNModal>
         </View>
     );
 }

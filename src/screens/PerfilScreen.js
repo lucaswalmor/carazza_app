@@ -3,7 +3,6 @@ import { View, TouchableOpacity, Text, ActivityIndicator, Image } from 'react-na
 import api from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../assets/css/styles';
-import { Card } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function PerfilScreen({ navigation }) {
@@ -25,7 +24,7 @@ export default function PerfilScreen({ navigation }) {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            
+
             await AsyncStorage.removeItem('token');
             navigation.navigate('Login');
         }
@@ -95,7 +94,7 @@ export default function PerfilScreen({ navigation }) {
                     {/* Card 1: Avatar */}
                     <View style={[styles.card, { gap: 10, flexDirection: 'row', alignItems: 'center' }]}>
                         <Image
-                            source={{ uri: user?.img_perfil || 'https://via.placeholder.com/100' }}
+                            source={{ uri: user?.img_perfil || 'https://i.ibb.co/5kkRBSS/default-Avatar.png' }}
                             style={styles.avatar}
                             onError={() => console.log('Erro ao carregar a imagem.')}
                         />
@@ -108,8 +107,8 @@ export default function PerfilScreen({ navigation }) {
                     {/* Card 2: Desafios */}
                     <View style={[styles.card, { gap: 10, flexDirection: 'row', alignItems: 'center' }]}>
                         <TouchableOpacity
-                            style={{flex: 1, alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}
-                            onPress={() => {}}
+                            style={{ flex: 1, alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}
+                            onPress={() => { }}
                         >
                             <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
                                 Desafios
@@ -119,40 +118,41 @@ export default function PerfilScreen({ navigation }) {
                         </TouchableOpacity>
                     </View>
 
-                    {/* Card 3: Assinatura */}
-                    <Card style={styles.card}>
-                        <Card.Title title="Assinatura" />
-                        <Card.Content>
-                            <Text style={styles.infoLabel}>Valor</Text>
-                            <Text style={styles.infoText}>{user?.subscription?.amount}</Text>
-                            <Text style={styles.infoLabel}>Recorrência</Text>
-                            <Text style={styles.infoText}>{user?.subscription?.interval}</Text>
-                            <Text style={styles.infoLabel}>Início</Text>
-                            <Text style={styles.infoText}>{user?.subscription?.start_date}</Text>
+                    {/* Card 2: Desafios */}
+                    <View style={[styles.card, { gap: 10,  }]}>
+                        <Text style={styles.infoTitle}>
+                            Assinatura
+                        </Text>
 
-                            <TouchableOpacity style={styles.buttonDanger} onPress={handlePauseSubscription} disabled={isLoading}>
-                                <View style={styles.buttonContent}>
-                                    {isLoading ? (
-                                        <>
-                                            <ActivityIndicator
-                                                style={styles.loadingIndicator}
-                                                size="small"
-                                                color="#fff"
-                                            />
-                                            <Text style={styles.buttonText}>Aguarde</Text>
-                                        </>
-                                    ) : (
-                                        <Text style={styles.buttonText}>Pausar Assinatura</Text>
-                                    )}
-                                </View>
-                            </TouchableOpacity>
-                        </Card.Content>
-                    </Card>
+                        <Text style={styles.infoLabel}>Valor</Text>
+                        <Text style={styles.infoText}>{user?.subscription?.amount}</Text>
+                        <Text style={styles.infoLabel}>Recorrência</Text>
+                        <Text style={styles.infoText}>{user?.subscription?.interval}</Text>
+                        <Text style={styles.infoLabel}>Início</Text>
+                        <Text style={styles.infoText}>{user?.subscription?.start_date}</Text>
+
+                        <TouchableOpacity style={styles.buttonDanger} onPress={handlePauseSubscription} disabled={isLoading}>
+                            <View style={styles.buttonContent}>
+                                {isLoading ? (
+                                    <>
+                                        <ActivityIndicator
+                                            style={styles.loadingIndicator}
+                                            size="small"
+                                            color="#fff"
+                                        />
+                                        <Text style={styles.buttonText}>Aguarde</Text>
+                                    </>
+                                ) : (
+                                    <Text style={styles.buttonText}>Pausar Assinatura</Text>
+                                )}
+                            </View>
+                        </TouchableOpacity>
+                    </View>
 
                     {/* Card 4: Logout */}
                     <View style={[styles.cardDanger, { gap: 10, flexDirection: 'row', alignItems: 'center' }]}>
                         <TouchableOpacity
-                            style={{flex: 1, alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}
+                            style={{ flex: 1, alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}
                             onPress={handleLogout}
                         >
                             <Text style={[styles.textDanger, { fontSize: 18, fontWeight: 'bold' }]}>
@@ -163,8 +163,7 @@ export default function PerfilScreen({ navigation }) {
                         </TouchableOpacity>
                     </View>
                 </>
-            )
-            }
+            )}
         </View >
     );
 }

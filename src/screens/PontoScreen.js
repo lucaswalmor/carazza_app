@@ -1,28 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Linking, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Button, View, Text, StyleSheet, ActivityIndicator, Linking, ScrollView, TouchableOpacity } from 'react-native';
 import api from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import YoutubePlayer from 'react-native-youtube-iframe';
-import { Button, Card } from 'react-native-paper';
 import MapView, { Marker } from 'react-native-maps';
-import * as Location from 'expo-location'; // Importa a biblioteca de localização do Expo
-// import styles from '../assets/css/styles';
-import { useEvent } from 'expo';
 import { WebView } from 'react-native-webview';
 
 const PontoScreen = ({ route }) => {
-    const embedHTML = `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          </head>
-          <body style="margin:0;padding:0;">
-            <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@brunocarazza3/video/7418940621391547654" data-video-id="7418940621391547654" style="max-width: 605px;min-width: 325px;" > <section> <a target="_blank" title="@brunocarazza3" href="https://www.tiktok.com/@brunocarazza3?refer=embed">@brunocarazza3</a> <p>Me siga pra mais videos ..</p> <a target="_blank" title="♬ som original - Bruno Carazza" href="https://www.tiktok.com/music/som-original-7418940659736709894?refer=embed">♬ som original - Bruno Carazza</a> </section> </blockquote> <script async src="https://www.tiktok.com/embed.js"></script>
-          <script async src="https://www.tiktok.com/embed.js"></script>
-          </body>
-        </html>
-      `;
     const { id } = route.params;
     const [ponto, setPonto] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -115,79 +98,81 @@ const PontoScreen = ({ route }) => {
             </View>
 
             {/* Card 2: Informações */}
-            <Card style={styles.card}>
-                <Card.Title title="Informações" />
-                <Card.Content>
-                    <Text style={styles.infoLabel}>Informações Complementares:</Text>
-                    <Text style={styles.infoText}>{ponto.informacoes_complementares}</Text>
-                    <Text style={styles.infoLabel}>Descrição:</Text>
-                    <Text style={styles.infoText}>{ponto.descricao}</Text>
-                </Card.Content>
-            </Card>
+            <View style={[styles.card]}>
+                <Text style={styles.infoTitle}>
+                    Informações
+                </Text>
+
+                <Text style={styles.infoLabel}>Informações Complementares:</Text>
+                <Text style={styles.infoText}>{ponto.informacoes_complementares}</Text>
+                <Text style={styles.infoLabel}>Descrição:</Text>
+                <Text style={styles.infoText}>{ponto.descricao}</Text>
+            </View>
 
             {/* Card 3: Horários */}
-            <Card style={styles.card}>
-                <Card.Title title="Horários" />
-                <Card.Content>
-                    <Text style={styles.infoLabel}>Horário de Funcionamento:</Text>
-                    <Text style={styles.infoText}>{ponto.hora_abertura} - {ponto.hora_fechamento}</Text>
-                </Card.Content>
-            </Card>
+            <View style={[styles.card]}>
+                <Text style={styles.infoTitle}>
+                    Horários
+                </Text>
+
+                <Text style={styles.infoLabel}>Horário de Funcionamento:</Text>
+                <Text style={styles.infoText}>{ponto.hora_abertura} - {ponto.hora_fechamento}</Text>
+            </View>
 
             {/* Card 4: Valores */}
-            <Card style={styles.card}>
-                <Card.Title title="Valors do local" />
-                <Card.Content>
-                    <Text style={styles.infoText}>{ponto.hora_abertura} - {ponto.hora_fechamento}</Text>
-                    <Text style={styles.infoLabel}>Mínimo Alimentação:</Text>
-                    <Text style={styles.infoText}>{ponto.valor_minimo_alimentaca}</Text>
-                    <Text style={styles.infoLabel}>Máximo Alimentação:</Text>
-                    <Text style={styles.infoText}>{ponto.valor_maximo_alimentaca}</Text>
-                    <Text style={styles.infoLabel}>Mínimo Hospedagem:</Text>
-                    <Text style={styles.infoText}>{ponto.valor_minimo_hospedagem}</Text>
-                    <Text style={styles.infoLabel}>Máximo Hospedagem:</Text>
-                    <Text style={styles.infoText}>{ponto.valor_maximo_hospedagem}</Text>
-                </Card.Content>
-            </Card>
+            <View style={[styles.card]}>
+                <Text style={styles.infoTitle}>
+                    Valores
+                </Text>
+
+                <Text style={styles.infoLabel}>Mínimo Alimentação:</Text>
+                <Text style={styles.infoText}>{ponto.valor_minimo_alimentaca}</Text>
+                <Text style={styles.infoLabel}>Máximo Alimentação:</Text>
+                <Text style={styles.infoText}>{ponto.valor_maximo_alimentaca}</Text>
+                <Text style={styles.infoLabel}>Mínimo Hospedagem:</Text>
+                <Text style={styles.infoText}>{ponto.valor_minimo_hospedagem}</Text>
+                <Text style={styles.infoLabel}>Máximo Hospedagem:</Text>
+                <Text style={styles.infoText}>{ponto.valor_maximo_hospedagem}</Text>
+            </View>
 
             {/* Card 5: Localização */}
-            <Card style={[styles.card, {marginBottom: 50}]}>
-                <Card.Title title="Localização" />
-                <Card.Content>
-                    <Text style={styles.infoLabel}>CEP:</Text>
-                    <Text style={styles.infoText}>{ponto.cep}</Text>
-                    <Text style={styles.infoLabel}>Rua:</Text>
-                    <Text style={styles.infoText}>{ponto.rua}, nº {ponto.numero}, {ponto.bairro}</Text>
-                    <Text style={styles.infoLabel}>Cidade - Estado</Text>
-                    <Text style={styles.infoText}>{ponto.cidade} - {ponto.estado}</Text>
+            <View style={[styles.card, {marginBottom: 50}]}>
+                <Text style={styles.infoTitle}>
+                    Localização
+                </Text>
+                <Text style={styles.infoLabel}>CEP:</Text>
+                <Text style={styles.infoText}>{ponto.cep}</Text>
+                <Text style={styles.infoLabel}>Rua:</Text>
+                <Text style={styles.infoText}>{ponto.rua}, nº {ponto.numero}, {ponto.bairro}</Text>
+                <Text style={styles.infoLabel}>Cidade - Estado</Text>
+                <Text style={styles.infoText}>{ponto.cidade} - {ponto.estado}</Text>
 
-                    <Button mode="contained" onPress={openMap} style={styles.button}>
-                        Ver no Mapa
-                    </Button>
+                <TouchableOpacity style={styles.buttonDanger} onPress={openMap}>
+                    <Text style={styles.buttonText}>Pausar Assinatura</Text>
+                </TouchableOpacity>
 
-                    {ponto.latitude && ponto.longitude ? (
-                        <MapView
-                            style={{ height: 200, marginTop: 10 }}
-                            initialRegion={{
+                {ponto.latitude && ponto.longitude ? (
+                    <MapView
+                        style={{ height: 200, marginTop: 10 }}
+                        initialRegion={{
+                            latitude: parseFloat(ponto.latitude),
+                            longitude: parseFloat(ponto.longitude),
+                            latitudeDelta: 0.01,
+                            longitudeDelta: 0.01,
+                        }}
+                    >
+                        <Marker
+                            coordinate={{
                                 latitude: parseFloat(ponto.latitude),
                                 longitude: parseFloat(ponto.longitude),
-                                latitudeDelta: 0.01,
-                                longitudeDelta: 0.01,
                             }}
-                        >
-                            <Marker
-                                coordinate={{
-                                    latitude: parseFloat(ponto.latitude),
-                                    longitude: parseFloat(ponto.longitude),
-                                }}
-                                title="Ponto Localização"
-                            />
-                        </MapView>
-                    ) : (
-                        <Text style={styles.errorText}>Coordenadas inválidas</Text>
-                    )}
-                </Card.Content>
-            </Card>
+                            title="Ponto Localização"
+                        />
+                    </MapView>
+                ) : (
+                    <Text style={styles.errorText}>Coordenadas inválidas</Text>
+                )}
+            </View>
         </ScrollView>
     );
 };
@@ -263,6 +248,11 @@ const styles = StyleSheet.create({
         marginTop: 10,
         backgroundColor: '#007BFF',
     },
+    infoTitle: {
+        fontSize: 16,
+        color: '#007BFF',
+        fontWeight: 'bold'
+    }
 });
 
 export default PontoScreen;

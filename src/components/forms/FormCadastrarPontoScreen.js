@@ -11,7 +11,6 @@ import {
 import { MaskedTextInput } from "react-native-mask-text";
 import styles from '../../assets/css/styles';
 import pesquisacep from '../../services/viacep';
-import { TextInputMask } from 'react-native-masked-text';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../../services/api';
 import * as ImagePicker from 'expo-image-picker';
@@ -158,13 +157,15 @@ const CadastrarPonto = ({ navigation }) => {
             />
 
             <View style={styles.inputView}>
-                <TextInputMask
+                <MaskedTextInput
+                    mask="99999-99"
+                    keyboardType="numeric"
+                    onChangeText={(text) => handleInputChange('horaFechamento', text)}
                     style={styles.input}
-                    type={'zip-code'}
-                    value={form.cep}
-                    placeholder="CEP"
-                    onChangeText={(text) => handleCep(text)}
+                    value={form.horaFechamento}
+                    placeholder='Hora Fechamento'
                 />
+    
                 {errors.cep && <Text style={styles.errorText}>{errors.cep[0]}</Text>}
             </View>
 

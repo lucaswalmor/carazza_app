@@ -1,16 +1,17 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import LoginScreen from '../screens/LoginScreen';
-import PontoScreen from '../screens/PontoScreen';
-import EventosScreen from '../screens/EventosScreen';
-import RastreamentoScreen from '../screens/RastreamentoScreen';
-import RegisterScreen from '../screens/RegisterScreen';
-import FormCadastrarPontoScreen from '../components/forms/FormCadastrarPontoScreen'
-import PerfilScreen from '../screens/PerfilScreen';
 import { Ionicons } from '@expo/vector-icons';
-import PontosListScreen from '../screens/PontosListScreen'
-import EncontrosScreen from '../screens/EncontrosScreen'
+
+// Lazy Loading dos componentes
+const LoginScreen = React.lazy(() => import('../screens/LoginScreen'));
+const PontoScreen = React.lazy(() => import('../screens/PontoScreen'));
+const EventosScreen = React.lazy(() => import('../screens/EventosScreen'));
+const RegisterScreen = React.lazy(() => import('../screens/RegisterScreen'));
+const FormCadastrarPontoScreen = React.lazy(() => import('../components/forms/FormCadastrarPontoScreen'));
+const PerfilScreen = React.lazy(() => import('../screens/PerfilScreen'));
+const PontosListScreen = React.lazy(() => import('../screens/PontosListScreen'));
+const EncontrosScreen = React.lazy(() => import('../screens/EncontrosScreen'));
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -39,11 +40,11 @@ function BottomTabNavigator() {
         tabBarActiveTintColor: '#fff', // Cor dos ícones ativos
         tabBarInactiveTintColor: '#000c19', // Cor dos ícones inativos
         tabBarStyle: {
-          backgroundColor: '#007BFF', // Cor de fundo da aba
+          backgroundColor: '#007bff', // Cor de fundo da aba
           borderTopWidth: 0,         // Remove a borda superior
         },
         headerStyle: {
-          backgroundColor: '#007BFF', // Cor de fundo do cabeçalho
+          backgroundColor: '#007bff', // Cor de fundo do cabeçalho
         },
         headerTintColor: '#FFFFFF', // Cor do texto no cabeçalho
         headerTitleStyle: {
@@ -51,11 +52,10 @@ function BottomTabNavigator() {
         },
       })}
     >
-      <Tab.Screen name="Pontos" component={PontosListScreen} />
-      <Tab.Screen name="Eventos" component={EventosScreen} />
-      <Tab.Screen name="Encontros" component={EncontrosScreen} />
-      {/* <Tab.Screen name="Rastreamento" component={RastreamentoScreen} /> */}
-      <Tab.Screen name="Perfil" component={PerfilScreen} />
+      <Tab.Screen name="Pontos" component={React.lazy(() => import('../screens/PontosListScreen'))} />
+      <Tab.Screen name="Eventos" component={React.lazy(() => import('../screens/EventosScreen'))} />
+      <Tab.Screen name="Encontros" component={React.lazy(() => import('../screens/EncontrosScreen'))} />
+      <Tab.Screen name="Perfil" component={React.lazy(() => import('../screens/PerfilScreen'))} />
     </Tab.Navigator>
   );
 }
@@ -66,7 +66,7 @@ export default function AppNavigator() {
     <Stack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: '#007BFF', // Cor de fundo do cabeçalho
+          backgroundColor: '#007bff', // Cor de fundo do cabeçalho
         },
         headerTintColor: '#FFFFFF', // Cor do texto no cabeçalho
         headerTitleStyle: {
@@ -79,12 +79,12 @@ export default function AppNavigator() {
     >
       <Stack.Screen
         name="Login"
-        component={LoginScreen}
+        component={React.lazy(() => import('../screens/LoginScreen'))}
         options={{ headerShown: false }}
       />
       <Stack.Screen
         name="Register"
-        component={RegisterScreen}
+        component={React.lazy(() => import('../screens/RegisterScreen'))}
         options={{ headerShown: false }}
       />
       <Stack.Screen
@@ -94,12 +94,12 @@ export default function AppNavigator() {
       />
       <Stack.Screen
         name="CadastrarPonto"
-        component={FormCadastrarPontoScreen}
+        component={React.lazy(() => import('../components/forms/FormCadastrarPontoScreen'))}
         options={{ headerShown: true, title: "Cadastrar Ponto" }}
       />
       <Stack.Screen
         name="PontoScreen"
-        component={PontoScreen}
+        component={React.lazy(() => import('../screens/PontoScreen'))}
         options={{ title: 'Detalhes do Ponto' }}
       />
     </Stack.Navigator>

@@ -16,23 +16,7 @@
       "supportsTablet": true,
       "config": {
         "googleMapsApiKey": "AIzaSyAPOMVj_GA0krJ0XYq4Ui0CxiB7CGZ5kmQ"
-      },
-      "intentFilters": [
-        {
-          "action": "VIEW",
-          "data": [
-            {
-              "scheme": "myapp",
-              "host": "checkout",
-              "pathPrefix": "/pending"
-            }
-          ],
-          "category": [
-            "BROWSABLE",
-            "DEFAULT"
-          ]
-        }
-      ]
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -42,23 +26,7 @@
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyB2PKyiPLwysX53zSFx7Vv2wgIFb88oTL4"
-        },
-        "intentFilters": [
-          {
-            "action": "VIEW",
-            "data": [
-              {
-                "scheme": "myapp",
-                "host": "checkout",
-                "pathPrefix": "/pending"
-              }
-            ],
-            "category": [
-              "BROWSABLE",
-              "DEFAULT"
-            ]
-          }
-        ]
+        }
       },
       "package": "com.lucassteinbach.Carazza"
     },
@@ -70,7 +38,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "46342c8e-a108-467a-a99b-c3040353a164"
+        "projectId": "7987922d-ad80-4a2e-a8e1-bf58db8654fa"
       }
     }
   }

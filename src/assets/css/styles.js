@@ -48,11 +48,20 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: 5,
         marginTop: 10,
-        padding: 10
+        padding: 10,
     },
     buttonDanger: {
         height: 50,
         backgroundColor: '#E8003F',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 5,
+        marginTop: 10,
+        padding: 10
+    },
+    buttonSecondary: {
+        height: 50,
+        backgroundColor: '#6C747E',
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 5,
@@ -183,6 +192,9 @@ const styles = StyleSheet.create({
     textDanger: {
         color: '#E8003F'
     },
+    textPrimary: {
+        color: '#007BFF'
+    },
     avatar: {
         width: 60,
         height: 60,
@@ -199,6 +211,24 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#333',
         marginBottom: 8,
+    },
+    infoTitle: {
+        fontSize: 16,
+        color: '#007BFF',
+        fontWeight: 'bold'
+    },
+    modalCenteredView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+    modalView: {
+        backgroundColor: 'white',
+        margin: 20,
+        padding: 30,
+        borderRadius: 10,
+        alignItems: 'center',
     },
 })
 

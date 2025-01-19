@@ -2,26 +2,26 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Image, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator, TextInput } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { initPaymentSheet, presentPaymentSheet } from '@stripe/stripe-react-native';
-import { TextInputMask } from 'react-native-masked-text';
+import { MaskedTextInput } from "react-native-mask-text";
 import styles from '../assets/css/styles';
 import api from '../services/api'
 
 const RegisterScreen = ({ navigation }) => {
     const [profileImage, setProfileImage] = useState(null);
-    const [nome, setNome] = useState('Lucas Stinbach');
-    const [telefone, setTelefone] = useState('(34) 9 9202-1394');
-    const [cpf, setCpf] = useState('122.947.976-71');
+    const [nome, setNome] = useState(null);
+    const [telefone, setTelefone] = useState(null);
+    const [cpf, setCpf] = useState(null);
 
-    const [cep, setCep] = useState('38080-615');
-    const [rua, setRua] = useState('Rua A');
-    const [bairro, setBairro] = useState('Bairro A');
-    const [numero, setNumero] = useState('147');
+    const [cep, setCep] = useState(null);
+    const [rua, setRua] = useState(null);
+    const [bairro, setBairro] = useState(null);
+    const [numero, setNumero] = useState(null);
     const [complemento, setComplemento] = useState(null);
-    const [estado, setEstado] = useState('MG');
-    const [cidade, setCidade] = useState('Cidade A');
+    const [estado, setEstado] = useState(null);
+    const [cidade, setCidade] = useState(null);
 
-    const [email, setEmail] = useState('lucaswsb52@gmail.com');
-    const [password, setPassword] = useState('32329585');
+    const [email, setEmail] = useState(null);
+    const [password, setPassword] = useState(null);
 
     const [subscriptionId, setSubscriptionId] = useState(null);
     const [customer, setCustomer] = useState(null);
@@ -257,25 +257,22 @@ const RegisterScreen = ({ navigation }) => {
                                 </View>
 
                                 <View style={styles.inputView}>
-                                    <TextInputMask
+                                    <MaskedTextInput
+                                        mask="999.999.999-99"
+                                        keyboardType="numeric"
                                         style={styles.input}
-                                        type={'cpf'}
                                         value={cpf}
-                                        onChangeText={(text) => setCpf(text)}
                                         placeholder="CPF"
+                                        onChangeText={(text) => setCpf(text)}
                                     />
                                     {errors.cpf && <Text style={styles.errorText}>{errors.cpf[0]}</Text>}
                                 </View>
 
                                 <View style={styles.inputView}>
-                                    <TextInputMask
+                                    <MaskedTextInput
+                                        mask="(99) 9 9999-9999"
+                                        keyboardType="numeric"
                                         style={styles.input}
-                                        type={'cel-phone'}
-                                        options={{
-                                            maskType: 'BRL',
-                                            withDDD: true,
-                                            dddMask: '(99) '
-                                        }}
                                         value={telefone}
                                         placeholder="Telefone"
                                         onChangeText={(text) => setTelefone(text)}
@@ -292,9 +289,10 @@ const RegisterScreen = ({ navigation }) => {
                                 </Text>
 
                                 <View style={styles.inputView}>
-                                    <TextInputMask
+                                    <MaskedTextInput
+                                        mask="99999-990"
+                                        keyboardType="numeric"
                                         style={styles.input}
-                                        type={'zip-code'}
                                         value={cep}
                                         placeholder="CEP"
                                         onChangeText={(text) => pesquisacep(text)}

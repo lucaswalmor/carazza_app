@@ -71,7 +71,7 @@ const PointsScreen = ({ navigation }) => {
                 <View style={{}}>
                     <View style={{ padding: 10, width: '100%' }}>
                         <TouchableOpacity style={styles.button} onPress={CadastrarPonto}>
-                            <Text style={styles.buttonText}>Cadastrar Point</Text>
+                            <Text style={styles.buttonText}>Cadastrar Ponto</Text>
                         </TouchableOpacity>
                     </View>
 
