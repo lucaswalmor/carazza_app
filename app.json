@@ -15,7 +15,7 @@
     "ios": {
       "supportsTablet": true,
       "config": {
-        "googleMapsApiKey": "AIzaSyAPOMVj_GA0krJ0XYq4Ui0CxiB7CGZ5kmQ"
+        "googleMapsApiKey": ""
       }
     },
     "android": {
@@ -25,7 +25,7 @@
       },
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyB2PKyiPLwysX53zSFx7Vv2wgIFb88oTL4"
+          "apiKey": ""
         }
       },
       "package": "com.lucassteinbach.Carazza"
