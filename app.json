@@ -23,11 +23,6 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "config": {
-        "googleMaps": {
-          "apiKey": ""
-        }
-      },
       "package": "com.lucassteinbach.Carazza"
     },
     "web": {
