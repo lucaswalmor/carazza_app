@@ -1,9 +1,11 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import TabRoutes from './tab.routes';
-import LoginScreen from '../src/screens/LoginScreen'
-import PontoScreen from '../src/screens/PontoScreen';
+import LoginScreen from '../src/screens/LoginScreen';
 import RegisterScreen from '../src/screens/RegisterScreen';
+import PontoScreen from '../src/screens/PontoScreen';
 import CadastrarPonto from '../src/screens/CadastrarPonto';
+import SuccessScreen from '../src/screens/SuccessScreen';
+import RetryPaymentScreen from '../src/screens/RetryPaymentScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -11,18 +13,18 @@ export default function StackRoutes() {
     return (
         <Stack.Navigator
             screenOptions={({ route }) => ({
-                tabBarActiveTintColor: '#fff', // Cor dos ícones ativos
-                tabBarInactiveTintColor: '#000c19', // Cor dos ícones inativos
+                tabBarActiveTintColor: '#fff',
+                tabBarInactiveTintColor: '#000c19',
                 tabBarStyle: {
-                    backgroundColor: '#007bff', // Cor de fundo da aba
-                    borderTopWidth: 0,         // Remove a borda superior
+                    backgroundColor: '#007bff',
+                    borderTopWidth: 0,
                 },
                 headerStyle: {
-                    backgroundColor: '#007bff', // Cor de fundo do cabeçalho
+                    backgroundColor: '#007bff',
                 },
-                headerTintColor: '#FFFFFF', // Cor do texto no cabeçalho
+                headerTintColor: '#FFFFFF',
                 headerTitleStyle: {
-                    fontWeight: 'bold', // Estilo do título
+                    fontWeight: 'bold',
                 },
             })}>
             <Stack.Screen
@@ -49,6 +51,16 @@ export default function StackRoutes() {
                 name="CadastrarPonto"
                 component={CadastrarPonto}
                 options={{ title: 'Cadastrar Ponto' }}
+            />
+            <Stack.Screen
+                name="Success"
+                component={SuccessScreen}
+                options={{ title: 'Sucesso' }}
+            />
+            <Stack.Screen
+                name="Failure"
+                component={RetryPaymentScreen}
+                options={{ title: 'Re-tentar Pagamento' }}
             />
         </Stack.Navigator>
     );

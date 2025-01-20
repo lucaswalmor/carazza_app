@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Image, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator, TextInput, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { createPreference, criarAssinatura } from '../services/MercadoPago'; // Ajustado para Mercado Pago
+import { initPaymentSheet, presentPaymentSheet, StripeProvider } from '@stripe/stripe-react-native';
+import { MaskedTextInput } from "react-native-mask-text";
+import styles from '../assets/css/styles';
+import api from '../services/api'
+import { createPreference } from '../services/MercadoPago';
 import { openBrowserAsync } from 'expo-web-browser';
-import { MaskedTextInput } from 'react-native-mask-text';
-import styles from '../../styles';
-import api from '../services/api';
 
 const RegisterScreen = ({ navigation }) => {
     const [profileImage, setProfileImage] = useState(null);
@@ -35,6 +36,7 @@ const RegisterScreen = ({ navigation }) => {
     const [showSteps, setShowSteps] = useState(true);
 
     const [cardData, setCardData] = useState({ cardNumber: '5031433215406351', expirationDate: '11/25', securityCode: '123', cardholderName: 'teste' });
+
 
     const handleNext = () => {
         setCurrentStep((prevStep) => prevStep + 1);
@@ -120,7 +122,7 @@ const RegisterScreen = ({ navigation }) => {
                 },
             });
 
-            handlePayment();
+            handlePayment(response.data.data.id);
             setUserId(response.data.data.id)
         } catch (err) {
             if (err.response && err.response.data) {
@@ -134,20 +136,93 @@ const RegisterScreen = ({ navigation }) => {
         }
     };
 
+    const handlePayment2 = async (userId) => {
+        try {
+            const response = await fetch('https://a4d4-2804-1e68-c209-24e7-7deb-4382-6a05-da6b.ngrok-free.app/api/stripe/subscription', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: email }),
+            });
+
+            const { paymentIntent, ephemeralKey, customer, subscriptionId } = await response.json();
+
+            const initSheet = await initPaymentSheet({
+                merchantDisplayName: 'Carazza',
+                customerId: customer,
+                customerEphemeralKeySecret: ephemeralKey,
+                paymentIntentClientSecret: paymentIntent,
+                googlePay: {
+                    merchantCountryCode: 'BR',
+                    testEnv: true,
+                },
+            });
+
+            if (initSheet.error) {
+                console.error(initSheet.error);
+                return;
+            }
+
+            const paymentResult = await presentPaymentSheet();
+
+            if (paymentResult.error) {
+                setShowSteps(false)
+                console.error('Erro ao processar pagamento:', paymentResult.error.message);
+            } else {
+                setCustomer(customer)
+                setSubscriptionId(subscriptionId)
+
+                if (customer && subscriptionId) {
+                    await handleUpdateUserPayment(customer, subscriptionId, userId);
+                }
+            }
+        } catch (error) {
+            setIsLoading(false);
+            console.log(error)
+            // console.error('Erro ao inicializar o pagamento:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     const handlePayment = async () => {
         if (!email) {
             Alert.alert('Digite seu email')
         }
 
-        // const checkoutUrl = await createPreference(email); // Utiliza o Mercado Pago
-        const url = `https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=2c9380849469a4a1019485312b350edb`;
-        
+        const checkoutUrl = await createPreference(email)
+
         try {
-            await openBrowserAsync(url);
+            await openBrowserAsync(checkoutUrl);
         } catch (error) {
             console.error('Erro ao abrir o checkout:', error);
         }
     }
+
+    const handleUpdateUserPayment = async (customer, subscriptionId, userId) => {
+        const dados = {
+            stripe_subscription_id: subscriptionId,
+            stripe_customer_id: customer,
+        }
+
+        try {
+            const response = await api.put(`/user/update-payment/${userId}`, dados);
+
+            if (response.status == 201) {
+                navigation.replace('Login');
+            }
+
+        } catch (err) {
+            if (err.response && err.response.data) {
+                setErrors(err.response.data.errors);
+            } else {
+                console.log('Erro:', err.message);
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const backToLogin = () => {
         navigation.replace('Login');
@@ -169,7 +244,7 @@ const RegisterScreen = ({ navigation }) => {
                         </Text>
                         <TouchableOpacity
                             style={styles.button}
-                            onPress={() => handlePayment()}>
+                            onPress={() => handlePayment(userId)}>
                             <Text style={styles.buttonText}>Realizar Pagamento</Text>
                         </TouchableOpacity>
                     </View>
@@ -270,6 +345,7 @@ const RegisterScreen = ({ navigation }) => {
                                         style={styles.input}
                                         placeholder="Número"
                                         value={numero}
+                                        keyboardType="numeric"
                                         onChangeText={(text) => setNumero(text)}
                                     />
                                     {errors.numero && <Text style={styles.errorText}>{errors.numero[0]}</Text>}
@@ -278,21 +354,11 @@ const RegisterScreen = ({ navigation }) => {
                                 <View style={styles.inputView}>
                                     <TextInput
                                         style={styles.input}
-                                        placeholder="Complemento (opcional)"
+                                        placeholder="Complemento"
                                         value={complemento}
                                         onChangeText={(text) => setComplemento(text)}
                                     />
                                     {errors.complemento && <Text style={styles.errorText}>{errors.complemento[0]}</Text>}
-                                </View>
-
-                                <View style={styles.inputView}>
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="Estado"
-                                        value={estado}
-                                        onChangeText={(text) => setEstado(text)}
-                                    />
-                                    {errors.estado && <Text style={styles.errorText}>{errors.estado[0]}</Text>}
                                 </View>
 
                                 <View style={styles.inputView}>
@@ -304,19 +370,29 @@ const RegisterScreen = ({ navigation }) => {
                                     />
                                     {errors.cidade && <Text style={styles.errorText}>{errors.cidade[0]}</Text>}
                                 </View>
+
+                                <View style={styles.inputView}>
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="Estado"
+                                        value={estado}
+                                        onChangeText={(text) => setEstado(text)}
+                                    />
+                                    {errors.estado && <Text style={styles.errorText}>{errors.estado[0]}</Text>}
+                                </View>
                             </View>
                         )}
 
                         {currentStep === 3 && (
-                            <View style={{ flex: 1 }}>
+                            <View>
                                 <Text style={{ textAlign: 'center', margin: 20, fontSize: 16, fontWeight: 'bold' }}>
-                                    Dados de Acesso
+                                    Dados de Login
                                 </Text>
 
                                 <View style={styles.inputView}>
                                     <TextInput
                                         style={styles.input}
-                                        placeholder="Email"
+                                        placeholder="E-mail"
                                         value={email}
                                         onChangeText={(text) => setEmail(text)}
                                     />
@@ -336,7 +412,42 @@ const RegisterScreen = ({ navigation }) => {
                             </View>
                         )}
 
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 10 }}>
+                        {currentStep === 4 && (
+
+                            <View style={{ padding: 20 }}>
+                                <Text>Tokenização do Cartão de Crédito</Text>
+
+                                <TextInput
+                                    placeholder="Número do cartão"
+                                    value={cardData.cardNumber}
+                                    onChangeText={(text) => setCardData({ ...cardData, cardNumber: text })}
+                                />
+                                <TextInput
+                                    placeholder="Data de validade (MM/YYYY)"
+                                    value={cardData.expirationDate}
+                                    onChangeText={(text) => setCardData({ ...cardData, expirationDate: text })}
+                                />
+                                <TextInput
+                                    placeholder="Código de segurança"
+                                    value={cardData.securityCode}
+                                    onChangeText={(text) => setCardData({ ...cardData, securityCode: text })}
+                                />
+                                <TextInput
+                                    placeholder="Nome do portador"
+                                    value={cardData.cardholderName}
+                                    onChangeText={(text) => setCardData({ ...cardData, cardholderName: text })}
+                                />
+
+                                <TouchableOpacity
+                                    style={styles.button}
+                                    onPress={handlePayment}
+                                >
+                                    <Text style={styles.buttonText}>Testar</Text>
+                                </TouchableOpacity>
+                            </View>
+                        )}
+
+                        <View style={styles.buttonContainer}>
                             {currentStep == 1 && (
                                 <TouchableOpacity
                                     style={styles.buttonVoltar}
@@ -353,13 +464,29 @@ const RegisterScreen = ({ navigation }) => {
                                     <Text style={styles.buttonText}>Voltar</Text>
                                 </TouchableOpacity>
                             )}
-                            {currentStep < 3 ? (
+                            {currentStep < 3 && (
                                 <TouchableOpacity style={styles.button} onPress={handleNext}>
-                                    <Text style={styles.buttonText}>Próximo</Text>
+                                    <View style={styles.buttonContent}>
+                                        <Text style={styles.buttonText}>Próximo</Text>
+                                    </View>
                                 </TouchableOpacity>
-                            ) : (
-                                <TouchableOpacity style={styles.button} onPress={handleRegister}>
-                                    <Text style={styles.buttonText}>Cadastrar</Text>
+                            )}
+                            {currentStep === 3 && (
+                                <TouchableOpacity style={styles.button} onPress={handlePayment} disabled={isLoading}>
+                                    <View style={styles.buttonContent}>
+                                        {isLoading ? (
+                                            <>
+                                                <ActivityIndicator
+                                                    style={styles.loadingIndicator}
+                                                    size="small"
+                                                    color="#fff"
+                                                />
+                                                <Text style={styles.buttonText}>Aguarde</Text>
+                                            </>
+                                        ) : (
+                                            <Text style={styles.buttonText}>Finalizar Cadastro</Text>
+                                        )}
+                                    </View>
                                 </TouchableOpacity>
                             )}
                         </View>

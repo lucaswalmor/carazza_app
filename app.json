@@ -7,6 +7,7 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "scheme": "myapp",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -14,8 +15,15 @@
     },
     "ios": {
       "supportsTablet": true,
-      "config": {
-        "googleMapsApiKey": ""
+      "infoPlist": {
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLName": "myapp",
+            "CFBundleURLSchemes": [
+              "myapp"
+            ]
+          }
+        ]
       }
     },
     "android": {
@@ -23,7 +31,28 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.lucassteinbach.Carazza"
+      "package": "com.lucassteinbach.Carazza",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "myapp",
+              "host": "checkout",
+              "pathPrefix": "/success"
+            },
+            {
+              "scheme": "myapp",
+              "host": "checkout",
+              "pathPrefix": "/failure"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"

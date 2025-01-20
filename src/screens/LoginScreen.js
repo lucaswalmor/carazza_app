@@ -4,6 +4,7 @@ import styles from '../../styles';
 import api from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as LocalAuthentication from 'expo-local-authentication';
+import { createURL } from 'expo-linking';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
