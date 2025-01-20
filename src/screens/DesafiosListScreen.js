@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-export default function EncontrosScreen() {
+export default function DesafiosListScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Bem-vindo à tela de Encontros!</Text>
+      <Text style={styles.text}>Bem-vindo à tela de Desafios!</Text>
     </View>
   );
 };

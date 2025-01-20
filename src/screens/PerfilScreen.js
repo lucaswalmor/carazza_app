@@ -119,7 +119,7 @@ export default function PerfilScreen({ navigation }) {
                     </View>
 
                     {/* Card 2: Desafios */}
-                    <View style={[styles.card, { gap: 10,  }]}>
+                    <View style={[styles.card, { gap: 10, }]}>
                         <Text style={styles.infoTitle}>
                             Assinatura
                         </Text>

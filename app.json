@@ -13,32 +13,21 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true,
-      "config": {
-        "googleMapsApiKey": "AIzaSyAPOMVj_GA0krJ0XYq4Ui0CxiB7CGZ5kmQ"
-      }
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "config": {
-        "googleMaps": {
-          "apiKey": "AIzaSyB2PKyiPLwysX53zSFx7Vv2wgIFb88oTL4"
-        }
-      },
       "package": "com.lucassteinbach.Carazza"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [
-      "expo-video"
-    ],
     "extra": {
       "eas": {
-        "projectId": "7987922d-ad80-4a2e-a8e1-bf58db8654fa"
+        "projectId": "61721ec3-c518-4701-8453-7bd69acf2c94"
       }
     }
   }

@@ -1,27 +1,27 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Image, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator, TextInput } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { initPaymentSheet, presentPaymentSheet } from '@stripe/stripe-react-native';
+import { initPaymentSheet, presentPaymentSheet, StripeProvider } from '@stripe/stripe-react-native';
 import { MaskedTextInput } from "react-native-mask-text";
 import styles from '../assets/css/styles';
 import api from '../services/api'
 
 const RegisterScreen = ({ navigation }) => {
     const [profileImage, setProfileImage] = useState(null);
-    const [nome, setNome] = useState(null);
-    const [telefone, setTelefone] = useState(null);
-    const [cpf, setCpf] = useState(null);
+    const [nome, setNome] = useState('Teste');
+    const [telefone, setTelefone] = useState('(00) 0 0000-0000');
+    const [cpf, setCpf] = useState('000.000.000-00');
 
-    const [cep, setCep] = useState(null);
+    const [cep, setCep] = useState('38080-615');
     const [rua, setRua] = useState(null);
     const [bairro, setBairro] = useState(null);
-    const [numero, setNumero] = useState(null);
+    const [numero, setNumero] = useState('147');
     const [complemento, setComplemento] = useState(null);
     const [estado, setEstado] = useState(null);
     const [cidade, setCidade] = useState(null);
 
-    const [email, setEmail] = useState(null);
-    const [password, setPassword] = useState(null);
+    const [email, setEmail] = useState('teste@gmail.com');
+    const [password, setPassword] = useState('12345678');
 
     const [subscriptionId, setSubscriptionId] = useState(null);
     const [customer, setCustomer] = useState(null);
@@ -49,7 +49,7 @@ const RegisterScreen = ({ navigation }) => {
         }
 
         const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            mediaTypes: ['images'],
             allowsEditing: true,
             aspect: [1, 1],
             quality: 0.8,
@@ -133,7 +133,7 @@ const RegisterScreen = ({ navigation }) => {
 
     const handlePayment = async (userId) => {
         try {
-            const response = await fetch('/stripe/subscription', {
+            const response = await fetch('https://a4d4-2804-1e68-c209-24e7-7deb-4382-6a05-da6b.ngrok-free.app/api/stripe/subscription', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -174,7 +174,8 @@ const RegisterScreen = ({ navigation }) => {
             }
         } catch (error) {
             setIsLoading(false);
-            console.error('Erro ao inicializar o pagamento:', error);
+            console.log(error)
+            // console.error('Erro ao inicializar o pagamento:', error);
         } finally {
             setIsLoading(false);
         }
@@ -230,166 +231,173 @@ const RegisterScreen = ({ navigation }) => {
                     </View>
                 ) : (
                     <>
-                        {currentStep === 1 && (
-                            <View style={{ flex: 1 }}>
-                                <Text style={{ textAlign: 'center', margin: 20, fontSize: 16, fontWeight: 'bold' }}>
-                                    Dados Pessoais
-                                </Text>
-                                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                                    <TouchableOpacity style={styles.imageContainer} onPress={handleProfileImageChange}>
-                                        {profileImage ? (
-                                            <Image source={{ uri: profileImage }} style={styles.image} />
-                                        ) : (
-                                            <Text style={styles.imagePlaceholder}>Foto de Perfil</Text>
-                                        )}
-                                    </TouchableOpacity>
-                                    {errors.img_perfil && <Text style={styles.errorText}>{errors.img_perfil[0]}</Text>}
+
+                        <StripeProvider
+                            publishableKey={'pk_test_51Oq66vIMTjPTuMuCOTDVTzPkRMwZQmQ32ByZc38Cvlg5xICKRmL3l2G0hG77TlpmcsTcs5KiroBUmXnaQnrzLfIt00oACWvA9V'}
+                            merchantIdentifier="merchant.identifier"
+                        >
+                            {currentStep === 1 && (
+                                <View style={{ flex: 1 }}>
+                                    <Text style={{ textAlign: 'center', margin: 20, fontSize: 16, fontWeight: 'bold' }}>
+                                        Dados Pessoais
+                                    </Text>
+                                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                                        <TouchableOpacity style={styles.imageContainer} onPress={handleProfileImageChange}>
+                                            {profileImage ? (
+                                                <Image source={{ uri: profileImage }} style={styles.image} />
+                                            ) : (
+                                                <Text style={styles.imagePlaceholder}>Foto de Perfil</Text>
+                                            )}
+                                        </TouchableOpacity>
+                                        {errors.img_perfil && <Text style={styles.errorText}>{errors.img_perfil[0]}</Text>}
+                                    </View>
+
+                                    <View style={styles.inputView}>
+                                        <TextInput
+                                            style={styles.input}
+                                            placeholder="Nome Completo"
+                                            value={nome}
+                                            onChangeText={(text) => setNome(text)}
+                                        />
+                                        {errors.nome && <Text style={styles.errorText}>{errors.nome[0]}</Text>}
+                                    </View>
+
+                                    <View style={styles.inputView}>
+                                        <MaskedTextInput
+                                            mask="999.999.999-99"
+                                            keyboardType="numeric"
+                                            style={styles.input}
+                                            value={cpf}
+                                            placeholder="CPF"
+                                            onChangeText={(text) => setCpf(text)}
+                                        />
+                                        {errors.cpf && <Text style={styles.errorText}>{errors.cpf[0]}</Text>}
+                                    </View>
+
+                                    <View style={styles.inputView}>
+                                        <MaskedTextInput
+                                            mask="(99) 9 9999-9999"
+                                            keyboardType="numeric"
+                                            style={styles.input}
+                                            value={telefone}
+                                            placeholder="Telefone"
+                                            onChangeText={(text) => setTelefone(text)}
+                                        />
+                                        {errors.telefone && <Text style={styles.errorText}>{errors.telefone[0]}</Text>}
+                                    </View>
                                 </View>
+                            )}
 
-                                <View style={styles.inputView}>
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="Nome Completo"
-                                        value={nome}
-                                        onChangeText={(text) => setNome(text)}
-                                    />
-                                    {errors.nome && <Text style={styles.errorText}>{errors.nome[0]}</Text>}
+                            {currentStep === 2 && (
+                                <View style={{ flex: 1 }}>
+                                    <Text style={{ textAlign: 'center', margin: 20, fontSize: 16, fontWeight: 'bold' }}>
+                                        Endereço
+                                    </Text>
+
+                                    <View style={styles.inputView}>
+                                        <MaskedTextInput
+                                            mask="99999-990"
+                                            keyboardType="numeric"
+                                            style={styles.input}
+                                            value={cep}
+                                            placeholder="CEP"
+                                            onChangeText={(text) => pesquisacep(text)}
+                                        />
+                                        {errors.cep && <Text style={styles.errorText}>{errors.cep[0]}</Text>}
+                                    </View>
+
+                                    <View style={styles.inputView}>
+                                        <TextInput
+                                            style={styles.input}
+                                            placeholder="Rua"
+                                            value={rua}
+                                            onChangeText={(text) => setRua(text)}
+                                        />
+                                        {errors.rua && <Text style={styles.errorText}>{errors.rua[0]}</Text>}
+                                    </View>
+
+                                    <View style={styles.inputView}>
+                                        <TextInput
+                                            style={styles.input}
+                                            placeholder="Bairro"
+                                            value={bairro}
+                                            onChangeText={(text) => setBairro(text)}
+                                        />
+                                        {errors.bairro && <Text style={styles.errorText}>{errors.bairro[0]}</Text>}
+                                    </View>
+
+                                    <View style={styles.inputView}>
+                                        <TextInput
+                                            style={styles.input}
+                                            placeholder="Número"
+                                            value={numero}
+                                            keyboardType="numeric"
+                                            onChangeText={(text) => setNumero(text)}
+                                        />
+                                        {errors.numero && <Text style={styles.errorText}>{errors.numero[0]}</Text>}
+                                    </View>
+
+                                    <View style={styles.inputView}>
+                                        <TextInput
+                                            style={styles.input}
+                                            placeholder="Complemento"
+                                            value={complemento}
+                                            onChangeText={(text) => setComplemento(text)}
+                                        />
+                                        {errors.complemento && <Text style={styles.errorText}>{errors.complemento[0]}</Text>}
+                                    </View>
+
+                                    <View style={styles.inputView}>
+                                        <TextInput
+                                            style={styles.input}
+                                            placeholder="Cidade"
+                                            value={cidade}
+                                            onChangeText={(text) => setCidade(text)}
+                                        />
+                                        {errors.cidade && <Text style={styles.errorText}>{errors.cidade[0]}</Text>}
+                                    </View>
+
+                                    <View style={styles.inputView}>
+                                        <TextInput
+                                            style={styles.input}
+                                            placeholder="Estado"
+                                            value={estado}
+                                            onChangeText={(text) => setEstado(text)}
+                                        />
+                                        {errors.estado && <Text style={styles.errorText}>{errors.estado[0]}</Text>}
+                                    </View>
                                 </View>
+                            )}
 
-                                <View style={styles.inputView}>
-                                    <MaskedTextInput
-                                        mask="999.999.999-99"
-                                        keyboardType="numeric"
-                                        style={styles.input}
-                                        value={cpf}
-                                        placeholder="CPF"
-                                        onChangeText={(text) => setCpf(text)}
-                                    />
-                                    {errors.cpf && <Text style={styles.errorText}>{errors.cpf[0]}</Text>}
+                            {currentStep === 3 && (
+                                <View>
+                                    <Text style={{ textAlign: 'center', margin: 20, fontSize: 16, fontWeight: 'bold' }}>
+                                        Dados de Login
+                                    </Text>
+
+                                    <View style={styles.inputView}>
+                                        <TextInput
+                                            style={styles.input}
+                                            placeholder="E-mail"
+                                            value={email}
+                                            onChangeText={(text) => setEmail(text)}
+                                        />
+                                        {errors.email && <Text style={styles.errorText}>{errors.email[0]}</Text>}
+                                    </View>
+
+                                    <View style={styles.inputView}>
+                                        <TextInput
+                                            style={styles.input}
+                                            placeholder="Senha"
+                                            secureTextEntry
+                                            value={password}
+                                            onChangeText={(text) => setPassword(text)}
+                                        />
+                                        {errors.password && <Text style={styles.errorText}>{errors.password[0]}</Text>}
+                                    </View>
                                 </View>
-
-                                <View style={styles.inputView}>
-                                    <MaskedTextInput
-                                        mask="(99) 9 9999-9999"
-                                        keyboardType="numeric"
-                                        style={styles.input}
-                                        value={telefone}
-                                        placeholder="Telefone"
-                                        onChangeText={(text) => setTelefone(text)}
-                                    />
-                                    {errors.telefone && <Text style={styles.errorText}>{errors.telefone[0]}</Text>}
-                                </View>
-                            </View>
-                        )}
-
-                        {currentStep === 2 && (
-                            <View style={{ flex: 1 }}>
-                                <Text style={{ textAlign: 'center', margin: 20, fontSize: 16, fontWeight: 'bold' }}>
-                                    Endereço
-                                </Text>
-
-                                <View style={styles.inputView}>
-                                    <MaskedTextInput
-                                        mask="99999-990"
-                                        keyboardType="numeric"
-                                        style={styles.input}
-                                        value={cep}
-                                        placeholder="CEP"
-                                        onChangeText={(text) => pesquisacep(text)}
-                                    />
-                                    {errors.cep && <Text style={styles.errorText}>{errors.cep[0]}</Text>}
-                                </View>
-
-                                <View style={styles.inputView}>
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="Rua"
-                                        value={rua}
-                                        onChangeText={(text) => setRua(text)}
-                                    />
-                                    {errors.rua && <Text style={styles.errorText}>{errors.rua[0]}</Text>}
-                                </View>
-
-                                <View style={styles.inputView}>
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="Bairro"
-                                        value={bairro}
-                                        onChangeText={(text) => setBairro(text)}
-                                    />
-                                    {errors.bairro && <Text style={styles.errorText}>{errors.bairro[0]}</Text>}
-                                </View>
-
-                                <View style={styles.inputView}>
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="Número"
-                                        value={numero}
-                                        onChangeText={(text) => setNumero(text)}
-                                    />
-                                    {errors.numero && <Text style={styles.errorText}>{errors.numero[0]}</Text>}
-                                </View>
-
-                                <View style={styles.inputView}>
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="Complemento"
-                                        value={complemento}
-                                        onChangeText={(text) => setComplemento(text)}
-                                    />
-                                    {errors.complemento && <Text style={styles.errorText}>{errors.complemento[0]}</Text>}
-                                </View>
-
-                                <View style={styles.inputView}>
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="Cidade"
-                                        value={cidade}
-                                        onChangeText={(text) => setCidade(text)}
-                                    />
-                                    {errors.cidade && <Text style={styles.errorText}>{errors.cidade[0]}</Text>}
-                                </View>
-
-                                <View style={styles.inputView}>
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="Estado"
-                                        value={estado}
-                                        onChangeText={(text) => setEstado(text)}
-                                    />
-                                    {errors.estado && <Text style={styles.errorText}>{errors.estado[0]}</Text>}
-                                </View>
-                            </View>
-                        )}
-
-                        {currentStep === 3 && (
-                            <View>
-                                <Text style={{ textAlign: 'center', margin: 20, fontSize: 16, fontWeight: 'bold' }}>
-                                    Dados de Login
-                                </Text>
-
-                                <View style={styles.inputView}>
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="E-mail"
-                                        value={email}
-                                        onChangeText={(text) => setEmail(text)}
-                                    />
-                                    {errors.email && <Text style={styles.errorText}>{errors.email[0]}</Text>}
-                                </View>
-
-                                <View style={styles.inputView}>
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="Senha"
-                                        secureTextEntry
-                                        value={password}
-                                        onChangeText={(text) => setPassword(text)}
-                                    />
-                                    {errors.password && <Text style={styles.errorText}>{errors.password[0]}</Text>}
-                                </View>
-                            </View>
-                        )}
+                            )}
+                        </StripeProvider>
 
                         <View style={styles.buttonContainer}>
                             {currentStep == 1 && (
@@ -416,7 +424,7 @@ const RegisterScreen = ({ navigation }) => {
                                 </TouchableOpacity>
                             )}
                             {currentStep === 3 && (
-                                <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={isLoading}>
+                                <TouchableOpacity style={styles.button} onPress={handlePayment} disabled={isLoading}>
                                     <View style={styles.buttonContent}>
                                         {isLoading ? (
                                             <>
