@@ -104,7 +104,7 @@ const PointsScreen = ({ navigation }) => {
     return (
         <View style={{ flex: 1 }}>
             {user.tipo_usuario == 1 && (
-                <View style={{ padding: 10, marginBottom: 20 }}>
+                <View style={{ padding: 10}}>
                     <View style={{ width: '100%' }}>
                         <TouchableOpacity style={styles.button} onPress={CadastrarPonto}>
                             <Text style={styles.buttonText}>Cadastrar Ponto</Text>
