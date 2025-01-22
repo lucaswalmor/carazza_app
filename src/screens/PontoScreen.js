@@ -1,15 +1,17 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, Linking, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, Linking, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import api from '../services/api';
 import styles from '../../styles';
 import { WebView } from 'react-native-webview';
-import { Ionicons } from '@expo/vector-icons';
+import { FontAwesome, Ionicons } from '@expo/vector-icons';
 
 export default function PontoScreen({ route }) {
     const { id } = route.params;
     const [ponto, setPonto] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isLoadingComentario, setIsLoadingComentario] = useState(false);
+    const [comentario, setComentario] = useState(null);
 
     useEffect(() => {
         const fetchPonto = async () => {
@@ -57,6 +59,10 @@ export default function PontoScreen({ route }) {
             return false; // Bloqueia o carregamento da URL na WebView
         }
     };
+
+    const handleSubmit = () => {
+        console.log(comentario)
+    }
 
     const openMap = async () => {
         const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${ponto?.latitude},${ponto?.longitude}`;
@@ -135,7 +141,7 @@ export default function PontoScreen({ route }) {
                     </View>
 
                     {/* Card 5: Localização */}
-                    <View style={[styles.card, { marginBottom: 150 }]}>
+                    <View style={[styles.card]}>
                         <Text style={styles.infoTitle}>
                             Localização
                         </Text>
@@ -150,6 +156,63 @@ export default function PontoScreen({ route }) {
                             <Ionicons name="location-outline" size={20} color="#fff" style={{ marginRight: 8 }} />
                             <Text style={styles.buttonText}>Abrir no Google Maps</Text>
                         </TouchableOpacity>
+                    </View>
+
+                    {/* Card 6: Galeria de Imagens */}
+                    <View style={[styles.card]}>
+                        <Text style={styles.infoTitle}>Galeria de Imagens</Text>
+                        {ponto?.imagens && ponto.imagens.length > 0 ? (
+                            ponto.imagens.map((imagem) => (
+                                <View key={imagem.id} style={{ marginBottom: 10, marginTop: 20 }}>
+                                    <Image
+                                        source={{ uri: imagem.path }}
+                                        style={{ width: '100%', height: 200, borderRadius: 10 }}
+                                        resizeMode="cover"
+                                    />
+                                </View>
+                            ))
+                        ) : (
+                            <Text style={styles.infoText}>Nenhuma imagem disponível.</Text>
+                        )}
+                    </View>
+
+                    {/* Card 6: Comentários */}
+                    <View style={[styles.card, { marginBottom: 100 }]}>
+                        <Text style={styles.infoTitle}>
+                            Comentários
+                        </Text>
+
+                        <Text style={{ marginTop: 10, marginBottom: 10 }}>
+                            Lista de comentários
+                        </Text>
+
+                        <TextInput
+                            style={[styles.textArea, { marginTop: 10 }]}
+                            placeholder="Deixe seu comentário"
+                            multiline
+                            numberOfLines={4}
+                            value={comentario}
+                            onChangeText={(text) => setComentario(text)}
+                        />
+
+                        <View style={{ flex: 1 }}>
+                            <TouchableOpacity style={styles.buttonSend} onPress={handleSubmit}>
+                                <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                                    {isLoadingComentario ? (
+                                        <>
+                                            <ActivityIndicator style={{ marginRight: 10 }} size="small" color="#fff" />
+                                            <Text style={styles.buttonText}>Enviando</Text>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Text style={styles.buttonTextSend}>Enviar</Text>
+                                            {/* <Ionicons name="send-outline" size={12} color="#fff" style={{ marginLeft: 8 }} /> */}
+                                            <FontAwesome name="paper-plane" size={12} color="#fff" style={{ marginLeft: 8 }} />
+                                        </>
+                                    )}
+                                </View>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </>
             )}

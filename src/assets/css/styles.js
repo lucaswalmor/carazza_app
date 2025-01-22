@@ -192,6 +192,9 @@ const styles = StyleSheet.create({
     textDanger: {
         color: '#E8003F'
     },
+    textWarning: {
+        color: '#FFCA00'
+    },
     textPrimary: {
         color: '#007BFF'
     },
@@ -221,14 +224,16 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        flexDirection: 'row',
         backgroundColor: 'rgba(0,0,0,0.5)',
     },
     modalView: {
         backgroundColor: 'white',
-        margin: 20,
-        padding: 30,
         borderRadius: 10,
+        justifyContent: 'center',
         alignItems: 'center',
+        width: '100%', // Ou `width: width` se usar Dimensions
+        padding: 20,   // Adicione um padding para melhor espaçamento
     },
 })
 

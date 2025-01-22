@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, TouchableOpacity, Text, ActivityIndicator, Image } from 'react-native';
+import { View, TouchableOpacity, Text, ActivityIndicator, Image, Alert } from 'react-native';
 import api from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../assets/css/styles';
@@ -49,20 +49,31 @@ export default function PerfilScreen({ navigation }) {
                 setUser(response.data.data)
 
             } catch (error) {
-                console.error('Erro ao enviar o formulário:', error);
+                console.log('Erro ao enviar o formulário:', error);
             } finally {
                 setIsLoading(false)
             }
         }
     }
 
+    const confirmPause = async () => {
+        Alert.alert(
+            'Deseja realmente pausar esta assinatura?',
+            'Você poderá reativar a assinatura a qualquer momento depois',
+            [
+                { text: 'Cancelar', onPress: () => { }, style: 'cancel' },
+                { text: 'OK', onPress: () => handlePauseSubscription() },
+            ],
+            { cancelable: true }
+        );
+    }
+
     const handlePauseSubscription = async () => {
         const token = await AsyncStorage.getItem('token');
-        const user = JSON.parse(await AsyncStorage.getItem('user'));
+        setIsLoading(true)
 
-        if (user && token) {
+         if (token) {
             try {
-                setIsLoading(true);
                 const response = await api.get(`/stripe/subscription/pause`, {
                     headers: {
                         'Content-Type': 'application/json',
@@ -70,11 +81,9 @@ export default function PerfilScreen({ navigation }) {
                     },
                 });
 
-                console.log(response.data)
-                await handleLogout();
-
+                handleLogout();
             } catch (error) {
-                console.error('Erro ao enviar o formulário:', error);
+                console.log(error)
             } finally {
                 setIsLoading(false)
             }
@@ -104,34 +113,20 @@ export default function PerfilScreen({ navigation }) {
                         </Text>
                     </View>
 
-                    {/* Card 2: Desafios */}
-                    <View style={[styles.card, { gap: 10, flexDirection: 'row', alignItems: 'center' }]}>
-                        <TouchableOpacity
-                            style={{ flex: 1, alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}
-                            onPress={() => { }}
-                        >
-                            <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
-                                Desafios
-                            </Text>
-
-                            <Ionicons name="arrow-forward-outline" size={20} color="#007BFF" style={{ marginRight: 8 }} />
-                        </TouchableOpacity>
-                    </View>
-
-                    {/* Card 2: Desafios */}
+                    {/* Card 2: Assinatura */}
                     <View style={[styles.card, { gap: 10, }]}>
                         <Text style={styles.infoTitle}>
                             Assinatura
                         </Text>
 
                         <Text style={styles.infoLabel}>Valor</Text>
-                        <Text style={styles.infoText}>{user?.subscription?.amount}</Text>
+                        <Text style={styles.infoText}>R$ 4,99</Text>
                         <Text style={styles.infoLabel}>Recorrência</Text>
-                        <Text style={styles.infoText}>{user?.subscription?.interval}</Text>
-                        <Text style={styles.infoLabel}>Início</Text>
-                        <Text style={styles.infoText}>{user?.subscription?.start_date}</Text>
+                        <Text style={styles.infoText}>Mensal</Text>
+                        {/* <Text style={styles.infoLabel}>Início</Text>
+                        <Text style={styles.infoText}>R$ 4,99</Text> */}
 
-                        <TouchableOpacity style={styles.buttonDanger} onPress={handlePauseSubscription} disabled={isLoading}>
+                        <TouchableOpacity style={styles.buttonDanger} onPress={confirmPause} disabled={isLoading}>
                             <View style={styles.buttonContent}>
                                 {isLoading ? (
                                     <>

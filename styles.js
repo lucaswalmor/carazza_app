@@ -50,6 +50,15 @@ const styles = StyleSheet.create({
         marginTop: 10,
         padding: 10,
     },
+    buttonSend: {
+        height: 30,
+        backgroundColor: '#007BFF',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 25,
+        marginTop: 10,
+        width: '25%'
+    },
     buttonDanger: {
         height: 50,
         backgroundColor: '#E8003F',
@@ -90,6 +99,11 @@ const styles = StyleSheet.create({
     buttonText: {
         color: '#fff',
         fontSize: 18,
+        fontWeight: 'bold',
+    },
+    buttonTextSend: {
+        color: '#fff',
+        fontSize: 12,
         fontWeight: 'bold',
     },
     buttonContainer: {
@@ -228,7 +242,8 @@ const styles = StyleSheet.create({
         margin: 20,
         padding: 30,
         borderRadius: 10,
-        alignItems: 'center',
+        alignItems: 'stretch', // Permite que os filhos ocupem toda a largura
+        width: '90%', // Define a largura do modal
     },
 })
 

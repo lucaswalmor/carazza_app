@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Image, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator, TextInput, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Image, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator, TextInput, Alert, Linking } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { createPreference, criarAssinatura } from '../services/MercadoPago'; // Ajustado para Mercado Pago
-import { openBrowserAsync } from 'expo-web-browser';
 import { MaskedTextInput } from 'react-native-mask-text';
 import styles from '../../styles';
 import api from '../services/api';
@@ -120,7 +118,7 @@ const RegisterScreen = ({ navigation }) => {
                 },
             });
 
-            handlePayment();
+            handleOpenLinkWithParams();
             setUserId(response.data.data.id)
         } catch (err) {
             if (err.response && err.response.data) {
@@ -134,20 +132,24 @@ const RegisterScreen = ({ navigation }) => {
         }
     };
 
-    const handlePayment = async () => {
-        if (!email) {
-            Alert.alert('Digite seu email')
-        }
+    const handleOpenLinkWithParams = async () => {
+        const baseUrl = 'https://carazzapayment.vercel.app/';
+        const params = {
+            email: email,
+        };
 
-        // const checkoutUrl = await createPreference(email); // Utiliza o Mercado Pago
-        const url = `https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=2c9380849469a4a1019485312b350edb`;
-        
-        try {
-            await openBrowserAsync(url);
-        } catch (error) {
-            console.error('Erro ao abrir o checkout:', error);
+        // Construindo a URL com parâmetros
+        const url = `${baseUrl}?${new URLSearchParams(params).toString()}`;
+
+        const supported = await Linking.canOpenURL(url);
+
+        if (supported) {
+            await Linking.openURL(url);
+            navigation.replace('Login', { message: 'Cadastro realizado com sucesso!' });
+        } else {
+            Alert.alert('Erro', 'Não foi possível abrir o link: ' + url);
         }
-    }
+    };
 
     const backToLogin = () => {
         navigation.replace('Login');
@@ -215,7 +217,7 @@ const RegisterScreen = ({ navigation }) => {
 
                                 <View style={styles.inputView}>
                                     <MaskedTextInput
-                                        mask="(99) 9 9999-9999"
+                                        mask="(99) 99999-9999"
                                         keyboardType="numeric"
                                         style={styles.input}
                                         value={telefone}
@@ -358,8 +360,21 @@ const RegisterScreen = ({ navigation }) => {
                                     <Text style={styles.buttonText}>Próximo</Text>
                                 </TouchableOpacity>
                             ) : (
-                                <TouchableOpacity style={styles.button} onPress={handleRegister}>
-                                    <Text style={styles.buttonText}>Cadastrar</Text>
+                                <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={isLoading}>
+                                    <View style={styles.buttonContent}>
+                                        {isLoading ? (
+                                            <>
+                                                <ActivityIndicator
+                                                    style={styles.loadingIndicator}
+                                                    size="small"
+                                                    color="#fff"
+                                                />
+                                                <Text style={styles.buttonText}>Aguarde</Text>
+                                            </>
+                                        ) : (
+                                            <Text style={styles.buttonText}>Finalizar Cadastro</Text>
+                                        )}
+                                    </View>
                                 </TouchableOpacity>
                             )}
                         </View>

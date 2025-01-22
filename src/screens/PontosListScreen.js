@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, RefreshControl } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../services/api';
 import styles from '../assets/css/styles';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const PointsScreen = ({ navigation }) => {
     const [user, setUser] = useState({});
     const [isLoading, setIsLoading] = useState(false);
+    const [isRefreshing, setIsRefreshing] = useState(false);
     const [pontos, setPontos] = useState([]);
+    const [refreshKey, setRefreshKey] = useState(0);
 
     const CadastrarPonto = () => {
         navigation.navigate('CadastrarPonto');
@@ -31,13 +34,8 @@ const PointsScreen = ({ navigation }) => {
 
         try {
             setIsLoading(true);
-            const response = await api.get('/ponto/index', {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            setPontos(response.data.data)
+            const response = await api.get('/ponto/index');
+            setPontos(response.data)
         } catch (error) {
             console.error('Erro ao enviar o formulário:', error);
         } finally {
@@ -45,18 +43,57 @@ const PointsScreen = ({ navigation }) => {
         }
     }
 
+    const refreshPontos = async () => {
+        setIsRefreshing(true);
+        await getPontos();
+        setIsRefreshing(false);
+    };
+
+    const likePonto = async (ponto) => {
+        const token = await AsyncStorage.getItem('token');
+
+        try {
+            const response = await api.put(`/ponto/update/like/${ponto.id}`, {}, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+
+            await getPontos();
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     const renderCard = ({ item }) => (
         <TouchableOpacity
-            style={[styles.card, {gap: 10}]}
+            style={[styles.card, { gap: 10 }]}
             onPress={() => navigation.navigate('PontoScreen', { id: item.id })}
         >
-            <Text style={styles.h3}>{item.nome}</Text>
+            <Text style={[styles.h3, styles.infoTitle]}>{item.nome}</Text>
             <Text style={styles.h5}>{item.cidade}, {item.estado}</Text>
             <Text style={styles.span}>{item.descricao}</Text>
+
+            <View style={stylesPontoListScreen.actionsContainer}>
+                <TouchableOpacity
+                    style={stylesPontoListScreen.actionButton}
+                    onPress={() => likePonto(item)}
+                >
+                    <Ionicons
+                        name={item.like ? "thumbs-up" : "thumbs-up-outline"}
+                        size={24}
+                        color="#007BFF"
+                        style={{ marginRight: 10 }}
+                    />
+
+                    <Text>{item.like_count}</Text>
+                </TouchableOpacity>
+            </View>
         </TouchableOpacity>
     );
 
-    if (isLoading) {
+    if (isLoading && !isRefreshing) {
         return (
             <View style={stylesPontoListScreen.loadingContainer}>
                 <ActivityIndicator size="large" color="#007BFF" />
@@ -67,21 +104,37 @@ const PointsScreen = ({ navigation }) => {
     return (
         <View style={{ flex: 1 }}>
             {user.tipo_usuario == 1 && (
-                <View style={{}}>
-                    <View style={{ padding: 10, width: '100%' }}>
+                <View style={{ padding: 10, marginBottom: 20 }}>
+                    <View style={{ width: '100%' }}>
                         <TouchableOpacity style={styles.button} onPress={CadastrarPonto}>
                             <Text style={styles.buttonText}>Cadastrar Ponto</Text>
                         </TouchableOpacity>
                     </View>
-
-                    <FlatList
-                        data={pontos}
-                        renderItem={renderCard}
-                        keyExtractor={(item) => item.id.toString()}
-                        contentContainerStyle={stylesPontoListScreen.listContainer}
-                    />
                 </View>
             )}
+            <View style={{ padding: 10, marginBottom: 50 }}>
+                <FlatList
+                    data={pontos}
+                    keyExtractor={(item) => item.estado}
+                    renderItem={({ item }) => (
+                        <View>
+                            <Text style={[styles.infoTitle, { marginTop: 15, marginBottom: 15, fontSize: 18 }]}>{`${item.estado}`}</Text>
+                            <FlatList
+                                data={item.pontos}
+                                keyExtractor={(ponto) => ponto.id.toString()}
+                                renderItem={renderCard}
+                            />
+                        </View>
+                    )}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={isRefreshing}
+                            onRefresh={refreshPontos}
+                            colors={['#007BFF']}
+                        />
+                    }
+                />
+            </View>
         </View>
     );
 };
@@ -109,6 +162,28 @@ const stylesPontoListScreen = StyleSheet.create({
     descricao: {
         fontSize: 12,
         color: '#777',
+    },
+    actionsContainer: {
+        flexDirection: 'row', // Alinha os botões horizontalmente
+        justifyContent: 'space-between', // Espaço igual entre os botões
+        marginTop: 10,
+    },
+    actionButton: {
+        flexDirection: 'row', // Ícone e texto na mesma linha
+        alignItems: 'center',
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        borderRadius: 8,
+        backgroundColor: '#f9f9f9',
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    actionText: {
+        marginLeft: 5,
+        fontSize: 14,
+        color: '#333',
     },
 });
 
