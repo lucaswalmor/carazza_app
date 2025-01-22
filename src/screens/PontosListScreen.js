@@ -34,7 +34,11 @@ const PointsScreen = ({ navigation }) => {
 
         try {
             setIsLoading(true);
-            const response = await api.get('/ponto/index');
+            const response = await api.get('/ponto/index', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
             setPontos(response.data)
         } catch (error) {
             console.error('Erro ao enviar o formulário:', error);

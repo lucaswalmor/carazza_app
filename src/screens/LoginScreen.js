@@ -85,11 +85,11 @@ export default function LoginScreen({ navigation, route }) {
         setModalAssinaturaVisible(true)
       }
     } catch (error) {
-      // if (error.response && error.response.data) {
-      //   setErrors(error.response.data.errors);
-      // } else {
-      //   console.log('Erro:', error.message);
-      // }
+      if (error.response && error.response.data) {
+        setErrors(error.response.data.errors);
+      } else {
+        console.log('Erro:', error.message);
+      }
       setIsLoading(false);
     } finally {
       setIsLoading(false);
