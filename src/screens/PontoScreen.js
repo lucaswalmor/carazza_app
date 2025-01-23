@@ -106,21 +106,21 @@ export default function PontoScreen({ route }) {
                             source={
                                 Platform.OS === 'ios'
                                     ? {
-                                        uri: 'https://www.tiktok.com/@brunocarazza3/video/7416808673978109189?q=brunocarazza&t=1737605809002',
+                                        uri: ponto?.link_video,
                                     }
                                     : {
                                         html: `
-                        <!DOCTYPE html>
-                        <html>
-                          <head>
-                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                            <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-                          </head>
-                          <body style="margin:0;padding:0;">
-                            ${ponto?.codigo_video}
-                          </body>
-                        </html>
-                      `,
+                                            <!DOCTYPE html>
+                                            <html>
+                                            <head>
+                                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                                <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+                                            </head>
+                                            <body style="margin:0;padding:0;">
+                                                ${ponto?.codigo_video}
+                                            </body>
+                                            </html>
+                                        `,
                                     }
                             }
                         />
