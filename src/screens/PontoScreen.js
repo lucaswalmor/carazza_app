@@ -26,6 +26,7 @@ export default function PontoScreen({ route }) {
                     },
                 });
 
+                console.log(response.data.data)
                 setPonto(response.data.data);
             } catch (error) {
                 console.error(error);
@@ -41,6 +42,11 @@ export default function PontoScreen({ route }) {
         setIsLoading(true)
 
         const url = event.url;
+
+        if (!url || url === "about:blank") {
+            console.warn("URL inválida bloqueada:", url);
+            return false; // Bloqueia o carregamento na WebView
+        }
 
         // Verifica se é uma URL desconhecida ou um esquema externo
         if (url.startsWith('http') || url.startsWith('https')) {
