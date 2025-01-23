@@ -237,7 +237,7 @@ const RegisterScreen = ({ navigation }) => {
 
                                 <View style={styles.inputView}>
                                     <MaskedTextInput
-                                        mask="99999-990"
+                                        mask="99999-999"
                                         keyboardType="numeric"
                                         style={styles.input}
                                         value={cep}
