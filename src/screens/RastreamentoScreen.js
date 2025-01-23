@@ -10,7 +10,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 const TASK_NAME = 'background-fetch-task';
 
-export default function TrackingScreen() {
+export default function RastreamentoScreen() {
     const [location, setLocation] = useState(null);
     const [region, setRegion] = useState({
         latitude: 37.78825,
@@ -205,7 +205,6 @@ export default function TrackingScreen() {
     return (
         <View style={styles.container}>
             <LinearGradient
-                // Button Linear Gradient
                 colors={['#3b5998', '#3b5998' ,'#3b5998', '#3b5998', '#001933']}
                 style={styles.gradientContainer}
             >

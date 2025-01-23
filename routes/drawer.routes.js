@@ -1,7 +1,8 @@
-import { Feather, Ionicons } from '@expo/vector-icons'
+import { Feather, FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons'
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import PerfilScreen from '../src/screens/PerfilScreen'
-import DesafiosListScreen from '../src/screens/DesafiosListScreen';
+import MeusDesafios from '../src/screens/MeusDesafios';
+import RotaScreen from '../src/screens/RotaScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -29,18 +30,30 @@ export default function DrawerRoutes() {
                 name="PerfilScreen"
                 component={PerfilScreen}
                 options={{
-                    drawerIcon: ({ color, size }) => <Feather name="user" color={color} size={size} />,
+                    drawerIcon: ({ color, size }) => (
+                        <MaterialIcons name="person" color={color} size={size} />
+                    ),
                     drawerLabel: 'Perfil',
                 }}
             />
             <Drawer.Screen
-                name="DesafiosListScreen"
-                component={DesafiosListScreen}
+                name="MeusDesafios"
+                component={MeusDesafios}
                 options={{
                     drawerIcon: ({ color, size }) => (
-                        <Ionicons name="trophy-outline" color={color} size={size} />
+                        <FontAwesome5 name="medal" color={color} size={size} />
                     ),
                     drawerLabel: 'Desafios',
+                }}
+            />
+            <Drawer.Screen
+                name="RotaScreen"
+                component={RotaScreen}
+                options={{
+                    drawerIcon: ({ color, size }) => (
+                        <FontAwesome5 name="record-vinyl" color={color} size={size} />
+                    ),
+                    drawerLabel: 'Gravar',
                 }}
             />
         </Drawer.Navigator>

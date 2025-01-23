@@ -5,6 +5,7 @@ import EventosScreen from '../src/screens/EventosScreen'
 import DrawerRoutes from './drawer.routes';
 import PontoListScreen from '../src/screens/PontosListScreen'
 import EncontrosScreen from '../src/screens/EncontrosScreen'
+import DesafiosListScreen from '../src/screens/DesafiosListScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -20,8 +21,8 @@ export default function TabRoutes() {
                         iconName = 'calendar-outline';
                     } else if (route.name === 'Perfil') {
                         iconName = 'person-outline';
-                    } else if (route.name === 'Encontros') {
-                        iconName = 'location-outline';
+                    } else if (route.name === 'Desafios') {
+                        iconName = 'trophy-outline';
                       }
 
                     return <Ionicons name={iconName} size={size} color={color} />;
@@ -43,7 +44,7 @@ export default function TabRoutes() {
         >
             <Tab.Screen name="Pontos" component={PontoListScreen} />
             <Tab.Screen name="Eventos" component={EventosScreen} />
-            <Tab.Screen name="Encontros" component={EncontrosScreen} />
+            <Tab.Screen name="Desafios" component={DesafiosListScreen} />
             <Tab.Screen name="Perfil" component={DrawerRoutes} options={{ headerShown: false }} />
         </Tab.Navigator>
     );

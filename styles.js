@@ -240,6 +240,12 @@ const styles = StyleSheet.create({
         alignItems: 'stretch', // Permite que os filhos ocupem toda a largura
         width: '90%', // Define a largura do modal
     },
+    timer: {
+        fontSize: 20,
+        paddingLeft: 30,
+        fontWeight: "bold",
+        color: '#cce5ff'
+    },
 })
 
 export default styles
