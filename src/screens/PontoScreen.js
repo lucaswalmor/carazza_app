@@ -26,8 +26,8 @@ export default function PontoScreen({ route }) {
                     },
                 });
 
-                console.log(response.data.data)
                 setPonto(response.data.data);
+                setIsLoading(false);
             } catch (error) {
                 console.error(error);
             } finally {
