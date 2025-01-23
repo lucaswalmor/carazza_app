@@ -1,10 +1,20 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, Linking, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+    ActivityIndicator,
+    Image,
+    Linking,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 import api from '../services/api';
 import styles from '../../styles';
 import { WebView } from 'react-native-webview';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
+import { Platform } from 'react-native';
 
 export default function PontoScreen({ route }) {
     const { id } = route.params;
@@ -15,7 +25,7 @@ export default function PontoScreen({ route }) {
 
     useEffect(() => {
         const fetchPonto = async () => {
-            setIsLoading(true)
+            // setIsLoading(true);
             const token = await AsyncStorage.getItem('token');
 
             try {
@@ -27,25 +37,22 @@ export default function PontoScreen({ route }) {
                 });
 
                 setPonto(response.data.data);
-                setIsLoading(false);
             } catch (error) {
                 console.error(error);
-                setIsLoading(false);
             } finally {
                 setIsLoading(false);
             }
         };
-
         fetchPonto();
     }, [id]);
 
     const handleNavigation = (event) => {
-        setIsLoading(true)
+        setIsLoading(true);
 
         const url = event.url;
 
-        if (!url || url === "about:blank") {
-            console.warn("URL inválida bloqueada:", url);
+        if (!url || url === 'about:blank') {
+            console.warn('URL inválida bloqueada:', url);
             return false; // Bloqueia o carregamento na WebView
         }
 
@@ -68,8 +75,8 @@ export default function PontoScreen({ route }) {
     };
 
     const handleSubmit = () => {
-        console.log(comentario)
-    }
+        console.log(comentario);
+    };
 
     const openMap = async () => {
         const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${ponto?.latitude},${ponto?.longitude}`;
@@ -80,87 +87,115 @@ export default function PontoScreen({ route }) {
         <ScrollView style={styles.container}>
             {isLoading ? (
                 <>
-                    <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                    <View
+                        style={{
+                            flex: 1,
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}>
                         <ActivityIndicator size="large" color="#007BFF" />
                     </View>
                 </>
             ) : (
                 <>
-                    {/* Card 1: Video */}
                     <View style={{}}>
                         <WebView
+                            style={{ height: Platform.OS === 'ios' ? 500 : 750 }}
                             originWhitelist={['*']}
-                            source={{
-                                html:
-                                    `
+                            source={
+                                Platform.OS === 'ios'
+                                    ? {
+                                        uri: 'https://www.tiktok.com/@brunocarazza3/video/7416808673978109189?q=brunocarazza&t=1737605809002',
+                                    }
+                                    : {
+                                        html: `
                         <!DOCTYPE html>
                         <html>
-                            <head>
-                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                            </head>
-                            <body style="margin:0;padding:0;">
-                                ${ponto?.codigo_video}
-                            </body>
+                          <head>
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+                          </head>
+                          <body style="margin:0;padding:0;">
+                            ${ponto?.codigo_video}
+                          </body>
                         </html>
-                    `
-                            }}
-                            style={{ width: '100%', height: 750 }}
-                            onShouldStartLoadWithRequest={handleNavigation}
+                      `,
+                                    }
+                            }
                         />
                     </View>
 
                     {/* Card 2: Informações */}
                     <View style={styles.card}>
-                        <Text style={styles.infoTitle}>
-                            Informações
-                        </Text>
+                        <Text style={styles.infoTitle}>Informações</Text>
 
                         <Text style={styles.infoLabel}>Informações Complementares:</Text>
-                        <Text style={styles.infoText}>{ponto?.informacoes_complementares}</Text>
+                        <Text style={styles.infoText}>
+                            {ponto?.informacoes_complementares}
+                        </Text>
                         <Text style={styles.infoLabel}>Descrição:</Text>
                         <Text style={styles.infoText}>{ponto?.descricao}</Text>
                     </View>
 
                     {/* Card 3: Horários */}
                     <View style={styles.card}>
-                        <Text style={styles.infoTitle}>
-                            Horários
-                        </Text>
+                        <Text style={styles.infoTitle}>Horários</Text>
 
                         <Text style={styles.infoLabel}>Horário de Funcionamento:</Text>
-                        <Text style={styles.infoText}>{ponto?.hora_abertura} - {ponto?.hora_fechamento}</Text>
+                        <Text style={styles.infoText}>
+                            {ponto?.hora_abertura} - {ponto?.hora_fechamento}
+                        </Text>
                     </View>
 
                     {/* Card 4: Valores */}
                     <View style={styles.card}>
-                        <Text style={styles.infoTitle}>
-                            Valores
-                        </Text>
+                        <Text style={styles.infoTitle}>Valores</Text>
 
                         <Text style={styles.infoLabel}>Mínimo Alimentação:</Text>
-                        <Text style={styles.infoText}>{ponto?.valor_minimo_alimentaca}</Text>
+                        <Text style={styles.infoText}>
+                            {ponto?.valor_minimo_alimentaca}
+                        </Text>
                         <Text style={styles.infoLabel}>Máximo Alimentação:</Text>
-                        <Text style={styles.infoText}>{ponto?.valor_maximo_alimentaca}</Text>
+                        <Text style={styles.infoText}>
+                            {ponto?.valor_maximo_alimentaca}
+                        </Text>
                         <Text style={styles.infoLabel}>Mínimo Hospedagem:</Text>
-                        <Text style={styles.infoText}>{ponto?.valor_minimo_hospedagem}</Text>
+                        <Text style={styles.infoText}>
+                            {ponto?.valor_minimo_hospedagem}
+                        </Text>
                         <Text style={styles.infoLabel}>Máximo Hospedagem:</Text>
-                        <Text style={styles.infoText}>{ponto?.valor_maximo_hospedagem}</Text>
+                        <Text style={styles.infoText}>
+                            {ponto?.valor_maximo_hospedagem}
+                        </Text>
                     </View>
 
                     {/* Card 5: Localização */}
                     <View style={styles.card}>
-                        <Text style={styles.infoTitle}>
-                            Localização
-                        </Text>
+                        <Text style={styles.infoTitle}>Localização</Text>
                         <Text style={styles.infoLabel}>CEP:</Text>
                         <Text style={styles.infoText}>{ponto?.cep}</Text>
                         <Text style={styles.infoLabel}>Rua:</Text>
-                        <Text style={styles.infoText}>{ponto?.rua}, nº {ponto?.numero}, {ponto?.bairro}</Text>
+                        <Text style={styles.infoText}>
+                            {ponto?.rua}, nº {ponto?.numero}, {ponto?.bairro}
+                        </Text>
                         <Text style={styles.infoLabel}>Cidade - Estado</Text>
-                        <Text style={styles.infoText}>{ponto?.cidade} - {ponto?.estado}</Text>
+                        <Text style={styles.infoText}>
+                            {ponto?.cidade} - {ponto?.estado}
+                        </Text>
 
-                        <TouchableOpacity style={[styles.button, { flexDirection: 'row', marginBottom: 20 }]} onPress={openMap}>
-                            <Ionicons name="location-outline" size={20} color="#fff" style={{ marginRight: 8 }} />
+                        <TouchableOpacity
+                            style={[
+                                styles.button,
+                                { flexDirection: 'row', marginBottom: 20 },
+                            ]}
+                            onPress={openMap}>
+                            <Ionicons
+                                name="location-outline"
+                                size={20}
+                                color="#fff"
+                                style={{ marginRight: 8 }}
+                            />
                             <Text style={styles.buttonText}>Abrir no Google Maps</Text>
                         </TouchableOpacity>
                     </View>
@@ -170,7 +205,9 @@ export default function PontoScreen({ route }) {
                         <Text style={styles.infoTitle}>Galeria de Imagens</Text>
                         {ponto?.imagens && ponto.imagens.length > 0 ? (
                             ponto.imagens.map((imagem) => (
-                                <View key={imagem.id} style={{ marginBottom: 10, marginTop: 20 }}>
+                                <View
+                                    key={imagem.id}
+                                    style={{ marginBottom: 10, marginTop: 20 }}>
                                     <Image
                                         source={{ uri: imagem.path }}
                                         style={{ width: '100%', height: 200, borderRadius: 10 }}
@@ -185,9 +222,7 @@ export default function PontoScreen({ route }) {
 
                     {/* Card 6: Comentários */}
                     <View style={[styles.card, { marginBottom: 100 }]}>
-                        <Text style={styles.infoTitle}>
-                            Comentários
-                        </Text>
+                        <Text style={styles.infoTitle}>Comentários</Text>
 
                         <Text style={{ marginTop: 10, marginBottom: 10 }}>
                             Lista de comentários
@@ -203,18 +238,35 @@ export default function PontoScreen({ route }) {
                         />
 
                         <View style={{ flex: 1 }}>
-                            <TouchableOpacity style={styles.buttonSend} onPress={handleSubmit}>
-                                <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                            <TouchableOpacity
+                                style={styles.buttonSend}
+                                onPress={handleSubmit}>
+                                <View
+                                    style={{
+                                        flex: 1,
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                    }}>
                                     {isLoadingComentario ? (
                                         <>
-                                            <ActivityIndicator style={{ marginRight: 10 }} size="small" color="#fff" />
+                                            <ActivityIndicator
+                                                style={{ marginRight: 10 }}
+                                                size="small"
+                                                color="#fff"
+                                            />
                                             <Text style={styles.buttonText}>Enviando</Text>
                                         </>
                                     ) : (
                                         <>
                                             <Text style={styles.buttonTextSend}>Enviar</Text>
                                             {/* <Ionicons name="send-outline" size={12} color="#fff" style={{ marginLeft: 8 }} /> */}
-                                            <FontAwesome name="paper-plane" size={12} color="#fff" style={{ marginLeft: 8 }} />
+                                            <FontAwesome
+                                                name="paper-plane"
+                                                size={12}
+                                                color="#fff"
+                                                style={{ marginLeft: 8 }}
+                                            />
                                         </>
                                     )}
                                 </View>
