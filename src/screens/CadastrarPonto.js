@@ -36,6 +36,7 @@ export default function CadastrarPonto({ navigation })  {
         descricao: 'O loca é historico por tal coisa bla bla bla bla bla bla',
         informacoesComplementares: 'Ponto bom para comer',
         codigoVideo: '<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@brunocarazza3/video/7416808403827248389" data-video-id="7416808403827248389" style="max-width: 605px;min-width: 325px;" > <section> <a target="_blank" title="@brunocarazza3" href="https://www.tiktok.com/@brunocarazza3?refer=embed">@brunocarazza3</a> <p>Me siga pra mais …</p> <a target="_blank" title="♬ som original - Bruno Carazza" href="https://www.tiktok.com/music/som-original-7416808761504008965?refer=embed">♬ som original - Bruno Carazza</a> </section> </blockquote> <script async src="https://www.tiktok.com/embed.js"></script>',
+        linkVideo: 'https://www.tiktok.com/@brunocarazza3/video/7416808673978109189?q=brunocarazza&t=1737605809002',
         horaAbertura: '10:00',
         horaFechamento: '22:00',
     });
@@ -93,6 +94,7 @@ export default function CadastrarPonto({ navigation })  {
                 valorMaxHospedagem: '',
                 informacoesComplementares: '',
                 codigoVideo: '',
+                linkVideo: '',
                 horaAbertura: '',
                 horaFechamento: '',
             });
@@ -310,9 +312,16 @@ export default function CadastrarPonto({ navigation })  {
 
             <TextInput
                 style={styles.input}
-                placeholder="Link do vídeo no TIKTOK"
+                placeholder="Embed do video no TIKTOK"
                 value={form.codigoVideo}
                 onChangeText={(text) => handleInputChange('codigoVideo', text)}
+            />
+
+            <TextInput
+                style={styles.input}
+                placeholder="Link do vídeo no TIKTOK"
+                value={form.linkVideo}
+                onChangeText={(text) => handleInputChange('linkVideo', text)}
             />
 
             <MaskedTextInput
