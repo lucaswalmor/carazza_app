@@ -150,23 +150,6 @@ const stylesPontoListScreen = StyleSheet.create({
         alignItems: 'center',
         width: '100%'
     },
-    listContainer: {
-        padding: 10,
-    },
-    nome: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#333',
-    },
-    cidadeEstado: {
-        fontSize: 14,
-        color: '#555',
-        marginVertical: 5,
-    },
-    descricao: {
-        fontSize: 12,
-        color: '#777',
-    },
     actionsContainer: {
         flexDirection: 'row', // Alinha os botões horizontalmente
         justifyContent: 'space-between', // Espaço igual entre os botões
@@ -183,11 +166,6 @@ const stylesPontoListScreen = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 4,
         elevation: 2,
-    },
-    actionText: {
-        marginLeft: 5,
-        fontSize: 14,
-        color: '#333',
     },
 });
 

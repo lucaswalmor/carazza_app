@@ -7,7 +7,7 @@ export default function EventosScreen() {
             <Text style={styles.text}>Bem-vindo à tela de Eventos!</Text>
         </View>
     );
-};
+}
 
 const styles = StyleSheet.create({
     container: {

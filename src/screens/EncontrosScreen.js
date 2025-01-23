@@ -7,7 +7,7 @@ export default function EncontrosScreen() {
       <Text style={styles.text}>Bem-vindo à tela de Encontros!</Text>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {

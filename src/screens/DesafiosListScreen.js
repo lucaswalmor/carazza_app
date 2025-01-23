@@ -7,7 +7,7 @@ export default function DesafiosListScreen() {
       <Text style={styles.text}>Bem-vindo à tela de Desafios!</Text>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {

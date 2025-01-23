@@ -378,4 +378,4 @@ export default function CadastrarPonto({ navigation })  {
             </View>
         </ScrollView>
     );
-};
+}

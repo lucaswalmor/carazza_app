@@ -148,7 +148,7 @@ export default function PontoScreen({ route }) {
                     </View>
 
                     {/* Card 5: Localização */}
-                    <View style={[styles.card]}>
+                    <View style={styles.card}>
                         <Text style={styles.infoTitle}>
                             Localização
                         </Text>
@@ -166,7 +166,7 @@ export default function PontoScreen({ route }) {
                     </View>
 
                     {/* Card 6: Galeria de Imagens */}
-                    <View style={[styles.card]}>
+                    <View style={styles.card}>
                         <Text style={styles.infoTitle}>Galeria de Imagens</Text>
                         {ponto?.imagens && ponto.imagens.length > 0 ? (
                             ponto.imagens.map((imagem) => (

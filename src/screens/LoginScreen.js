@@ -248,7 +248,7 @@ export default function LoginScreen({ navigation, route }) {
               onChangeText={setEmail}
             />
 
-            <TouchableOpacity onPress={handleResumeSubscription} style={[styles.button]}>
+            <TouchableOpacity onPress={handleResumeSubscription} style={styles.button}>
               <Text style={{color: '#FFFFFF', fontWeight: 'bold'}}>Confirmar Rativação de assinatura</Text>
             </TouchableOpacity>
 
