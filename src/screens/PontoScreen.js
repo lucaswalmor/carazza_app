@@ -30,6 +30,7 @@ export default function PontoScreen({ route }) {
                 setIsLoading(false);
             } catch (error) {
                 console.error(error);
+                setIsLoading(false);
             } finally {
                 setIsLoading(false);
             }
