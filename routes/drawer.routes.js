@@ -43,7 +43,7 @@ export default function DrawerRoutes() {
                     drawerIcon: ({ color, size }) => (
                         <FontAwesome5 name="medal" color={color} size={size} />
                     ),
-                    drawerLabel: 'Desafios',
+                    drawerLabel: 'Meus Desafios',
                 }}
             />
             <Drawer.Screen

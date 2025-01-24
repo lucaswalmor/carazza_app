@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, View, Text, Alert, TouchableOpacity } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
-import * as TaskManager from 'expo-task-manager';
 import { MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import WebView from 'react-native-webview';
 
 const LOCATION_TASK_NAME = 'background-location-task';
 
@@ -15,7 +15,7 @@ export default function RotaScreen() {
     const [currentLocation, setCurrentLocation] = useState(null);
     const [startMarker, setStartMarker] = useState(null);
     const [endMarker, setEndMarker] = useState(null);
-    const [routeData, setRouteData] = useState(null);
+    const [cordenatesWebview, setCordenatesWebview] = useState([]);
     const mapRef = useRef(null);
 
     // Permissão de localização e configuração do watchPositionAsync
@@ -28,12 +28,18 @@ export default function RotaScreen() {
             }
 
             const location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
+
+            if (cordenatesWebview.length < 1) {
+                setCordenatesWebview((prevCoordinates) => {
+                    return [...prevCoordinates, { lat: location.coords.latitude, lng: location.coords.longitude }];
+                });
+            }
             setCurrentLocation(location.coords);
 
             const subscription = await Location.watchPositionAsync(
                 {
                     accuracy: Location.Accuracy.Highest,
-                    timeInterval: 1000,
+                    timeInterval: 4000,
                     distanceInterval: 1,
                 },
                 (response) => {
@@ -54,6 +60,11 @@ export default function RotaScreen() {
                                 const newDistance = calculateDistance(lastPoint, response.coords);
                                 setDistance((prevDistance) => prevDistance + newDistance);
                             }
+
+                            setCordenatesWebview((prevCoordinates) => {
+                                return [...prevCoordinates, { lat: response.coords.latitude, lng: response.coords.longitude }];
+                            });
+
                             return [...prevRoute, response.coords];
                         });
                     }
@@ -67,7 +78,7 @@ export default function RotaScreen() {
             if (!(await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME))) {
                 await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
                     accuracy: Location.Accuracy.Highest,
-                    timeInterval: 1000,
+                    timeInterval: 5000,
                     distanceInterval: 1,
                     showsBackgroundLocationIndicator: true,
                     foregroundService: {
@@ -98,6 +109,7 @@ export default function RotaScreen() {
         setStartMarker(currentLocation);
         setEndMarker(null);
         setIsRecording(true);
+        setCordenatesWebview([]);
         Alert.alert('Gravação iniciada', 'Estamos gravando sua rota.');
     };
 
@@ -105,14 +117,19 @@ export default function RotaScreen() {
         setIsRecording(false);
         setEndMarker(currentLocation);
 
+        const coordinates = route.map(point => ({
+            lat: point.latitude,
+            lng: point.longitude
+        }));
+
         const data = {
             startLocation: startMarker,
             endLocation: currentLocation,
             distance,
-            coordinates: route,
+            coordinates: coordinates,
         };
-        setRouteData(data);
 
+        setCordenatesWebview(coordinates);
         Alert.alert(
             'Rota concluída',
             `Distância total: ${distance.toFixed(2)} km.`,
@@ -133,57 +150,76 @@ export default function RotaScreen() {
         setStartMarker(null);
         setEndMarker(null);
         setDistance(0);
-        setRouteData(null);
+        // setRouteData(null);
         Alert.alert('Rota resetada', 'Você pode iniciar uma nova rota.');
     };
 
     return (
         <View style={stylesMap.container}>
             {currentLocation ? (
-                <></>
-                // <MapView
-                //     style={stylesMap.map}
-                //     initialRegion={{
-                //         latitude: currentLocation.latitude,
-                //         longitude: currentLocation.longitude,
-                //         latitudeDelta: 0.006,
-                //         longitudeDelta: 0.006,
-                //     }}
-                //     showsUserLocation
-                //     followsUserLocation
-                //     ref={mapRef}
-                // >
-                //     {route.length > 0 && isRecording && (
-                //         <Polyline
-                //             coordinates={route}
-                //             strokeColor="blue"
-                //             strokeWidth={5}
-                //         />
-                //     )}
-                //     {startMarker && (
-                //         <Marker
-                //             coordinate={{
-                //                 latitude: startMarker.latitude,
-                //                 longitude: startMarker.longitude,
-                //             }}
-                //             title="Início"
-                //             pinColor="green"
-                //         />
-                //     )}
-                //     {endMarker && (
-                //         <Marker
-                //             coordinate={{
-                //                 latitude: endMarker.latitude,
-                //                 longitude: endMarker.longitude,
-                //             }}
-                //             title="Fim"
-                //             pinColor="red"
-                //         />
-                //     )}
-                // </MapView>
+                <WebView
+                    originWhitelist={['*']}
+                    source={{
+                        html: `
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <style>
+                            #map { height: 100%; width: 100%; }
+                            html, body { height: 100%; margin: 0; padding: 0; }
+                            </style>
+                            <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB2PKyiPLwysX53zSFx7Vv2wgIFb88oTL4"></script>
+                            <script>
+                                function initMap() {
+                                    const routeCoordinates = ${JSON.stringify(cordenatesWebview)};
+                                    const map = new google.maps.Map(document.getElementById('map'), {
+                                        zoom:  ${isRecording} ? 19 : 17,
+                                        center: routeCoordinates[routeCoordinates.length - 1],
+                                    });
+
+                                    const routePath = new google.maps.Polyline({
+                                        path: routeCoordinates,
+                                        geodesic: true,
+                                        strokeColor: '#007BFF',
+                                        strokeOpacity: 1.0,
+                                        strokeWeight: 7
+                                    });
+
+                                    routePath.setMap(map);
+
+                                    const startMarker = new google.maps.Marker({
+                                        position: routeCoordinates[0],
+                                        map: map,
+                                        title: 'Início da Rota',
+                                        icon: {
+                                            url: 'data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"><circle cx="15" cy="15" r="12" fill="green" /><text x="50%" y="50%" alignment-baseline="middle" text-anchor="middle" font-size="14" fill="white">A</text></svg>', // Ícone customizado com "A"
+                                            scaledSize: new google.maps.Size(50, 50) // Tamanho do ícone
+                                        }
+                                    });
+
+                                    const endMarker = new google.maps.Marker({
+                                        position: routeCoordinates[routeCoordinates.length - 1],
+                                        map: map,
+                                        title: 'Fim da Rota',
+                                        icon: {
+                                            url: 'data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"><circle cx="15" cy="15" r="12" fill="red" /><text x="50%" y="50%" alignment-baseline="middle" text-anchor="middle" font-size="14" fill="white">B</text></svg>', // Ícone customizado com "B"
+                                            scaledSize: new google.maps.Size(50, 50) // Tamanho do ícone
+                                        }
+                                    });
+                                }
+                            </script>
+                        </head>
+                        <body onload="initMap()">
+                            <div id="map"></div>
+                        </body>
+                        </html>
+                    ` }}
+                    style={{ flex: 1 }}
+                />
             ) : (
                 <Text style={stylesMap.loadingText}>Carregando localização...</Text>
             )}
+
             <View style={stylesMap.info}>
                 <LinearGradient
                     colors={['#3b5998', '#001933']}
@@ -193,13 +229,13 @@ export default function RotaScreen() {
                         <View style={stylesMap.controls}>
                             {isRecording ? (
                                 <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10 }}>
-                                    <Text style={stylesMap.timer}>Distância: {distance.toFixed(2)} km</Text>
                                     <TouchableOpacity
                                         style={[stylesMap.button, { backgroundColor: isRecording ? "#f00" : "#80bdff" }]}
                                         onPress={stopRecording}
                                     >
                                         <MaterialIcons name="stop" size={24} color="white" />
                                     </TouchableOpacity>
+                                    <Text style={stylesMap.timer}>Distância: {distance.toFixed(2)} km</Text>
                                 </View>
                             ) : (
                                 <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10 }}>
@@ -209,9 +245,7 @@ export default function RotaScreen() {
                                     >
                                         <MaterialIcons name="play-arrow" size={24} color="white" />
                                     </TouchableOpacity>
-                                    <Text style={stylesMap.timer}>
-                                        Iniciar
-                                    </Text>
+                                    <Text style={stylesMap.timer}>Iniciar</Text>
                                 </View>
                             )}
                         </View>
@@ -222,60 +256,13 @@ export default function RotaScreen() {
     );
 }
 
-TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
-    if (error) {
-        console.error(error);
-        return;
-    }
-    if (data) {
-        const { locations } = data;
-        const location = locations[0];
-        if (location) {
-            console.log('Localização em segundo plano:', location);
-        }
-    }
-});
-
 const stylesMap = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    map: {
-        flex: 1,
-        width: "100%",
-        height: '80%',
-    },
-    info: {
-        height: '20%'
-    },
-    loadingText: {
-        padding: 20,
-        textAlign: 'center',
-        fontSize: 16,
-    },
-    controlsContainer: {
-        flex: 1,
-    },
-    controls: {
-        flexDirection: "row",
-        justifyContent: "space-around",
-        alignItems: "center",
-        marginVertical: 20,
-    },
-    button: {
-        width: 60,
-        height: 60,
-        borderRadius: 30,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "#80bdff",
-    },
-    timer: {
-        fontSize: 20,
-        fontWeight: "bold",
-        color: '#cce5ff'
-    },
-    gradientContainer: {
-        flex: 1,
-    },
+    container: { flex: 1 },
+    loadingText: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+    gradientContainer: { flex: 1 },
+    controlsContainer: { flex: 1 },
+    controls: { flex: 1, justifyContent: 'center', gap: 10 },
+    button: { padding: 10, borderRadius: 50 },
+    timer: { color: 'white', fontSize: 18 },
+    info: { height: '20%' },
 });
