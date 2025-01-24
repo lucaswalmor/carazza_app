@@ -140,47 +140,46 @@ export default function RotaScreen() {
     return (
         <View style={stylesMap.container}>
             {currentLocation ? (
-                <></>
-                // <MapView
-                //     style={stylesMap.map}
-                //     initialRegion={{
-                //         latitude: currentLocation.latitude,
-                //         longitude: currentLocation.longitude,
-                //         latitudeDelta: 0.006,
-                //         longitudeDelta: 0.006,
-                //     }}
-                //     showsUserLocation
-                //     followsUserLocation
-                //     ref={mapRef}
-                // >
-                //     {route.length > 0 && isRecording && (
-                //         <Polyline
-                //             coordinates={route}
-                //             strokeColor="blue"
-                //             strokeWidth={5}
-                //         />
-                //     )}
-                //     {startMarker && (
-                //         <Marker
-                //             coordinate={{
-                //                 latitude: startMarker.latitude,
-                //                 longitude: startMarker.longitude,
-                //             }}
-                //             title="Início"
-                //             pinColor="green"
-                //         />
-                //     )}
-                //     {endMarker && (
-                //         <Marker
-                //             coordinate={{
-                //                 latitude: endMarker.latitude,
-                //                 longitude: endMarker.longitude,
-                //             }}
-                //             title="Fim"
-                //             pinColor="red"
-                //         />
-                //     )}
-                // </MapView>
+                <MapView
+                    style={stylesMap.map}
+                    initialRegion={{
+                        latitude: currentLocation.latitude,
+                        longitude: currentLocation.longitude,
+                        latitudeDelta: 0.006,
+                        longitudeDelta: 0.006,
+                    }}
+                    showsUserLocation
+                    followsUserLocation
+                    ref={mapRef}
+                >
+                    {route.length > 0 && isRecording && (
+                        <Polyline
+                            coordinates={route}
+                            strokeColor="blue"
+                            strokeWidth={5}
+                        />
+                    )}
+                    {startMarker && (
+                        <Marker
+                            coordinate={{
+                                latitude: startMarker.latitude,
+                                longitude: startMarker.longitude,
+                            }}
+                            title="Início"
+                            pinColor="green"
+                        />
+                    )}
+                    {endMarker && (
+                        <Marker
+                            coordinate={{
+                                latitude: endMarker.latitude,
+                                longitude: endMarker.longitude,
+                            }}
+                            title="Fim"
+                            pinColor="red"
+                        />
+                    )}
+                </MapView>
             ) : (
                 <Text style={stylesMap.loadingText}>Carregando localização...</Text>
             )}

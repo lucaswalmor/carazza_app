@@ -68,6 +68,11 @@
       "eas": {
         "projectId": "61721ec3-c518-4701-8453-7bd69acf2c94"
       }
+    },
+    "install": {
+      "exclude": [
+        "react-native-maps"
+      ]
     }
   }
 }
