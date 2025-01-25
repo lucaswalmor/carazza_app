@@ -6,6 +6,7 @@ import DrawerRoutes from './drawer.routes';
 import PontoListScreen from '../src/screens/PontosListScreen'
 import EncontrosScreen from '../src/screens/EncontrosScreen'
 import DesafiosListScreen from '../src/screens/DesafiosListScreen';
+import PerfilScreen from '../src/screens/PerfilScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -19,11 +20,11 @@ export default function TabRoutes() {
                         iconName = 'home-outline';
                     } else if (route.name === 'Eventos') {
                         iconName = 'calendar-outline';
-                    } else if (route.name === 'Perfil') {
-                        iconName = 'person-outline';
+                    } else if (route.name === 'Encontros') {
+                        iconName = 'location-outline';
                     } else if (route.name === 'Desafios') {
                         iconName = 'trophy-outline';
-                      }
+                    }
 
                     return <Ionicons name={iconName} size={size} color={color} />;
                 },
@@ -42,10 +43,10 @@ export default function TabRoutes() {
                 },
             })}
         >
-            <Tab.Screen name="Pontos" component={PontoListScreen} />
-            <Tab.Screen name="Eventos" component={EventosScreen} />
-            <Tab.Screen name="Desafios" component={DesafiosListScreen} />
-            <Tab.Screen name="Perfil" component={DrawerRoutes} options={{ headerShown: false }} />
+            <Tab.Screen name="Pontos" component={PontoListScreen} options={{ headerShown: false }} />
+            <Tab.Screen name="Eventos" component={EventosScreen} options={{ headerShown: false }} />
+            <Tab.Screen name="Encontros" component={EncontrosScreen} options={{ headerShown: false }} />
+            <Tab.Screen name="Desafios" component={DesafiosListScreen} options={{ headerShown: false }} />
         </Tab.Navigator>
     );
 }

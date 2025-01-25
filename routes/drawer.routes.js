@@ -1,31 +1,45 @@
-import { Feather, FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons'
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import PerfilScreen from '../src/screens/PerfilScreen'
+import TabRoutes from './tab.routes'; // Tab dentro do Drawer
+import PerfilScreen from '../src/screens/PerfilScreen';
 import MeusDesafios from '../src/screens/MeusDesafios';
 import RotaScreen from '../src/screens/RotaScreen';
+import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
+import { Text } from 'react-native';
 
 const Drawer = createDrawerNavigator();
 
 export default function DrawerRoutes() {
     return (
         <Drawer.Navigator
-            screenOptions={{
-                title: '',
-                tabBarActiveTintColor: '#fff', // Cor dos ícones ativos
-                tabBarInactiveTintColor: '#000c19', // Cor dos ícones inativos
-                tabBarStyle: {
-                    backgroundColor: '#007bff', // Cor de fundo da aba
-                    borderTopWidth: 0,         // Remove a borda superior
-                },
-                headerStyle: {
-                    backgroundColor: '#007bff', // Cor de fundo do cabeçalho
-                },
-                headerTintColor: '#FFFFFF', // Cor do texto no cabeçalho
-                headerTitleStyle: {
-                    fontWeight: 'bold', // Estilo do título
-                },
-            }}
+            screenOptions={({ route }) => ({
+                headerStyle: { backgroundColor: '#007bff' },
+                headerTintColor: '#fff',
+                headerTitleStyle: { fontWeight: 'bold' },
+                drawerStyle: { backgroundColor: '#f4f4f4' },
+                headerTitle: (route) => {
+                    switch (route.children) {
+                        case 'PerfilScreen':
+                            return <Text style={{color: '#ffffff', fontWeight: 'bold', fontSize: 18}}>Perfil</Text>
+                        case 'MeusDesafios':
+                            return <Text style={{color: '#ffffff', fontWeight: 'bold', fontSize: 18}}>Meus Desafio</Text>
+                        case 'RotaScreen':
+                            return <Text style={{color: '#ffffff', fontWeight: 'bold', fontSize: 18}}>Gravar</Text>
+                        default: 
+                            return <Text style={{color: '#ffffff', fontWeight: 'bold', fontSize: 18}}>Início</Text>
+                    }
+                }
+            })}
         >
+            <Drawer.Screen
+                name="Home"
+                component={TabRoutes}
+                options={{
+                    drawerIcon: ({ color, size }) => (
+                        <MaterialIcons name="home" color={color} size={size} />
+                    ),
+                    drawerLabel: 'Início'
+                }}
+            />
             <Drawer.Screen
                 name="PerfilScreen"
                 component={PerfilScreen}
@@ -33,7 +47,7 @@ export default function DrawerRoutes() {
                     drawerIcon: ({ color, size }) => (
                         <MaterialIcons name="person" color={color} size={size} />
                     ),
-                    drawerLabel: 'Perfil',
+                    drawerLabel: 'Perfil'
                 }}
             />
             <Drawer.Screen
@@ -43,7 +57,7 @@ export default function DrawerRoutes() {
                     drawerIcon: ({ color, size }) => (
                         <FontAwesome5 name="medal" color={color} size={size} />
                     ),
-                    drawerLabel: 'Meus Desafios',
+                    drawerLabel: 'Meus Desafios'
                 }}
             />
             <Drawer.Screen
@@ -53,7 +67,7 @@ export default function DrawerRoutes() {
                     drawerIcon: ({ color, size }) => (
                         <FontAwesome5 name="record-vinyl" color={color} size={size} />
                     ),
-                    drawerLabel: 'Gravar',
+                    drawerLabel: 'Gravar'
                 }}
             />
         </Drawer.Navigator>

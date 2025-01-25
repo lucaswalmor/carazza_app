@@ -172,9 +172,69 @@ export default function RotaScreen() {
                             <script>
                                 function initMap() {
                                     const routeCoordinates = ${JSON.stringify(cordenatesWebview)};
+                                    const darkStyle = [
+                                        {
+                                            "elementType": "geometry",
+                                            "stylers": [{ "color": "#1A2636" }]
+                                        },
+                                        {
+                                            "elementType": "labels.icon",
+                                            "stylers": [{ "visibility": "off" }]
+                                        },
+                                        {
+                                            "elementType": "labels.text.fill",
+                                            "stylers": [{ "color": "#B5B9C4" }]
+                                        },
+                                        {
+                                            "elementType": "labels.text.stroke",
+                                            "stylers": [{ "color": "#1A2636" }]
+                                        },
+                                        {
+                                            "featureType": "administrative",
+                                            "elementType": "geometry",
+                                            "stylers": [{ "color": "#B5B9C4" }]
+                                        },
+                                        {
+                                            "featureType": "poi",
+                                            "elementType": "geometry",
+                                            "stylers": [{ "color": "#144043" }]
+                                        },
+                                        {
+                                            "featureType": "poi.park",
+                                            "elementType": "geometry", 
+                                            "stylers": [{ "color": "#144043" }]
+                                        },
+                                        {
+                                            "featureType": "road",
+                                            "elementType": "geometry.fill", // cores das ruas
+                                            "stylers": [{ "color": "#445365" }]
+                                        },
+                                        {
+                                            "featureType": "road",
+                                            "elementType": "geometry.stroke",
+                                            "stylers": [{ "color": "#1A2636" }]
+                                        },
+                                        {
+                                            "featureType": "road.highway",
+                                            "elementType": "geometry", // rodovias
+                                            "stylers": [{ "color": "#144043" }]
+                                        },
+                                        {
+                                            "featureType": "water",
+                                            "elementType": "geometry", // cores das aguas
+                                            "stylers": [{ "color": "#b3e5fc" }]
+                                        },
+                                        {
+                                            "featureType": "water",
+                                            "elementType": "labels.text.fill", // cores dos textos das aguas
+                                            "stylers": [{ "color": "#03a9f4" }]
+                                        }
+                                    ];
+
                                     const map = new google.maps.Map(document.getElementById('map'), {
-                                        zoom:  ${isRecording} ? 19 : 17,
+                                        zoom: ${isRecording} ? 19 : 17,
                                         center: routeCoordinates[routeCoordinates.length - 1],
+                                        styles: darkStyle // Adiciona o estilo escuro
                                     });
 
                                     const routePath = new google.maps.Polyline({
@@ -222,7 +282,7 @@ export default function RotaScreen() {
 
             <View style={stylesMap.info}>
                 <LinearGradient
-                    colors={['#3b5998', '#001933']}
+                    colors={['#1A2636', '#1A2636', '#001933']}
                     style={stylesMap.gradientContainer}
                 >
                     <View style={stylesMap.controlsContainer}>

@@ -1,12 +1,11 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { WebView } from 'react-native-webview';
+import { View, StyleSheet, Text } from 'react-native';
 
 export default function MapScreen({ routeData }) {
 
   return (
     <View style={styles.container}>
-      <Text>Bem vindo a tela de Desafios</Text>
+      <Text style={styles.text}>Bem-vindo à tela de Desafios!</Text>
     </View>
   );
 }
@@ -14,5 +13,12 @@ export default function MapScreen({ routeData }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  text: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
   },
 });
