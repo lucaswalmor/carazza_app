@@ -371,7 +371,7 @@ export default function CadastrarPonto({ navigation })  {
                 <Text style={styles.buttonText}>Fotos do Local</Text>
             </TouchableOpacity>
 
-            <View style={{ flex: 1 }}>
+            <View style={{ flex: 1, marginBottom: 50 }}>
                 <TouchableOpacity style={styles.button} onPress={handleSubmit}>
                     <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                         {isLoading ? (

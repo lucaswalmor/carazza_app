@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, RefreshControl, Image, ImageBackground } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../services/api';
 import styles from '../assets/css/styles';
@@ -39,6 +39,7 @@ const PointsScreen = ({ navigation }) => {
                     Authorization: `Bearer ${token}`
                 }
             });
+
             setPontos(response.data)
         } catch (error) {
             console.error('Erro ao enviar o formulário:', error);
@@ -55,7 +56,6 @@ const PointsScreen = ({ navigation }) => {
 
     const likePonto = async (ponto) => {
         const token = await AsyncStorage.getItem('token');
-
         try {
             const response = await api.put(`/ponto/update/like/${ponto.id}`, {}, {
                 headers: {
@@ -71,30 +71,64 @@ const PointsScreen = ({ navigation }) => {
     }
 
     const renderCard = ({ item }) => (
-        <TouchableOpacity
-            style={[styles.card, { gap: 10 }]}
-            onPress={() => navigation.navigate('PontoScreen', { id: item.id })}
-        >
-            <Text style={[styles.h3, styles.infoTitle]}>{item.nome}</Text>
-            <Text style={styles.h5}>{item.cidade}, {item.estado}</Text>
-            <Text style={styles.span}>{item.descricao}</Text>
-
-            <View style={stylesPontoListScreen.actionsContainer}>
+        <View style={{ marginBottom: 50 }}>
+            <ImageBackground
+                source={{
+                    uri: item?.imagem?.path,
+                }}
+                style={[styles.card, { gap: 10, borderRadius: 10, overflow: 'hidden'}]}
+                resizeMode="cover"
+            >
                 <TouchableOpacity
-                    style={stylesPontoListScreen.actionButton}
-                    onPress={() => likePonto(item)}
+                    onPress={() => navigation.navigate('PontoScreen', { id: item.id })}
                 >
-                    <Ionicons
-                        name={item.like ? "thumbs-up" : "thumbs-up-outline"}
-                        size={24}
-                        color="#007BFF"
-                        style={{ marginRight: 10 }}
-                    />
+                    <Text style={stylesPontoListScreen.textCardTitle}>{item.nome}</Text>
+                    <Text style={stylesPontoListScreen.textCard}>{item.cidade}, {item.estado}</Text>
+                    <Text style={stylesPontoListScreen.textInfoCard}>{item.descricao}</Text>
 
-                    <Text>{item.like_count}</Text>
+                    <View style={stylesPontoListScreen.actionsContainer}>
+                        <TouchableOpacity
+                            style={stylesPontoListScreen.actionButton}
+                            onPress={() => likePonto(item)}
+                        >
+                            <Ionicons
+                                name={item.like ? "thumbs-up" : "thumbs-up-outline"}
+                                size={24}
+                                color="#007BFF"
+                                style={{ marginRight: 10 }}
+                            />
+
+                            <Text>{item.like_count}</Text>
+                        </TouchableOpacity>
+                    </View>
                 </TouchableOpacity>
-            </View>
-        </TouchableOpacity>
+            </ImageBackground>
+
+            <TouchableOpacity
+                style={[styles.card, { gap: 10 }]}
+                onPress={() => navigation.navigate('PontoScreen', { id: item.id })}
+            >
+                <Text style={[styles.h3, styles.infoTitle]}>{item.nome}</Text>
+                <Text style={styles.h5}>{item.cidade}, {item.estado}</Text>
+                <Text style={styles.span}>{item.descricao}</Text>
+
+                <View style={stylesPontoListScreen.actionsContainer}>
+                    <TouchableOpacity
+                        style={stylesPontoListScreen.actionButton}
+                        onPress={() => likePonto(item)}
+                    >
+                        <Ionicons
+                            name={item.like ? "thumbs-up" : "thumbs-up-outline"}
+                            size={24}
+                            color="#007BFF"
+                            style={{ marginRight: 10 }}
+                        />
+
+                        <Text>{item.like_count}</Text>
+                    </TouchableOpacity>
+                </View>
+            </TouchableOpacity>
+        </View>
     );
 
     if (isLoading && !isRefreshing) {
@@ -108,7 +142,7 @@ const PointsScreen = ({ navigation }) => {
     return (
         <View style={{ flex: 1 }}>
             {user.tipo_usuario == 1 && (
-                <View style={{ padding: 10}}>
+                <View style={{ padding: 10 }}>
                     <View style={{ width: '100%' }}>
                         <TouchableOpacity style={styles.button} onPress={CadastrarPonto}>
                             <Text style={styles.buttonText}>Cadastrar Ponto</Text>
@@ -167,6 +201,35 @@ const stylesPontoListScreen = StyleSheet.create({
         shadowRadius: 4,
         elevation: 2,
     },
+    tinyLogo: {
+        width: 150,
+        height: 150,
+    },
+    textCardTitle: {
+        fontWeight: 'bold',
+        color: '#fff',
+        textShadowColor: 'rgba(0, 0, 0, 0.8)',
+        textShadowOffset: { width: 2, height: 2 },
+        textShadowRadius: 4,
+        fontSize: 20,
+        fontWeight: 'bold'
+    },
+    textCard: {
+        color: '#fff',
+        textShadowColor: 'rgba(0, 0, 0, 0.8)',
+        textShadowOffset: { width: 2, height: 2 },
+        textShadowRadius: 4,
+        fontSize: 18,
+        fontWeight: 'medium'
+    },
+    textInfoCard: {
+        color: '#fff',
+        textShadowColor: 'rgba(0, 0, 0, 0.8)',
+        textShadowOffset: { width: 2, height: 2 },
+        textShadowRadius: 4,
+        fontSize: 16,
+        fontWeight: 'medium'
+    }
 });
 
 export default PointsScreen;
