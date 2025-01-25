@@ -201,10 +201,6 @@ const stylesPontoListScreen = StyleSheet.create({
         shadowRadius: 4,
         elevation: 2,
     },
-    tinyLogo: {
-        width: 150,
-        height: 150,
-    },
     textCardTitle: {
         fontWeight: 'bold',
         color: '#fff',
@@ -212,7 +208,6 @@ const stylesPontoListScreen = StyleSheet.create({
         textShadowOffset: { width: 2, height: 2 },
         textShadowRadius: 4,
         fontSize: 20,
-        fontWeight: 'bold'
     },
     textCard: {
         color: '#fff',

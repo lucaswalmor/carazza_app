@@ -252,8 +252,7 @@ export default function RotaScreen() {
                                         map: map,
                                         title: 'Início da Rota',
                                         icon: {
-                                            url: 'data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"><circle cx="15" cy="15" r="12" fill="green" /><text x="50%" y="50%" alignment-baseline="middle" text-anchor="middle" font-size="14" fill="white">A</text></svg>', // Ícone customizado com "A"
-                                            scaledSize: new google.maps.Size(50, 50) // Tamanho do ícone
+                                            url: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
                                         }
                                     });
 
@@ -262,8 +261,7 @@ export default function RotaScreen() {
                                         map: map,
                                         title: 'Fim da Rota',
                                         icon: {
-                                            url: 'data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"><circle cx="15" cy="15" r="12" fill="red" /><text x="50%" y="50%" alignment-baseline="middle" text-anchor="middle" font-size="14" fill="white">B</text></svg>', // Ícone customizado com "B"
-                                            scaledSize: new google.maps.Size(50, 50) // Tamanho do ícone
+                                            url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
                                         }
                                     });
                                 }
