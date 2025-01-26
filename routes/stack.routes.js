@@ -4,6 +4,8 @@ import RegisterScreen from '../src/screens/RegisterScreen';
 import DrawerRoutes from './drawer.routes'; // Drawer como principal navegação após login.
 import CadastrarPonto from '../src/screens/CadastrarPonto';
 import PontoScreen from '../src/screens/PontoScreen';
+import SuccessScreen from '../src/screens/SuccessScreen';
+import RetryPaymentScreen from '../src/screens/RetryPaymentScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -28,6 +30,8 @@ export default function StackRoutes() {
             <Stack.Screen name="Cadastro" component={RegisterScreen} options={{ headerShown: false }} />
             <Stack.Screen name="CadastrarPonto" component={CadastrarPonto} options={{ headerShown: true }} />
             <Stack.Screen name="PontoScreen" component={PontoScreen} options={{ headerShown: true }} />
+            <Stack.Screen name="Success" component={SuccessScreen} options={{ headerShown: true }} />
+            <Stack.Screen name="Failure" component={RetryPaymentScreen} options={{ headerShown: true }} />
             <Stack.Screen name="Main" component={DrawerRoutes} options={{ headerShown: false }} />
         </Stack.Navigator>
     );

@@ -10,7 +10,7 @@ export default function Routes() {
             screens: {
                 Success: 'success',
                 Failure: 'failure',
-                Home: '',
+                Main: '',
             }
         }
     }
