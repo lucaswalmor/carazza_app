@@ -18,8 +18,17 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
 
         // Aqui, salve os dados no banco ou envie para a API
         locations.forEach((location) => {
-            // location.coords.latitude, location.coords.longitude, etc.
-            console.log("Latitude: " + location.coords.latitude + ' Longitude: ' + location.coords.longitude);
+            // Atualizando a rota com a nova localização
+            setRoute((prevRoute) => [
+                ...prevRoute,
+                { latitude: location.coords.latitude, longitude: location.coords.longitude },
+            ]);
+
+            // Você também pode continuar atualizando as cordenadas no WebView
+            setCordenatesWebview((prevCoordinates) => [
+                ...prevCoordinates,
+                { lat: location.coords.latitude, lng: location.coords.longitude },
+            ]);
         });
     }
 });
@@ -37,7 +46,7 @@ export default function RotaScreen() {
     // Permissão de localização e configuração do watchPositionAsync
     useEffect(() => {
         (async () => {
-    
+
             const { status } = await Location.requestForegroundPermissionsAsync();
 
             if (status !== 'granted') {
@@ -46,8 +55,6 @@ export default function RotaScreen() {
             }
 
             const location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Highest });
-
-            console.log(location)
 
             if (cordenatesWebview.length < 1) {
                 setCordenatesWebview((prevCoordinates) => {
@@ -151,7 +158,7 @@ export default function RotaScreen() {
         };
 
         setCordenatesWebview(coordinates);
-        
+
         Alert.alert(
             'Rota concluída',
             `Distância total: ${distance.toFixed(2)} km.`,

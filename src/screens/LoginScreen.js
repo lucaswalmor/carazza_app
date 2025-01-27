@@ -5,6 +5,7 @@ import api from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { Ionicons } from '@expo/vector-icons'
+import * as Notifications from 'expo-notifications';
 
 export default function LoginScreen({ navigation, route }) {
   const [email, setEmail] = useState('');
@@ -17,6 +18,53 @@ export default function LoginScreen({ navigation, route }) {
   const [msgConfirmResumeSubscription, setMsgConfirmResumeSubscription] = useState(false);
   const [modalConfirmResumeSubscriptionVisible, setModalConfirmResumeSubscriptionVisible] = useState(false);
   const [modalResumeSubscription, setModalResumeSubscription] = useState(false);
+  const [expoPushToken, setExpoPushToken] = useState('');
+
+  ///////////////////////////// EXPO PUSH NOTIFICATION /////////////////////////////////
+
+  const registerForPushNotifications = async () => {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+
+    if (finalStatus !== 'granted') {
+      alert('Permissões de notificações não concedidas!');
+      return;
+    }
+
+    // Obtenha o token para enviar notificações
+    const token = (await Notifications.getExpoPushTokenAsync()).data;
+    console.log('Expo Push Token:', token);
+
+    // Registre o token no backend
+    // Exemplo: envio para Laravel
+    // await fetch('https://seu-backend.com/api/register-push-token', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({ token }),
+    // });
+  };
+
+  useEffect(() => {
+    // const registerForPushNotifications = async () => {
+    //   const { status } = await Notifications.requestPermissionsAsync();
+    //   if (status === 'granted') {
+    //     const token = (await Notifications.getExpoPushTokenAsync()).data;
+    //     console.log('Expo Push Token:', token);
+    //     setExpoPushToken(token);
+    //   } else {
+    //     alert('Permissões de notificações não concedidas!');
+    //   }
+    // };
+
+    registerForPushNotifications();
+  }, []);
+
+  ////////////////////////////////////////////////////////////////////////////////////////
 
   useEffect(() => {
     checkBiometricAuth();
@@ -249,11 +297,11 @@ export default function LoginScreen({ navigation, route }) {
             />
 
             <TouchableOpacity onPress={handleResumeSubscription} style={styles.button}>
-              <Text style={{color: '#FFFFFF', fontWeight: 'bold'}}>Confirmar Rativação de assinatura</Text>
+              <Text style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Confirmar Rativação de assinatura</Text>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => setModalResumeSubscription(false)} style={styles.buttonDanger}>
-              <Text style={{color: '#FFFFFF', fontWeight: 'bold'}}>Cancelar</Text>
+              <Text style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Cancelar</Text>
             </TouchableOpacity>
           </View>
         </View>
