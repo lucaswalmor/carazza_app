@@ -35,32 +35,9 @@ export default function LoginScreen({ navigation, route }) {
       alert('Permissões de notificações não concedidas!');
       return;
     }
-
-    // Obtenha o token para enviar notificações
-    const token = (await Notifications.getExpoPushTokenAsync()).data;
-    console.log('Expo Push Token:', token);
-
-    // Registre o token no backend
-    // Exemplo: envio para Laravel
-    // await fetch('https://seu-backend.com/api/register-push-token', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ token }),
-    // });
   };
 
   useEffect(() => {
-    // const registerForPushNotifications = async () => {
-    //   const { status } = await Notifications.requestPermissionsAsync();
-    //   if (status === 'granted') {
-    //     const token = (await Notifications.getExpoPushTokenAsync()).data;
-    //     console.log('Expo Push Token:', token);
-    //     setExpoPushToken(token);
-    //   } else {
-    //     alert('Permissões de notificações não concedidas!');
-    //   }
-    // };
-
     registerForPushNotifications();
   }, []);
 
@@ -119,7 +96,9 @@ export default function LoginScreen({ navigation, route }) {
 
     setIsLoading(true);
     try {
-      const response = await api.post('/login', { email: email || emailBiometria, password: password || passwordBiometria });
+      const token = expoPushToken || (await Notifications.getExpoPushTokenAsync()).data;
+
+      const response = await api.post('/login', { expoToken: token, email: email || emailBiometria, password: password || passwordBiometria });
       const data = response.data;
 
       await AsyncStorage.setItem('user', JSON.stringify(data.user));
