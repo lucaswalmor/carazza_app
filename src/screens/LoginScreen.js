@@ -26,9 +26,29 @@ export default function LoginScreen({ navigation, route }) {
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
 
+    // if (existingStatus !== 'granted') {
+    //   const { status } = await Notifications.requestPermissionsAsync();
+    //   finalStatus = status;
+    // }
+
+    // Exibe uma mensagem personalizada antes de solicitar a permissão
     if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
+      Alert.alert(
+        "Permissão para Notificações",
+        "Precisamos de sua permissão para enviar notificações. Elas serão usadas para te avisar sobre novos eventos e atualizações importantes.",
+        [
+          { text: "Cancelar", style: "cancel" },
+          {
+            text: "OK", onPress: async () => {
+              const { status } = await Notifications.requestPermissionsAsync();
+              finalStatus = status;
+              if (finalStatus !== 'granted') {
+                Alert.alert('Permissões de notificações não concedidas!');
+              }
+            }
+          }
+        ]
+      );
     }
 
     if (finalStatus !== 'granted') {

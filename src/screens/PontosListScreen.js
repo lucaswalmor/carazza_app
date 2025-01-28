@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, RefreshControl, Image, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, RefreshControl, Image, ImageBackground, SafeAreaView, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../services/api';
 import styles from '../assets/css/styles';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { TextInput } from 'react-native-gesture-handler';
 
 const PointsScreen = ({ navigation }) => {
     const [user, setUser] = useState({});
@@ -11,6 +12,8 @@ const PointsScreen = ({ navigation }) => {
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [pontos, setPontos] = useState([]);
     const [refreshKey, setRefreshKey] = useState(0);
+    const [cidade, setCidade] = useState('');
+    const [allPontos, setAllPontos] = useState([]);
 
     const CadastrarPonto = () => {
         navigation.navigate('CadastrarPonto');
@@ -41,12 +44,45 @@ const PointsScreen = ({ navigation }) => {
             });
 
             setPontos(response.data)
+            setAllPontos(response.data);
         } catch (error) {
             console.error('Erro ao enviar o formulário:', error);
         } finally {
             setIsLoading(false)
         }
     }
+
+    const filterPontosByCidade = (text) => {
+        setCidade(text);
+
+        const textoSemAcento = removeAcentos(text); // Remove acentos da entrada do usuário
+
+        if (textoSemAcento === '') {
+            setPontos(allPontos);
+        } else {
+            const filteredPontos = allPontos.map((estado) => {
+                // Filtra os pontos de cada estado
+                const filteredByCidade = estado.pontos.filter((ponto) => {
+                    const cidadeSemAcento = removeAcentos(ponto.cidade); // Remove acentos dos nomes das cidades
+                    const nomePontoSemAcento = removeAcentos(ponto.nome); // Remove acentos dos nomes dos pontos
+                    return cidadeSemAcento.toLowerCase().includes(textoSemAcento.toLowerCase()) || nomePontoSemAcento.toLowerCase().includes(textoSemAcento.toLowerCase());
+                });
+
+                // Retorna o estado com os pontos filtrados
+                return { ...estado, pontos: filteredByCidade };
+            }).filter((estado) => estado.pontos.length > 0); // Filtra estados sem pontos correspondentes
+
+            setPontos(filteredPontos); // Atualiza a lista de pontos com os filtrados
+        }
+    };
+
+    const removeAcentos = (texto) => {
+        return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+    };
+
+    const clearInput = () => {
+        setCidade('');
+    };
 
     const refreshPontos = async () => {
         setIsRefreshing(true);
@@ -71,12 +107,12 @@ const PointsScreen = ({ navigation }) => {
     }
 
     const renderCard = ({ item }) => (
-        <View style={{ marginBottom: 50 }}>
+        <View style={{  }}>
             <ImageBackground
                 source={{
                     uri: item?.imagem?.path,
                 }}
-                style={[styles.card, { gap: 10, borderRadius: 10, overflow: 'hidden'}]}
+                style={[styles.card, { gap: 10, borderRadius: 10, overflow: 'hidden' }]}
                 resizeMode="cover"
             >
                 <TouchableOpacity
@@ -104,7 +140,7 @@ const PointsScreen = ({ navigation }) => {
                 </TouchableOpacity>
             </ImageBackground>
 
-            <TouchableOpacity
+            {/* <TouchableOpacity
                 style={[styles.card, { gap: 10 }]}
                 onPress={() => navigation.navigate('PontoScreen', { id: item.id })}
             >
@@ -127,7 +163,7 @@ const PointsScreen = ({ navigation }) => {
                         <Text>{item.like_count}</Text>
                     </TouchableOpacity>
                 </View>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
         </View>
     );
 
@@ -140,7 +176,21 @@ const PointsScreen = ({ navigation }) => {
     }
 
     return (
-        <View style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1, paddingBottom: 150 }}>
+            <View style={{ backgroundColor: '#007BFF', height: 80, padding: 20, justifyContent: 'center', position: 'relative' }}>
+                <TextInput
+                    style={styles.inputComum}
+                    placeholder="Buscar por cidade..."
+                    value={cidade}
+                    onChangeText={filterPontosByCidade}
+                />
+                {cidade.length > 0 && (
+                    <TouchableOpacity onPress={clearInput} style={styles.clearButton}>
+                        <Ionicons name="close-circle" size={24} color="#007BFF" />
+                    </TouchableOpacity>
+                )}
+            </View>
+
             {user.tipo_usuario == 1 && (
                 <View style={{ padding: 10 }}>
                     <View style={{ width: '100%' }}>
@@ -150,7 +200,8 @@ const PointsScreen = ({ navigation }) => {
                     </View>
                 </View>
             )}
-            <View style={{ padding: 10, marginBottom: 50 }}>
+
+            <View style={{ padding: 10 }}>
                 <FlatList
                     data={pontos}
                     keyExtractor={(item) => item.estado}
@@ -173,7 +224,7 @@ const PointsScreen = ({ navigation }) => {
                     }
                 />
             </View>
-        </View>
+        </SafeAreaView>
     );
 };
 

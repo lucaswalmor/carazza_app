@@ -29,6 +29,18 @@ const styles = StyleSheet.create({
         borderBottomColor: '#007BFF',
         borderWidth: 0,
     },
+    inputComum: {
+        height: 50,
+        borderColor: '#007BFF',
+        borderRadius: 5,
+        fontSize: 16,
+        backgroundColor: '#f9f9f9',
+    },
+    clearButton: {
+      position: 'absolute',
+      right: 30,
+      top: 30,
+    },
     textArea: {
         height: 80,
         borderBottomWidth: 2,
