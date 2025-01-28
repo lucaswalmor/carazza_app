@@ -37,9 +37,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#f9f9f9',
     },
     clearButton: {
-      position: 'absolute',
-      right: 30,
-      top: 30,
+        position: 'absolute',
+        right: 30,
+        top: 30,
     },
     textArea: {
         height: 80,
@@ -61,6 +61,15 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         marginTop: 10,
         padding: 10,
+    },
+    buttonSend: {
+        height: 30,
+        backgroundColor: '#007BFF',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 25,
+        marginTop: 10,
+        width: '25%'
     },
     buttonDanger: {
         height: 50,
@@ -102,6 +111,11 @@ const styles = StyleSheet.create({
     buttonText: {
         color: '#fff',
         fontSize: 18,
+        fontWeight: 'bold',
+    },
+    buttonTextSend: {
+        color: '#fff',
+        fontSize: 12,
         fontWeight: 'bold',
     },
     buttonContainer: {
@@ -174,7 +188,7 @@ const styles = StyleSheet.create({
     },
     h2: {
         fontSize: 28,
-        fontWeight: 'semi-bold'
+        fontWeight: '600' // Corrigido para valor numérico válido
     },
     h3: {
         fontSize: 24,
@@ -231,16 +245,21 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        flexDirection: 'row',
         backgroundColor: 'rgba(0,0,0,0.5)',
     },
     modalView: {
         backgroundColor: 'white',
         borderRadius: 10,
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: '100%', // Ou `width: width` se usar Dimensions
-        padding: 20,   // Adicione um padding para melhor espaçamento
+        padding: 20,
+        margin: 20,
+        width: '90%',
+        alignItems: 'stretch'
+    },
+    timer: {
+        fontSize: 20,
+        paddingLeft: 30,
+        fontWeight: "bold",
+        color: '#cce5ff'
     },
 })
 

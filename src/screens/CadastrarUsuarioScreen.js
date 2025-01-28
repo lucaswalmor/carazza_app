@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Image, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator, TextInput, Alert, Linking } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { MaskedTextInput } from 'react-native-mask-text';
-import styles from '../../styles';
+import styles from '../assets/css/styles';
 import api from '../services/api';
+import { Picker } from '@react-native-picker/picker';
 
-const RegisterScreen = ({ navigation }) => {
+const CadastrarUsuarioScreen = ({ navigation }) => {
     const [profileImage, setProfileImage] = useState(null);
     const [nome, setNome] = useState('Teste');
     const [telefone, setTelefone] = useState('(00) 0 0000-0000');
@@ -22,17 +23,42 @@ const RegisterScreen = ({ navigation }) => {
     const [email, setEmail] = useState('teste@gmail.com');
     const [password, setPassword] = useState('12345678');
 
-    const [subscriptionId, setSubscriptionId] = useState(null);
-    const [customer, setCustomer] = useState(null);
-    const [userId, setUserId] = useState(null);
-
     const [errors, setErrors] = useState({});
-    const [dados, setDados] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [currentStep, setCurrentStep] = useState(1);
     const [showSteps, setShowSteps] = useState(true);
 
-    const [cardData, setCardData] = useState({ cardNumber: '5031433215406351', expirationDate: '11/25', securityCode: '123', cardholderName: 'teste' });
+    const [marcas, setMarcas] = useState([]);
+    const [modelos, setModelos] = useState([]);
+    const [marcaSelecionada, setMarcaSelecionada] = useState('');
+    const [modeloSelecionado, setModeloSelecionado] = useState('');
+
+    useEffect(() => {
+        const fetchMarcas = async () => {
+            try {
+                const response = await api.get('https://parallelum.com.br/fipe/api/v1/motos/marcas');
+                setMarcas(response.data);
+            } catch (error) {
+                console.error('Erro ao buscar marcas:', error);
+            }
+        };
+        fetchMarcas();
+    }, []);
+
+    const handleMarcaChange = async (marca) => {
+        setMarcaSelecionada(marca);
+        setModeloSelecionado(''); // Resetar o modelo ao trocar de marca
+        if (marca) {
+            try {
+                const response = await api.get(`https://parallelum.com.br/fipe/api/v1/motos/marcas/${marca}/modelos`);
+                setModelos(response.data.modelos); // A API retorna {modelos: []}
+            } catch (error) {
+                console.error('Erro ao buscar modelos:', error);
+            }
+        } else {
+            setModelos([]); // Resetar os modelos se nenhuma marca for selecionada
+        }
+    };
 
     const handleNext = () => {
         setCurrentStep((prevStep) => prevStep + 1);
@@ -119,7 +145,6 @@ const RegisterScreen = ({ navigation }) => {
             });
 
             handleOpenLinkWithParams();
-            setUserId(response.data.data.id)
         } catch (err) {
             if (err.response && err.response.data) {
                 console.log('Erros de validação:', err.response.data.errors);
@@ -226,6 +251,33 @@ const RegisterScreen = ({ navigation }) => {
                                     />
                                     {errors.telefone && <Text style={styles.errorText}>{errors.telefone[0]}</Text>}
                                 </View>
+
+                                {/* <View style={styles.inputView}>
+                                    <Text>Selecione a marca:</Text>
+                                    <Picker
+                                        selectedValue={marcaSelecionada}
+                                        onValueChange={(itemValue) => handleMarcaChange(itemValue)}
+                                    >
+                                        <Picker.Item label="Selecione uma marca" value="" />
+                                        {marcas.map((marca) => (
+                                            <Picker.Item key={marca.codigo} label={marca.nome} value={marca.codigo} />
+                                        ))}
+                                    </Picker>
+                                </View>
+
+                                <View style={styles.inputView}>
+                                    <Text>Selecione o modelo:</Text>
+                                    <Picker
+                                        selectedValue={modeloSelecionado}
+                                        onValueChange={(itemValue) => setModeloSelecionado(itemValue)}
+                                        enabled={!!marcaSelecionada} // Habilitar apenas se uma marca for selecionada
+                                    >
+                                        <Picker.Item label="Selecione um modelo" value="" />
+                                        {modelos.map((modelo) => (
+                                            <Picker.Item key={modelo.codigo} label={modelo.nome} value={modelo.codigo} />
+                                        ))}
+                                    </Picker>
+                                </View> */}
                             </View>
                         )}
 
@@ -385,4 +437,4 @@ const RegisterScreen = ({ navigation }) => {
     );
 };
 
-export default RegisterScreen;
+export default CadastrarUsuarioScreen;

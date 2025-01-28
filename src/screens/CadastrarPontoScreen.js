@@ -9,32 +9,34 @@ import {
     Image
 } from 'react-native';
 import { MaskedTextInput } from "react-native-mask-text";
-import styles from '../../assets/css/styles';
-import pesquisacep from '../../services/viacep';
+import styles from '../assets/css/styles';
+import pesquisacep from '../services/viacep';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import api from '../../services/api';
+import api from '../services/api';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 
-const CadastrarPonto = ({ navigation }) => {
+export default function CadastrarPontoScreen({ navigation })  {
     const [isLoading, setIsLoading] = useState(false);
     const [errors, setErrors] = useState({});
     const [images, setImages] = useState([]);
     const [form, setForm] = useState({
-        nome: 'Ponto A',
-        cep: '38401-132',
-        rua: 'Rua A',
-        cidade: 'Cidade A',
-        bairro: 'Bairro A',
+        nome: 'Ponto B',
+        cep: '',
+        rua: 'Rua Izídio Antônio da Silva',
+        bairro: 'Presidente Roosevelt',
+        numero: '147',
+        cidade: 'Uberlândia',
         estado: 'MG',
-        numero: '198',
-        descricao: 'kasodkasopdkaspodk',
+        estado_completo: 'Minas Gerais',
         valorMinAlimentacao: '',
         valorMaxAlimentacao: '',
         valorMinHospedagem: '',
         valorMaxHospedagem: '',
-        informacoesComplementares: 'informações complementares',
-        codigoVideo: 'kdksapskao',
+        descricao: 'O loca é historico por tal coisa bla bla bla bla bla bla',
+        informacoesComplementares: 'Ponto bom para comer',
+        codigoVideo: '<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@brunocarazza3/video/7416808403827248389" data-video-id="7416808403827248389" style="max-width: 605px;min-width: 325px;" > <section> <a target="_blank" title="@brunocarazza3" href="https://www.tiktok.com/@brunocarazza3?refer=embed">@brunocarazza3</a> <p>Me siga pra mais …</p> <a target="_blank" title="♬ som original - Bruno Carazza" href="https://www.tiktok.com/music/som-original-7416808761504008965?refer=embed">♬ som original - Bruno Carazza</a> </section> </blockquote> <script async src="https://www.tiktok.com/embed.js"></script>',
+        linkVideo: 'https://www.tiktok.com/@brunocarazza3/video/7416808673978109189?q=brunocarazza&t=1737605809002',
         horaAbertura: '10:00',
         horaFechamento: '22:00',
     });
@@ -83,6 +85,7 @@ const CadastrarPonto = ({ navigation }) => {
                 cidade: '',
                 bairro: '',
                 estado: '',
+                estado_completo: '',
                 numero: '',
                 descricao: '',
                 valorMinAlimentacao: '',
@@ -91,6 +94,7 @@ const CadastrarPonto = ({ navigation }) => {
                 valorMaxHospedagem: '',
                 informacoesComplementares: '',
                 codigoVideo: '',
+                linkVideo: '',
                 horaAbertura: '',
                 horaFechamento: '',
             });
@@ -115,7 +119,7 @@ const CadastrarPonto = ({ navigation }) => {
         }
 
         const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            mediaTypes: ['images'],
             allowsMultipleSelection: false,
             quality: 0.7,
         });
@@ -137,14 +141,11 @@ const CadastrarPonto = ({ navigation }) => {
                 rua: data.logradouro,
                 bairro: data.bairro,
                 estado: data.uf,
+                estado_completo: data.estado,
                 cidade: data.localidade,
                 cep: data.cep,
             });
         }
-    };
-
-    const voltar = () => {
-        navigation.replace('Main');
     };
 
     return (
@@ -158,12 +159,12 @@ const CadastrarPonto = ({ navigation }) => {
 
             <View style={styles.inputView}>
                 <MaskedTextInput
-                    mask="99999-99"
+                    mask="99999-999"
                     keyboardType="numeric"
-                    onChangeText={(text) => handleInputChange('horaFechamento', text)}
+                    onChangeText={(text) => handleCep(text)}
                     style={styles.input}
-                    value={form.horaFechamento}
-                    placeholder='Hora Fechamento'
+                    value={form.cep}
+                    placeholder='CEP'
                 />
     
                 {errors.cep && <Text style={styles.errorText}>{errors.cep[0]}</Text>}
@@ -311,9 +312,16 @@ const CadastrarPonto = ({ navigation }) => {
 
             <TextInput
                 style={styles.input}
-                placeholder="Código do vídeo"
+                placeholder="Embed do video no TIKTOK"
                 value={form.codigoVideo}
                 onChangeText={(text) => handleInputChange('codigoVideo', text)}
+            />
+
+            <TextInput
+                style={styles.input}
+                placeholder="Link do vídeo no TIKTOK"
+                value={form.linkVideo}
+                onChangeText={(text) => handleInputChange('linkVideo', text)}
             />
 
             <MaskedTextInput
@@ -350,7 +358,7 @@ const CadastrarPonto = ({ navigation }) => {
                         </TouchableOpacity>
                     </View>
                 )) : (
-                    <Text style={{ textAlign: 'center', color: 'gray', fontStyle: 'italic' }}>Nenhuma imagem selecionada</Text>
+                    <Text style={{ textAlign: 'center', color: 'gray', fontStyle: 'italic' }}>Nenhuma imagem selecionada (Max: 3 imagems)</Text>
                 )}
             </View>
 
@@ -363,7 +371,7 @@ const CadastrarPonto = ({ navigation }) => {
                 <Text style={styles.buttonText}>Fotos do Local</Text>
             </TouchableOpacity>
 
-            <View style={{ flex: 1 }}>
+            <View style={{ flex: 1, marginBottom: 50 }}>
                 <TouchableOpacity style={styles.button} onPress={handleSubmit}>
                     <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                         {isLoading ? (
@@ -379,6 +387,4 @@ const CadastrarPonto = ({ navigation }) => {
             </View>
         </ScrollView>
     );
-};
-
-export default CadastrarPonto;
+}

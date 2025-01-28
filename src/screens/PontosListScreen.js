@@ -15,8 +15,8 @@ const PointsScreen = ({ navigation }) => {
     const [cidade, setCidade] = useState('');
     const [allPontos, setAllPontos] = useState([]);
 
-    const CadastrarPonto = () => {
-        navigation.navigate('CadastrarPonto');
+    const CadastrarPontoScreen = () => {
+        navigation.navigate('CadastrarPontoScreen');
     };
 
     const getUser = async () => {
@@ -81,7 +81,7 @@ const PointsScreen = ({ navigation }) => {
     };
 
     const clearInput = () => {
-        setCidade('');
+        filterPontosByCidade('');
     };
 
     const refreshPontos = async () => {
@@ -194,7 +194,7 @@ const PointsScreen = ({ navigation }) => {
             {user.tipo_usuario == 1 && (
                 <View style={{ padding: 10 }}>
                     <View style={{ width: '100%' }}>
-                        <TouchableOpacity style={styles.button} onPress={CadastrarPonto}>
+                        <TouchableOpacity style={styles.button} onPress={CadastrarPontoScreen}>
                             <Text style={styles.buttonText}>Cadastrar Ponto</Text>
                         </TouchableOpacity>
                     </View>

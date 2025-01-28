@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-export default function MeusDesafios() {
+export default function MeusDesafiosScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Bem-vindo à tela de Meus Desafios!</Text>

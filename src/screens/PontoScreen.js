@@ -11,7 +11,7 @@ import {
     View,
 } from 'react-native';
 import api from '../services/api';
-import styles from '../../styles';
+import styles from '../assets/css/styles';
 import { WebView } from 'react-native-webview';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import { Platform } from 'react-native';

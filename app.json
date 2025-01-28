@@ -27,12 +27,14 @@
             ]
           }
         ],
+        "UIBackgroundModes": ["remote-notification"],
         "NSLocationWhenInUseUsageDescription": "Nós precisamos da sua localização para mostrar e gravar a rota.",
         "NSLocationAlwaysUsageDescription": "Nós precisamos da sua localização mesmo quando o aplicativo está em segundo plano."
       },
       "bundleIdentifier": "com.lucassteinbach.Carazza"
     },
     "android": {
+      "useNextNotificationsApi": true,
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyAPOMVj_GA0krJ0XYq4Ui0CxiB7CGZ5kmQ"
@@ -41,7 +43,9 @@
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
-        "FOREGROUND_SERVICE"
+        "ACCESS_BACKGROUND_LOCATION",
+        "FOREGROUND_SERVICE",
+        "RECEIVE_BOOT_COMPLETED"
       ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",

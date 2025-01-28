@@ -13,14 +13,6 @@ export default function EncontrosScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Bem-vindo à tela de Encontros!</Text>
-      {/* <MapView style={styles.map} initialRegion={region}>
-        <Marker
-          provider={PROVIDER_GOOGLE}
-          coordinate={{ latitude: region.latitude, longitude: region.longitude }}
-          title="Minha Localização"
-          description="Rua Izídio Antônio da Silva, 147, Uberlândia"
-        />
-      </MapView> */}
     </View>
   );
 };

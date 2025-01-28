@@ -38,7 +38,8 @@
     "react-native-screens": "~4.4.0",
     "react-native-webview": "13.12.5",
     "expo-device": "~7.0.2",
-    "expo-dev-client": "~5.0.10"
+    "expo-dev-client": "~5.0.10",
+    "@react-native-picker/picker": "2.9.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

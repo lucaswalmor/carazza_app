@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, ActivityIndicator, Button, Modal as RNModal, Alert } from 'react-native';
-import styles from '../../styles';
+import styles from '../assets/css/styles';
 import api from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as LocalAuthentication from 'expo-local-authentication';
@@ -110,8 +110,10 @@ export default function LoginScreen({ navigation, route }) {
   const handleLogin = async (emailBiometria, passwordBiometria) => {
     if (!email && !emailBiometria) {
       Alert.alert('O campo email é obrigatório');
+      return
     } else if (!password && !passwordBiometria) {
       Alert.alert('O campo senha é obrigatório');
+      return
     }
 
     setIsLoading(true);
