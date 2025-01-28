@@ -139,31 +139,6 @@ const PointsScreen = ({ navigation }) => {
                     </View>
                 </TouchableOpacity>
             </ImageBackground>
-
-            {/* <TouchableOpacity
-                style={[styles.card, { gap: 10 }]}
-                onPress={() => navigation.navigate('PontoScreen', { id: item.id })}
-            >
-                <Text style={[styles.h3, styles.infoTitle]}>{item.nome}</Text>
-                <Text style={styles.h5}>{item.cidade}, {item.estado}</Text>
-                <Text style={styles.span}>{item.descricao}</Text>
-
-                <View style={stylesPontoListScreen.actionsContainer}>
-                    <TouchableOpacity
-                        style={stylesPontoListScreen.actionButton}
-                        onPress={() => likePonto(item)}
-                    >
-                        <Ionicons
-                            name={item.like ? "thumbs-up" : "thumbs-up-outline"}
-                            size={24}
-                            color="#007BFF"
-                            style={{ marginRight: 10 }}
-                        />
-
-                        <Text>{item.like_count}</Text>
-                    </TouchableOpacity>
-                </View>
-            </TouchableOpacity> */}
         </View>
     );
 
