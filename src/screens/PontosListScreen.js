@@ -11,7 +11,6 @@ const PointsScreen = ({ navigation }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [pontos, setPontos] = useState([]);
-    const [refreshKey, setRefreshKey] = useState(0);
     const [cidade, setCidade] = useState('');
     const [allPontos, setAllPontos] = useState([]);
 

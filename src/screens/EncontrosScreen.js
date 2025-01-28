@@ -19,7 +19,15 @@ export default function EncontrosScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#fff',
+  },
+  text: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: '#333',
   },
   map: {
     ...StyleSheet.absoluteFillObject,
