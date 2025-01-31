@@ -337,7 +337,14 @@ const styles = StyleSheet.create({
         textShadowRadius: 4,
         fontSize: 16,
         fontWeight: 'medium'
-    }
+    },
+    video: {
+      width: '100%',
+      height: 600,
+      marginBottom: 20,
+      borderRadius: 10,
+      overflow: 'hidden'
+    },
 })
 
 export default styles

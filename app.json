@@ -27,7 +27,9 @@
             ]
           }
         ],
-        "UIBackgroundModes": ["remote-notification"],
+        "UIBackgroundModes": [
+          "remote-notification"
+        ],
         "NSLocationWhenInUseUsageDescription": "Nós precisamos da sua localização para mostrar e gravar a rota.",
         "NSLocationAlwaysUsageDescription": "Nós precisamos da sua localização mesmo quando o aplicativo está em segundo plano."
       },
@@ -81,6 +83,17 @@
       "eas": {
         "projectId": "61721ec3-c518-4701-8453-7bd69acf2c94"
       }
-    }
+    },
+    "plugins": [
+      [
+        "expo-video",
+        {
+          "supportsBackgroundPlayback": true,
+          "supportsPictureInPicture": true,
+          "cameraPermission": "Permitir acesso à câmera para gravar vídeos",
+          "microphonePermission": "Permitir acesso ao microfone para gravar áudio"
+        }
+      ]
+    ]
   }
 }

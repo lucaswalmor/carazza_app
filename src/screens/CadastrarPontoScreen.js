@@ -6,7 +6,8 @@ import {
     View,
     ScrollView,
     ActivityIndicator,
-    Image
+    Image,
+    Alert
 } from 'react-native';
 import { MaskedTextInput } from "react-native-mask-text";
 import styles from '../assets/css/styles';
@@ -16,10 +17,11 @@ import api from '../services/api';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function CadastrarPontoScreen({ navigation })  {
+export default function CadastrarPontoScreen({ navigation }) {
     const [isLoading, setIsLoading] = useState(false);
     const [errors, setErrors] = useState({});
     const [images, setImages] = useState([]);
+    const [video, setVideo] = useState(null);
     const [form, setForm] = useState({
         nome: 'Ponto B',
         cep: '',
@@ -35,8 +37,6 @@ export default function CadastrarPontoScreen({ navigation })  {
         valorMaxHospedagem: '',
         descricao: 'O loca é historico por tal coisa bla bla bla bla bla bla',
         informacoesComplementares: 'Ponto bom para comer',
-        codigoVideo: '<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@brunocarazza3/video/7416808403827248389" data-video-id="7416808403827248389" style="max-width: 605px;min-width: 325px;" > <section> <a target="_blank" title="@brunocarazza3" href="https://www.tiktok.com/@brunocarazza3?refer=embed">@brunocarazza3</a> <p>Me siga pra mais …</p> <a target="_blank" title="♬ som original - Bruno Carazza" href="https://www.tiktok.com/music/som-original-7416808761504008965?refer=embed">♬ som original - Bruno Carazza</a> </section> </blockquote> <script async src="https://www.tiktok.com/embed.js"></script>',
-        linkVideo: 'https://www.tiktok.com/@brunocarazza3/video/7416808673978109189?q=brunocarazza&t=1737605809002',
         horaAbertura: '10:00',
         horaFechamento: '22:00',
     });
@@ -69,6 +69,17 @@ export default function CadastrarPontoScreen({ navigation })  {
             });
         });
 
+        if (video) {
+            const videoFilename = video.uri.split('/').pop();
+            const videoExt = videoFilename.split('.').pop();
+
+            formData.append('video', {
+                uri: video.uri,
+                name: `video.${videoExt}`,
+                type: `video/${videoExt}`,
+            });
+        }
+
         try {
             setIsLoading(true);
             const response = await api.post('/ponto/store', formData, {
@@ -77,6 +88,8 @@ export default function CadastrarPontoScreen({ navigation })  {
                     Authorization: `Bearer ${token}`,
                 },
             });
+
+            Alert.alert(response.data.message)
 
             setForm({
                 nome: '',
@@ -93,15 +106,13 @@ export default function CadastrarPontoScreen({ navigation })  {
                 valorMinHospedagem: '',
                 valorMaxHospedagem: '',
                 informacoesComplementares: '',
-                codigoVideo: '',
-                linkVideo: '',
                 horaAbertura: '',
                 horaFechamento: '',
             });
             setImages([]);
-
+            setVideo(null);
         } catch (error) {
-            console.error('Erro ao enviar o formulário:', error);
+            console.log('Erro:', error);
         } finally {
             setIsLoading(false);
         }
@@ -126,6 +137,28 @@ export default function CadastrarPontoScreen({ navigation })  {
 
         if (!result.canceled) {
             setImages([...images, result.assets[0].uri]);
+        }
+    };
+
+    const removeVideo = () => {
+        setVideo(null);
+    };
+
+    const pickVideo = async () => {
+        const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (!permissionResult.granted) {
+            alert('Permissão para acessar a galeria é necessária!');
+            return;
+        }
+
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ['videos'],
+            allowsEditing: true,
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            setVideo(result.assets[0]);
         }
     };
 
@@ -166,7 +199,7 @@ export default function CadastrarPontoScreen({ navigation })  {
                     value={form.cep}
                     placeholder='CEP'
                 />
-    
+
                 {errors.cep && <Text style={styles.errorText}>{errors.cep[0]}</Text>}
             </View>
 
@@ -310,20 +343,6 @@ export default function CadastrarPontoScreen({ navigation })  {
                 onChangeText={(text) => handleInputChange('informacoesComplementares', text)}
             />
 
-            <TextInput
-                style={styles.input}
-                placeholder="Embed do video no TIKTOK"
-                value={form.codigoVideo}
-                onChangeText={(text) => handleInputChange('codigoVideo', text)}
-            />
-
-            <TextInput
-                style={styles.input}
-                placeholder="Link do vídeo no TIKTOK"
-                value={form.linkVideo}
-                onChangeText={(text) => handleInputChange('linkVideo', text)}
-            />
-
             <MaskedTextInput
                 mask="99:99"
                 keyboardType="numeric"
@@ -341,6 +360,56 @@ export default function CadastrarPontoScreen({ navigation })  {
                 value={form.horaFechamento}
                 placeholder='Hora Fechamento'
             />
+
+            <TouchableOpacity
+                style={styles.buttonSelectImage}
+                onPress={pickVideo}
+            >
+                <Ionicons name="videocam-outline" size={20} color="#fff" style={{ marginRight: 8 }} />
+                <Text style={styles.buttonText}>Selecionar Vídeo</Text>
+            </TouchableOpacity>
+
+            {video ? (
+                <View
+                    style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        backgroundColor: '#f0f0f0',
+                        borderRadius: 8,
+                        padding: 10,
+                        marginTop: 10,
+                    }}
+                >
+                    <Text style={{ flex: 1, color: '#333' }}>
+                        {video.name || 'video.mp4'}
+                    </Text>
+
+                    <TouchableOpacity
+                        style={{
+                            backgroundColor: 'red',
+                            padding: 5,
+                            borderRadius: 5,
+                            marginLeft: 10,
+                        }}
+                        onPress={removeVideo}
+                    >
+                        <Ionicons name="trash-outline" size={26} color="white" />
+                    </TouchableOpacity>
+                </View>
+            ) : (
+                <Text style={{ color: 'gray', fontStyle: 'italic', marginTop: 10, marginBottom: 20 }}>
+                    Nenhum vídeo selecionado  (Max: 1 vídeo)
+                </Text>
+            )}
+
+            <TouchableOpacity
+                style={[styles.buttonSelectImage, isDisabled && { backgroundColor: '#ccc' }]}
+                onPress={pickImage}
+                disabled={isDisabled}
+            >
+                <Ionicons name="cloud-upload-outline" size={20} color="#fff" style={{ marginRight: 8 }} />
+                <Text style={styles.buttonText}>Fotos do Local</Text>
+            </TouchableOpacity>
 
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginVertical: 10, gap: 10 }}>
                 {images.length > 0 ? images.map((uri, index) => (
@@ -361,15 +430,6 @@ export default function CadastrarPontoScreen({ navigation })  {
                     <Text style={{ textAlign: 'center', color: 'gray', fontStyle: 'italic' }}>Nenhuma imagem selecionada (Max: 3 imagems)</Text>
                 )}
             </View>
-
-            <TouchableOpacity
-                style={[styles.buttonSelectImage, isDisabled && { backgroundColor: '#ccc' }]}
-                onPress={pickImage}
-                disabled={isDisabled}
-            >
-                <Ionicons name="cloud-upload-outline" size={20} color="#fff" style={{ marginRight: 8 }} />
-                <Text style={styles.buttonText}>Fotos do Local</Text>
-            </TouchableOpacity>
 
             <View style={{ flex: 1, marginBottom: 50 }}>
                 <TouchableOpacity style={styles.button} onPress={handleSubmit}>

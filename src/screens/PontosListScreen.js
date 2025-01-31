@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, RefreshControl, Image, ImageBackground, SafeAreaView, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../services/api';
 import styles from '../assets/css/styles';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { TextInput } from 'react-native-gesture-handler';
+import { useFocusEffect } from '@react-navigation/native';
 
 const PointsScreen = ({ navigation }) => {
     const [user, setUser] = useState({});
@@ -26,8 +27,13 @@ const PointsScreen = ({ navigation }) => {
         }
     }
 
+    useFocusEffect(
+        useCallback(() => {
+            getPontos();
+        }, [])
+    );
+
     useEffect(() => {
-        getPontos();
         getUser();
     }, [])
 

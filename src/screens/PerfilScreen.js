@@ -74,7 +74,7 @@ export default function PerfilScreen({ navigation }) {
 
          if (token) {
             try {
-                const response = await api.get(`/stripe/subscription/pause`, {
+                const response = await api.get(`/asaas/subscription/status?email=${user.email}`, {
                     headers: {
                         'Content-Type': 'application/json',
                         Authorization: `Bearer ${token}`,

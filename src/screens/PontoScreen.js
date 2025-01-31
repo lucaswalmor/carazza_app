@@ -1,7 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
     ActivityIndicator,
+    Alert,
     Image,
     Linking,
     ScrollView,
@@ -12,9 +13,12 @@ import {
 } from 'react-native';
 import api from '../services/api';
 import styles from '../assets/css/styles';
-import { WebView } from 'react-native-webview';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
+import { Video } from 'expo-av';
 import { Platform } from 'react-native';
+import { WebView } from 'react-native-webview';
+import { useVideoPlayer, VideoView } from 'expo-video';
+import { useEvent } from 'expo';
 
 export default function PontoScreen({ route }) {
     const { id } = route.params;
@@ -22,66 +26,70 @@ export default function PontoScreen({ route }) {
     const [isLoading, setIsLoading] = useState(true);
     const [isLoadingComentario, setIsLoadingComentario] = useState(false);
     const [comentario, setComentario] = useState(null);
+    const [videoSource, setVideoSource] = useState(null);
+
+    const player = useVideoPlayer(videoSource, player => {
+        player.loop = true;
+        player.play();
+    });
+
+    const { isPlaying } = useEvent(player, 'playingChange', { isPlaying: player.playing });
 
     useEffect(() => {
-        const fetchPonto = async () => {
-            // setIsLoading(true);
-            const token = await AsyncStorage.getItem('token');
-
-            try {
-                const response = await api.get(`/ponto/show/${id}`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-
-                setPonto(response.data.data);
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
         fetchPonto();
     }, [id]);
 
-    const handleNavigation = (event) => {
+    const fetchPonto = async () => {
         setIsLoading(true);
+        const token = await AsyncStorage.getItem('token');
 
-        const url = event.url;
-
-        if (!url || url === 'about:blank') {
-            console.warn('URL inválida bloqueada:', url);
-            return false; // Bloqueia o carregamento na WebView
-        }
-
-        // Verifica se é uma URL desconhecida ou um esquema externo
-        if (url.startsWith('http') || url.startsWith('https')) {
-            // Permite links regulares
-            return true;
-        } else {
-            // Impede carregamento de esquemas desconhecidos e tenta abrir no app nativo
-            try {
-                setIsLoading(false);
-                Linking.openURL(url); // Abre no app correspondente
-            } catch (e) {
-                setIsLoading(false);
-                console.warn('Erro ao tentar abrir o link:', url);
-            }
+        try {
+            const response = await api.get(`/ponto/show/${id}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            setVideoSource(`https://carazza.lksoftware.com.br/public/storage/${response.data.data.video_path}`)
+            setPonto(response.data.data);
+        } catch (error) {
+            console.error(error);
+        } finally {
             setIsLoading(false);
-            return false; // Bloqueia o carregamento da URL na WebView
         }
-    };
-
-    const handleSubmit = () => {
-        console.log(comentario);
     };
 
     const openMap = async () => {
         const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${ponto?.latitude},${ponto?.longitude}`;
         Linking.openURL(googleMapsUrl);
     };
+
+    const sendComentario = async () => {
+        setIsLoadingComentario(true)
+        try {
+            const token = await AsyncStorage.getItem('token');
+
+            const data = {
+                ponto_id: id,
+                comentario
+            }
+
+            const response = await api.post(`/comentario/store`, data, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            fetchPonto();
+
+            Alert.alert(response.data.message)
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setIsLoadingComentario(false)
+        }
+    }
 
     return (
         <ScrollView style={styles.container}>
@@ -100,7 +108,15 @@ export default function PontoScreen({ route }) {
             ) : (
                 <>
                     <View style={{}}>
-                        <WebView
+                        <VideoView
+                            style={styles.video}
+                            player={player}
+                            allowsFullscreen
+                            allowsPictureInPicture
+                            nativeControls={true}
+                        />
+
+                        {/* <WebView
                             style={{ height: Platform.OS === 'ios' ? 500 : 750 }}
                             originWhitelist={['*']}
                             source={
@@ -123,7 +139,19 @@ export default function PontoScreen({ route }) {
                                         `,
                                     }
                             }
-                        />
+                            onShouldStartLoadWithRequest={(event) => {
+                                const url = event.url;
+                        
+                                if (url.startsWith('snssdk') || url.includes('tiktok')) {
+                                    Linking.openURL(url).catch((err) =>
+                                        console.error('Erro ao abrir o link:', err)
+                                    );
+                                    return false; // Impede a WebView de carregar essa URL
+                                }
+                        
+                                return true; // Permite a WebView carregar URLs normais
+                            }}
+                        /> */}
                     </View>
 
                     {/* Card 2: Informações */}
@@ -224,10 +252,6 @@ export default function PontoScreen({ route }) {
                     <View style={[styles.card, { marginBottom: 100 }]}>
                         <Text style={styles.infoTitle}>Comentários</Text>
 
-                        <Text style={{ marginTop: 10, marginBottom: 10 }}>
-                            Lista de comentários
-                        </Text>
-
                         <TextInput
                             style={[styles.textArea, { marginTop: 10 }]}
                             placeholder="Deixe seu comentário"
@@ -240,7 +264,7 @@ export default function PontoScreen({ route }) {
                         <View style={{ flex: 1 }}>
                             <TouchableOpacity
                                 style={styles.buttonSend}
-                                onPress={handleSubmit}>
+                                onPress={sendComentario}>
                                 <View
                                     style={{
                                         flex: 1,
@@ -255,12 +279,11 @@ export default function PontoScreen({ route }) {
                                                 size="small"
                                                 color="#fff"
                                             />
-                                            <Text style={styles.buttonText}>Enviando</Text>
+                                            <Text style={styles.buttonTextSend}>Enviando</Text>
                                         </>
                                     ) : (
                                         <>
                                             <Text style={styles.buttonTextSend}>Enviar</Text>
-                                            {/* <Ionicons name="send-outline" size={12} color="#fff" style={{ marginLeft: 8 }} /> */}
                                             <FontAwesome
                                                 name="paper-plane"
                                                 size={12}
@@ -272,6 +295,43 @@ export default function PontoScreen({ route }) {
                                 </View>
                             </TouchableOpacity>
                         </View>
+
+
+                        <Text style={{ marginTop: 10 }}>
+                            Lista de comentários
+                        </Text>
+
+                        {ponto?.comentarios && ponto.comentarios.length > 0 ? (
+                            <View style={{ marginTop: 20 }}>
+                                {ponto.comentarios.map((comentarioItem) => (
+                                    <TouchableOpacity
+                                        key={comentarioItem.id}
+                                        onPress={() => Alert.alert('Comentário', comentarioItem.comentario)}
+                                        style={{ marginBottom: 15, flexDirection: 'row', alignItems: 'center', backgroundColor: '#f5f5f5', padding: 5, borderRadius: 10 }}
+                                    >
+                                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                            <Image
+                                                source={{ uri: comentarioItem.usuario.img_perfil }}
+                                                style={{
+                                                    width: 40,
+                                                    height: 40,
+                                                    borderRadius: 20,
+                                                    marginRight: 10,
+                                                }}
+                                            />
+                                            <Text style={{ fontWeight: 'bold' }}>
+                                                {comentarioItem.usuario.apelido}
+                                            </Text>
+                                        </View>
+                                        <Text style={{ marginTop: 5, marginLeft: 10 }}>
+                                            {comentarioItem.comentario}
+                                        </Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
+                        ) : (
+                            <Text style={styles.infoText}>Nenhum comentário disponível.</Text>
+                        )}
                     </View>
                 </>
             )}

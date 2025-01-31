@@ -1,9 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, RefreshControl, SafeAreaView, TextInput, ImageBackground } from 'react-native';
 import styles from '../assets/css/styles';
 import api from '../services/api';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function EventosListScreen({ navigation }) {
     const [user, setUser] = useState({});
@@ -44,10 +45,15 @@ export default function EventosListScreen({ navigation }) {
             setIsLoading(false)
         }
     }
+    
+    useFocusEffect(
+        useCallback(() => {
+            getEventos();
+        }, [])
+    );
 
     useEffect(() => {
         getUser();
-        getEventos();
     }, [])
 
     const filterEventosByCidade = (text) => {

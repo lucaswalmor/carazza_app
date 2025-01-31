@@ -137,6 +137,7 @@ export default function LoginScreen({ navigation, route }) {
       }
 
       if (data.token) {
+        console.log(data.token)
         await AsyncStorage.setItem('token', data.token);
       } else {
         await AsyncStorage.removeItem('token');
@@ -165,7 +166,7 @@ export default function LoginScreen({ navigation, route }) {
 
   const handleResumeSubscription = async () => {
     try {
-      const response = await api.get(`/stripe/subscription/resume?email=${email}`);
+      const response = await api.get(`/asaas/subscription/status?email=${email}`);
       setMsgConfirmResumeSubscription(response.data.message)
       setModalResumeSubscription(false)
       setModalConfirmResumeSubscriptionVisible(true)
