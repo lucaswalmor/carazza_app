@@ -1,11 +1,12 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from '../src/screens/LoginScreen';
-import CadastrarUsuarioScreen from '../src/screens/CadastrarUsuarioScreen';
-import DrawerRoutes from './drawer.routes'; // Drawer como principal navegação após login.
+import DrawerRoutes from './drawer.routes';
 import CadastrarPontoScreen from '../src/screens/CadastrarPontoScreen';
 import PontoScreen from '../src/screens/PontoScreen';
 import SuccessScreen from '../src/screens/SuccessScreen';
 import RetryPaymentScreen from '../src/screens/RetryPaymentScreen';
+import CadastrarEventoScreen from '../src/screens/CadastrarEventoScreen';
+import EventoScreen from '../src/screens/EventoScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -27,9 +28,10 @@ export default function StackRoutes() {
             },
         }}>
             <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="Cadastro" component={CadastrarUsuarioScreen} options={{ headerShown: false }} />
             <Stack.Screen name="CadastrarPontoScreen" component={CadastrarPontoScreen} options={{ headerShown: true, headerTitle: 'Cadastrar Ponto' }} />
+            <Stack.Screen name="CadastrarEventoScreen" component={CadastrarEventoScreen} options={{ headerShown: true, headerTitle: 'Cadastrar Evento' }} />
             <Stack.Screen name="PontoScreen" component={PontoScreen} options={{ headerShown: true }} />
+            <Stack.Screen name="EventoScreen" component={EventoScreen} options={{ headerShown: true }} />
             <Stack.Screen name="Success" component={SuccessScreen} options={{ headerShown: true }} />
             <Stack.Screen name="Failure" component={RetryPaymentScreen} options={{ headerShown: true }} />
             <Stack.Screen name="Main" component={DrawerRoutes} options={{ headerShown: false }} />

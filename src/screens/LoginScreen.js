@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, ActivityIndicator, Button, Modal as RNModal, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, ActivityIndicator, Button, Modal as RNModal, Alert, Linking } from 'react-native';
 import styles from '../assets/css/styles';
 import api from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -103,8 +103,15 @@ export default function LoginScreen({ navigation, route }) {
     }
   };
 
-  const handleRegisterNavigation = () => {
-    navigation.navigate('Cadastro');
+  const handleRegisterNavigation = async () => {
+      const baseUrl = 'https://carazzapayment.vercel.app/cadastro?ref=&inf=&';
+      const supported = await Linking.canOpenURL(baseUrl);
+      if (supported) {
+          await Linking.openURL(baseUrl);
+          navigation.replace('Login', { message: 'Cadastro realizado com sucesso!' });
+      } else {
+          Alert.alert('Erro', 'Não foi possível abrir o link: ' + baseUrl);
+      }
   };
 
   const handleLogin = async (emailBiometria, passwordBiometria) => {
@@ -123,8 +130,18 @@ export default function LoginScreen({ navigation, route }) {
       const response = await api.post('/login', { expoToken: token, email: email || emailBiometria, password: password || passwordBiometria });
       const data = response.data;
 
-      await AsyncStorage.setItem('user', JSON.stringify(data.user));
-      await AsyncStorage.setItem('token', data.token);
+      if (data.user) {
+        await AsyncStorage.setItem('user', JSON.stringify(data.user));
+      } else {
+        await AsyncStorage.removeItem('user');
+      }
+
+      if (data.token) {
+        await AsyncStorage.setItem('token', data.token);
+      } else {
+        await AsyncStorage.removeItem('token');
+      }
+      
       await AsyncStorage.setItem('email', email || emailBiometria);
       await AsyncStorage.setItem('password', password || passwordBiometria);
 
@@ -135,6 +152,7 @@ export default function LoginScreen({ navigation, route }) {
       }
     } catch (error) {
       if (error.response && error.response.data) {
+        console.log(error.response.data.errors)
         setErrors(error.response.data.errors);
       } else {
         console.log('Erro:', error.message);

@@ -99,6 +99,17 @@ const styles = StyleSheet.create({
         marginTop: 10,
         padding: 10
     },
+    buttonAddPatrocinador: {
+        height: 30,
+        width: '40%',
+        backgroundColor: '#198754',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'row',
+        borderRadius: 5,
+        marginTop: 10,
+        marginBottom: 10,
+    },
     buttonVoltar: {
         height: 50,
         backgroundColor: '#6c757d',
@@ -127,6 +138,16 @@ const styles = StyleSheet.create({
         width: 120,
         height: 120,
         borderRadius: 60,
+        backgroundColor: '#e0e0e0',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+        marginBottom: 20,
+    },
+    imageBannerContainer: {
+        width: '100%',
+        height: 120,
+        borderRadius: 10,
         backgroundColor: '#e0e0e0',
         alignItems: 'center',
         justifyContent: 'center',
@@ -225,6 +246,12 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         resizeMode: 'cover',
     },
+    logoEvento: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        resizeMode: 'cover',
+    },
     infoLabel: {
         fontSize: 14,
         color: '#777',
@@ -261,6 +288,56 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         color: '#cce5ff'
     },
+    patrocinadorContainer: {
+      marginBottom: 20,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%'
+    },
+    actionsContainer: {
+        flexDirection: 'row', // Alinha os botões horizontalmente
+        justifyContent: 'space-between', // Espaço igual entre os botões
+        marginTop: 10,
+    },
+    actionButton: {
+        flexDirection: 'row', // Ícone e texto na mesma linha
+        alignItems: 'center',
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        borderRadius: 8,
+        backgroundColor: '#f9f9f9',
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    textCardTitle: {
+        fontWeight: 'bold',
+        color: '#fff',
+        textShadowColor: 'rgba(0, 0, 0, 0.8)',
+        textShadowOffset: { width: 2, height: 2 },
+        textShadowRadius: 4,
+        fontSize: 20,
+    },
+    textCard: {
+        color: '#fff',
+        textShadowColor: 'rgba(0, 0, 0, 0.8)',
+        textShadowOffset: { width: 2, height: 2 },
+        textShadowRadius: 4,
+        fontSize: 18,
+        fontWeight: 'medium'
+    },
+    textInfoCard: {
+        color: '#fff',
+        textShadowColor: 'rgba(0, 0, 0, 0.8)',
+        textShadowOffset: { width: 2, height: 2 },
+        textShadowRadius: 4,
+        fontSize: 16,
+        fontWeight: 'medium'
+    }
 })
 
 export default styles

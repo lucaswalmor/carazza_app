@@ -1,12 +1,9 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-
-import EventosScreen from '../src/screens/EventosScreen'
-import DrawerRoutes from './drawer.routes';
+import EventosListScreen from '../src/screens/EventosListScreen'
 import PontoListScreen from '../src/screens/PontosListScreen'
 import EncontrosScreen from '../src/screens/EncontrosScreen'
 import DesafiosListScreen from '../src/screens/DesafiosListScreen';
-import PerfilScreen from '../src/screens/PerfilScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -44,7 +41,7 @@ export default function TabRoutes() {
             })}
         >
             <Tab.Screen name="Pontos" component={PontoListScreen} options={{ headerShown: false }} />
-            <Tab.Screen name="Eventos" component={EventosScreen} options={{ headerShown: false }} />
+            <Tab.Screen name="Eventos" component={EventosListScreen} options={{ headerShown: false }} />
             <Tab.Screen name="Encontros" component={EncontrosScreen} options={{ headerShown: false }} />
             <Tab.Screen name="Desafios" component={DesafiosListScreen} options={{ headerShown: false }} />
         </Tab.Navigator>
