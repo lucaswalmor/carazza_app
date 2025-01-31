@@ -127,7 +127,7 @@ export default function LoginScreen({ navigation, route }) {
     try {
       // const token = expoPushToken || (await Notifications.getExpoPushTokenAsync()).data;
 
-      const response = await api.post('/login', { emailBiometria, password: password || passwordBiometria });
+      const response = await api.post('/login', { email: email || emailBiometria, password: password || passwordBiometria });
       // const response = await api.post('/login', { expoToken: token, email: email || emailBiometria, password: password || passwordBiometria });
       const data = response.data;
 
