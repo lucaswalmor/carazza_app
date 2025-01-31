@@ -57,9 +57,9 @@ export default function LoginScreen({ navigation, route }) {
     }
   };
 
-  // useEffect(() => {
-  //   registerForPushNotifications();
-  // }, []);
+  useEffect(() => {
+    registerForPushNotifications();
+  }, []);
 
   ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -125,10 +125,9 @@ export default function LoginScreen({ navigation, route }) {
 
     setIsLoading(true);
     try {
-      // const token = expoPushToken || (await Notifications.getExpoPushTokenAsync()).data;
+      const token = expoPushToken || (await Notifications.getExpoPushTokenAsync()).data;
 
-      const response = await api.post('/login', { emailBiometria, password: password || passwordBiometria });
-      // const response = await api.post('/login', { expoToken: token, email: email || emailBiometria, password: password || passwordBiometria });
+      const response = await api.post('/login', { expoToken: token, email: email || emailBiometria, password: password || passwordBiometria });
       const data = response.data;
 
       if (data.user) {
