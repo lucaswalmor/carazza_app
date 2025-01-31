@@ -14,7 +14,6 @@ import {
 import api from '../services/api';
 import styles from '../assets/css/styles';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
-import { Video } from 'expo-av';
 import { Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { useVideoPlayer, VideoView } from 'expo-video';
