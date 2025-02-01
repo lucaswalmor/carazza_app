@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-    // baseURL: 'https://6fb4-2804-1e68-c209-daec-92b-b1cc-2eb5-3ae7.ngrok-free.app/api',
-    baseURL: 'https://carazza.lksoftware.com.br/public/api',
+    baseURL: 'https://9963-2804-1e68-c209-dc0a-1819-33b6-f9d9-a3fa.ngrok-free.app/api',
+    // baseURL: 'https://carazza.lksoftware.com.br/public/api',
     timeout: 0,
     headers: {
         'Content-Type': 'application/json',

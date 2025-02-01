@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
+    Alert,
     Image,
     Linking,
     ScrollView,
@@ -12,7 +13,7 @@ import {
 } from 'react-native';
 import api from '../services/api';
 import styles from '../assets/css/styles';
-import { Ionicons } from '@expo/vector-icons';
+import { FontAwesome, FontAwesome5, Ionicons } from '@expo/vector-icons';
 
 export default function EventoScreen({ route }) {
     const { id } = route.params;
@@ -20,27 +21,28 @@ export default function EventoScreen({ route }) {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const fetchEvento = async () => {
-            // setIsLoading(true);
-            const token = await AsyncStorage.getItem('token');
-
-            try {
-                const response = await api.get(`/evento/show/${id}`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-
-                setEvento(response.data.data);
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
         fetchEvento();
-    }, [id]);
+    }, []);
+
+    const fetchEvento = async () => {
+        setIsLoading(true);
+        const token = await AsyncStorage.getItem('token');
+
+        try {
+            const response = await api.get(`/evento/show/${id}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            
+            setEvento(response.data.data);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const openMap = async () => {
         Linking.openURL(evento?.link_maps_evento);
@@ -49,6 +51,42 @@ export default function EventoScreen({ route }) {
     const openMapPasseioMapa = async () => {
         Linking.openURL(evento?.link_maps_passeio);
     };
+
+    const confirmPresenca = async () => {
+        Alert.alert(
+            'Gostaria de confirmar presença neste evento?',
+            'Ao confirmar presença neste evento você entrará na lista de presenças confirmadas',
+            [
+                { text: 'Cancelar', onPress: () => { }, style: 'cancel' },
+                { text: 'OK', onPress: () => handleConfirm() },
+            ],
+            { cancelable: true }
+        );
+    }
+
+    const handleConfirm = async () => {
+        try {
+            const token = await AsyncStorage.getItem('token');
+
+            const response = await api.get(`/evento/confirmar-presenca/${id}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            Alert.alert(response.data.message)
+            Alert.alert(
+                response.data.message,
+                [
+                    { text: 'OK', onPress: () => fetchEvento() },
+                ],
+                { cancelable: true }
+            );
+        } catch (error) {
+            Alert.alert(error.response.data.error)
+        }
+    }
 
     return (
         <ScrollView style={styles.container}>
@@ -202,7 +240,7 @@ export default function EventoScreen({ route }) {
                             <>
                                 <Text style={styles.infoLabel}>Valor do Estacionamento:</Text>
                                 <Text style={styles.infoText}>
-                                    {evento.valor_estacionamento }
+                                    {evento.valor_estacionamento}
                                 </Text>
                             </>
                         ) : null}
@@ -283,7 +321,7 @@ export default function EventoScreen({ route }) {
                     </View>
 
                     {/* Card 7: Localização */}
-                    <View style={[styles.card, { marginBottom: 100 }]}>
+                    <View style={[styles.card]}>
                         <Text style={styles.infoTitle}>Localização</Text>
                         <Text style={styles.infoLabel}>Local:</Text>
                         <Text style={styles.infoText}>{evento?.local}</Text>
@@ -315,6 +353,52 @@ export default function EventoScreen({ route }) {
                             />
                             <Text style={styles.buttonText}>Abrir no Google Maps</Text>
                         </TouchableOpacity>
+                    </View>
+
+                    {/* Card 8: Participação */}
+                    <View style={[styles.card, { marginBottom: 100 }]}>
+                        <TouchableOpacity
+                            style={[
+                                styles.button,
+                                { flexDirection: 'row', marginBottom: 20 },
+                            ]}
+                            onPress={confirmPresenca}>
+                            <FontAwesome5 name="user-check" size={18} color="#fff" style={{ marginRight: 8 }} />
+                            <Text style={styles.buttonText}>Confirmar Presença</Text>
+                        </TouchableOpacity>
+
+                        <Text style={[styles.infoTitle, { textAlign: 'center' }]}>List de Presenças Confirmadas</Text>
+
+
+                        {evento?.participantes && evento.participantes.length > 0 ? (
+                            <View style={{ marginTop: 20 }}>
+                                {evento.participantes.map((participante) => (
+                                    <TouchableOpacity
+                                        key={participante.id}
+                                        onPress={() => Alert.alert('Participante', participante.apelido)}
+                                        style={{ marginBottom: 15, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f5f5f5', padding: 10, borderRadius: 10 }}
+                                    >
+                                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                            <Image
+                                                source={{ uri: participante.img_perfil }}
+                                                style={{
+                                                    width: 20,
+                                                    height: 20,
+                                                    borderRadius: 20,
+                                                    marginRight: 10,
+                                                }}
+                                            />
+                                            <Text style={{ fontWeight: 'bold' }}>
+                                                {participante.apelido}
+                                            </Text>
+                                        </View>
+                                        <FontAwesome5 name="eye" size={18} color="#007BFF" style={{ marginRight: 8 }} />
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
+                        ) : (
+                            <Text style={{ textAlign: 'center', padding: 10, backgroundColor: '#f5f5f5', fontStyle: 'italic', marginTop: 10 }}>Ainda não hà presenças confirmadas.</Text>
+                        )}
                     </View>
                 </>
             )}

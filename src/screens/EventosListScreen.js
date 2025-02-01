@@ -109,6 +109,7 @@ export default function EventosListScreen({ navigation }) {
                     <Text style={styles.textCard}>{item.cidade}, {item.estado}</Text>
                     <Text style={styles.textInfoCard}>{item.descricao}</Text>
                     <Text style={styles.textCard}>{item.local}</Text>
+                    <Text style={styles.textCard}>Início: {item.data_inicio}</Text>
                 </TouchableOpacity>
             </ImageBackground>
         </View>

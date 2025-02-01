@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import api from '../services/api';
 import styles from '../assets/css/styles';
-import { FontAwesome, Ionicons } from '@expo/vector-icons';
+import { FontAwesome, FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { useEvent } from 'expo';
 
@@ -223,7 +223,7 @@ export default function PontoScreen({ route }) {
 
                         <View style={{ flex: 1 }}>
                             <TouchableOpacity
-                                style={styles.buttonSend}
+                                style={styles.button}
                                 onPress={sendComentario}>
                                 <View
                                     style={{
@@ -243,7 +243,7 @@ export default function PontoScreen({ route }) {
                                         </>
                                     ) : (
                                         <>
-                                            <Text style={styles.buttonTextSend}>Enviar</Text>
+                                            <Text style={styles.buttonText}>Enviar</Text>
                                             <FontAwesome
                                                 name="paper-plane"
                                                 size={12}
@@ -267,25 +267,29 @@ export default function PontoScreen({ route }) {
                                     <TouchableOpacity
                                         key={comentarioItem.id}
                                         onPress={() => Alert.alert('Comentário', comentarioItem.comentario)}
-                                        style={{ marginBottom: 15, flexDirection: 'row', alignItems: 'center', backgroundColor: '#f5f5f5', padding: 5, borderRadius: 10 }}
+                                        style={{ marginBottom: 15, backgroundColor: '#f5f5f5', padding: 5, borderRadius: 10 }}
                                     >
-                                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                            <Image
-                                                source={{ uri: comentarioItem.usuario.img_perfil }}
-                                                style={{
-                                                    width: 40,
-                                                    height: 40,
-                                                    borderRadius: 20,
-                                                    marginRight: 10,
-                                                }}
-                                            />
-                                            <Text style={{ fontWeight: 'bold' }}>
-                                                {comentarioItem.usuario.apelido}
-                                            </Text>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                <Image
+                                                    source={{ uri: comentarioItem.usuario.img_perfil }}
+                                                    style={{
+                                                        width: 20,
+                                                        height: 20,
+                                                        borderRadius: 20,
+                                                        marginRight: 10,
+                                                    }}
+                                                />
+                                                <Text style={{ fontWeight: 'bold' }}>
+                                                    {comentarioItem.usuario.apelido}
+                                                </Text>
+                                            </View>
+                                            <FontAwesome5 name="eye" size={18} color="#007BFF" style={{ marginRight: 8 }} />
                                         </View>
-                                        <Text style={{ marginTop: 5, marginLeft: 10 }}>
+                                        <Text style={{ marginTop: 15, marginLeft: 10 }}>
                                             {comentarioItem.comentario}
                                         </Text>
+
                                     </TouchableOpacity>
                                 ))}
                             </View>

@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#fff',
         textShadowColor: 'rgba(0, 0, 0, 0.8)',
-        textShadowOffset: { width: 2, height: 2 },
+        textShadowOffset: { width: 5, height: 5 },
         textShadowRadius: 4,
         fontSize: 20,
     },
