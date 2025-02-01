@@ -1,7 +1,6 @@
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import TabRoutes from './tab.routes'; // Tab dentro do Drawer
 import PerfilScreen from '../src/screens/PerfilScreen';
-import MeusDesafiosScreen from '../src/screens/MeusDesafiosScreen';
 import RotaScreen from '../src/screens/RotaScreen';
 import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import { Text } from 'react-native';
@@ -48,16 +47,6 @@ export default function DrawerRoutes() {
                         <MaterialIcons name="person" color={color} size={size} />
                     ),
                     drawerLabel: 'Perfil'
-                }}
-            />
-            <Drawer.Screen
-                name="MeusDesafiosScreen"
-                component={MeusDesafiosScreen}
-                options={{
-                    drawerIcon: ({ color, size }) => (
-                        <FontAwesome5 name="medal" color={color} size={size} />
-                    ),
-                    drawerLabel: 'Meus Desafios'
                 }}
             />
             <Drawer.Screen

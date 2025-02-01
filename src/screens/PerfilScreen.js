@@ -3,7 +3,7 @@ import { View, TouchableOpacity, Text, ActivityIndicator, Image, Alert } from 'r
 import api from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../assets/css/styles';
-import { Ionicons } from '@expo/vector-icons';
+import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 
 export default function PerfilScreen({ navigation }) {
     const [isLoading, setIsLoading] = useState(false);
@@ -31,6 +31,10 @@ export default function PerfilScreen({ navigation }) {
 
         setIsLoading(false)
     };
+
+    const navigateMeusDesafios = () => {
+        navigation.navigate('MeusDesafiosScreen')
+    }
 
     const getUser = async () => {
         const token = await AsyncStorage.getItem('token');
@@ -72,7 +76,7 @@ export default function PerfilScreen({ navigation }) {
         const token = await AsyncStorage.getItem('token');
         setIsLoading(true)
 
-         if (token) {
+        if (token) {
             try {
                 const response = await api.get(`/asaas/subscription/status?email=${user.email}`, {
                     headers: {
@@ -111,6 +115,20 @@ export default function PerfilScreen({ navigation }) {
                         <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
                             {user?.nome}
                         </Text>
+                    </View>
+
+                    {/* Card 4: Logout */}
+                    <View style={[styles.card, { gap: 10, flexDirection: 'row', alignItems: 'center' }]}>
+                        <TouchableOpacity
+                            style={{ flex: 1, alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}
+                            onPress={navigateMeusDesafios}
+                        >
+                            <Text style={[styles.textPrimary, { fontSize: 18, fontWeight: 'bold' }]}>
+                                Meus Desafios
+                            </Text>
+
+                            <FontAwesome5 name="medal" style={[styles.textPrimary, { marginRight: 8 }]} size={20} />
+                        </TouchableOpacity>
                     </View>
 
                     {/* Card 2: Assinatura */}
