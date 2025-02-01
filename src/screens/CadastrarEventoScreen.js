@@ -48,7 +48,7 @@ const CadastrarUsuarioScreen = ({ navigation }) => {
     const [enderecoFimPasseio, setEnderecoFimPasseio] = useState('Autódromo de Interlagos');
     const [bolEstacionamento, setBolEstacionamento] = useState(true);
     const [bolEstacionamentoPago, setBolEstacionamentoPago] = useState(false);
-    const [valorEstacionamento, setValorEstacionamento] = useState(0);
+    const [valorEstacionamento, setValorEstacionamento] = useState("R$ 00,00");
 
 
     const [errors, setErrors] = useState({});

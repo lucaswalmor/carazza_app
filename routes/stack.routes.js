@@ -4,7 +4,6 @@ import DrawerRoutes from './drawer.routes';
 import CadastrarPontoScreen from '../src/screens/CadastrarPontoScreen';
 import PontoScreen from '../src/screens/PontoScreen';
 import SuccessScreen from '../src/screens/SuccessScreen';
-import RetryPaymentScreen from '../src/screens/RetryPaymentScreen';
 import CadastrarEventoScreen from '../src/screens/CadastrarEventoScreen';
 import EventoScreen from '../src/screens/EventoScreen';
 
@@ -33,7 +32,6 @@ export default function StackRoutes() {
             <Stack.Screen name="PontoScreen" component={PontoScreen} options={{ headerShown: true }} />
             <Stack.Screen name="EventoScreen" component={EventoScreen} options={{ headerShown: true }} />
             <Stack.Screen name="Success" component={SuccessScreen} options={{ headerShown: true }} />
-            <Stack.Screen name="Failure" component={RetryPaymentScreen} options={{ headerShown: true }} />
             <Stack.Screen name="Main" component={DrawerRoutes} options={{ headerShown: false }} />
         </Stack.Navigator>
     );

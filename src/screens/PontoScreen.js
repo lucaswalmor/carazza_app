@@ -14,8 +14,6 @@ import {
 import api from '../services/api';
 import styles from '../assets/css/styles';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
-import { Platform } from 'react-native';
-import { WebView } from 'react-native-webview';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { useEvent } from 'expo';
 
@@ -114,43 +112,6 @@ export default function PontoScreen({ route }) {
                             allowsPictureInPicture
                             nativeControls={true}
                         />
-
-                        {/* <WebView
-                            style={{ height: Platform.OS === 'ios' ? 500 : 750 }}
-                            originWhitelist={['*']}
-                            source={
-                                Platform.OS === 'ios'
-                                    ? {
-                                        uri: ponto?.link_video,
-                                    }
-                                    : {
-                                        html: `
-                                            <!DOCTYPE html>
-                                            <html>
-                                            <head>
-                                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                                                <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-                                            </head>
-                                            <body style="margin:0;padding:0;">
-                                                ${ponto?.codigo_video}
-                                            </body>
-                                            </html>
-                                        `,
-                                    }
-                            }
-                            onShouldStartLoadWithRequest={(event) => {
-                                const url = event.url;
-                        
-                                if (url.startsWith('snssdk') || url.includes('tiktok')) {
-                                    Linking.openURL(url).catch((err) =>
-                                        console.error('Erro ao abrir o link:', err)
-                                    );
-                                    return false; // Impede a WebView de carregar essa URL
-                                }
-                        
-                                return true; // Permite a WebView carregar URLs normais
-                            }}
-                        /> */}
                     </View>
 
                     {/* Card 2: Informações */}

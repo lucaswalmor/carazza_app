@@ -114,57 +114,53 @@ export default function EventoScreen({ route }) {
                                 </Text>
                             </View>
                             <View>
-                                {evento.bol_entrada_paga && (
+                                {evento.bol_entrada_paga ? (
                                     <>
                                         <Text style={styles.infoLabel}>Organizador:</Text>
                                         <Text style={styles.infoText}>
                                             {evento?.nome_organizador}
                                         </Text>
                                     </>
-                                )}
+                                ) : null}
                             </View>
                         </View>
 
-                        {evento.bol_entrada_paga && (
+                        {evento.bol_entrada_paga ? (
                             <>
                                 <TouchableOpacity onPress={() => Linking.openURL(evento?.link_ingressos)}>
                                     <Text style={[styles.infoText, { color: 'blue', textDecorationLine: 'underline' }]}>
                                         {evento?.link_ingressos}
                                     </Text>
                                 </TouchableOpacity>
-                                {/* <Text style={styles.infoLabel}>Site para compra do ingresso:</Text>
-                                <Text style={styles.infoText}>
-                                    {evento?.link_ingressos}
-                                </Text> */}
                             </>
-                        )}
+                        ) : null}
 
-                        {evento.lotacao_maxima && (
+                        {evento.lotacao_maxima ? (
                             <>
                                 <Text style={styles.infoLabel}>Lotação máxima:</Text>
                                 <Text style={styles.infoText}>
                                     {evento?.lotacao_maxima}
                                 </Text>
                             </>
-                        )}
+                        ) : null}
 
-                        {evento.regras && (
+                        {evento.regras ? (
                             <>
                                 <Text style={styles.infoLabel}>Regras:</Text>
                                 <Text style={styles.infoText}>
                                     {evento?.regras}
                                 </Text>
                             </>
-                        )}
+                        ) : null}
 
-                        {evento.idade_minima && (
+                        {evento.idade_minima ? (
                             <>
                                 <Text style={styles.infoLabel}>Idade Mínima:</Text>
                                 <Text style={styles.infoText}>
                                     {evento?.idade_minima}
                                 </Text>
                             </>
-                        )}
+                        ) : null}
                     </View>
 
                     {/* Card 4: Outros */}
@@ -193,6 +189,7 @@ export default function EventoScreen({ route }) {
                                     {evento?.bol_estacionamento ? 'Sim' : 'Não'}
                                 </Text>
                             </View>
+
                             <View>
                                 <Text style={styles.infoLabel}>Estacionamento Pago:</Text>
                                 <Text style={styles.infoText}>
@@ -201,14 +198,14 @@ export default function EventoScreen({ route }) {
                             </View>
                         </View>
 
-                        {evento.bol_estacionamento_pago && (
+                        {evento.bol_estacionamento_pago ? (
                             <>
                                 <Text style={styles.infoLabel}>Valor do Estacionamento:</Text>
                                 <Text style={styles.infoText}>
-                                    {evento?.bol_estacionamento_pago ? `${evento?.valor_estacionamento}` : 'Gratuíto'}
+                                    {evento.valor_estacionamento }
                                 </Text>
                             </>
-                        )}
+                        ) : null}
                     </View>
 
                     {/* Card 5: Organizacao do evento */}
