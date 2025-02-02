@@ -6,6 +6,7 @@ import styles from '../assets/css/styles';
 import api from '../services/api';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Ionicons } from 'react-native-vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CadastrarEventoScreen = ({ navigation }) => {
     const [nome, setNome] = useState('Encontro Nacional de Harley-Davidson 2024');
@@ -256,10 +257,13 @@ const CadastrarEventoScreen = ({ navigation }) => {
             console.log(`${key}: ${value}`);
         });
 
+        const token = await AsyncStorage.getItem('token');
+
         try {
             const response = await api.post('/evento/store', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${token}`
                 },
             });
 

@@ -4,6 +4,7 @@ import { MaskedTextInput } from 'react-native-mask-text';
 import styles from '../assets/css/styles';
 import api from '../services/api';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function CadastrarEncontroScreen({ navigation }) {
     const [nome, setNome] = useState('Encontro Nacional de Harley-Davidson 2024');
@@ -94,14 +95,17 @@ export default function CadastrarEncontroScreen({ navigation }) {
             console.log(`${key}: ${value}`);
         });
 
+        const token = await AsyncStorage.getItem('token');
+
         try {
             const response = await api.post('/encontro/store', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${token}`
                 },
             });
 
-            console.log(response.data);
+            Alert.alert(response.data.message)
         } catch (err) {
             if (err.response && err.response.data) {
                 console.log('Erros de validação:', err.response.data.errors);

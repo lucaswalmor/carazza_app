@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, RefreshControl, Image, ImageBackground, SafeAreaView, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, RefreshControl, Image, ImageBackground, SafeAreaView, Platform, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../services/api';
 import styles from '../assets/css/styles';
@@ -157,56 +157,64 @@ const PointsScreen = ({ navigation }) => {
 
     return (
         <SafeAreaView style={{ flex: 1, paddingBottom: 150 }}>
-            <View style={{ backgroundColor: '#007BFF', height: 120, padding: 20, justifyContent: 'space-evenly', gap: 5, position: 'relative' }}>
-                <Text style={{ textAlign: 'center', color: '#fff', fontSize: 20, fontWeight: 'bold', marginBottom: 10 }}>
-                    Lista de Pontos
-                </Text>
-                <TextInput
-                    style={styles.inputComum}
-                    placeholder="Buscar por cidade..."
-                    value={cidade}
-                    onChangeText={filterPontosByCidade}
-                />
-                {cidade.length > 0 && (
-                    <TouchableOpacity onPress={clearInput} style={styles.clearButton}>
-                        <Ionicons name="close-circle" size={24} color="#007BFF" />
-                    </TouchableOpacity>
-                )}
-            </View>
-
-            {user.tipo_usuario == 1 && (
-                <View style={{ padding: 10 }}>
-                    <View style={{ width: '100%' }}>
-                        <TouchableOpacity style={styles.button} onPress={CadastrarPontoScreen}>
-                            <Text style={styles.buttonText}>Cadastrar Ponto</Text>
+            <ScrollView
+                style={{ flex: 1 }}
+                contentContainerStyle={{ paddingBottom: 200 }}
+                keyboardShouldPersistTaps="handled"
+            >
+                <View style={{ backgroundColor: '#007BFF', height: 120, padding: 20, justifyContent: 'space-evenly', gap: 5, position: 'relative' }}>
+                    <Text style={{ textAlign: 'center', color: '#fff', fontSize: 20, fontWeight: 'bold', marginBottom: 10 }}>
+                        Lista de Pontos
+                    </Text>
+                    <TextInput
+                        style={styles.inputComum}
+                        placeholder="Buscar por cidade..."
+                        value={cidade}
+                        onChangeText={filterPontosByCidade}
+                    />
+                    {cidade.length > 0 && (
+                        <TouchableOpacity onPress={clearInput} style={styles.clearButton}>
+                            <Ionicons name="close-circle" size={24} color="#007BFF" />
                         </TouchableOpacity>
-                    </View>
-                </View>
-            )}
-
-            <View style={{ padding: 10 }}>
-                <FlatList
-                    data={pontos}
-                    keyExtractor={(item) => item.estado}
-                    renderItem={({ item }) => (
-                        <View>
-                            <Text style={[styles.infoTitle, { marginTop: 15, marginBottom: 15, fontSize: 18 }]}>{`${item.estado}`}</Text>
-                            <FlatList
-                                data={item.pontos}
-                                keyExtractor={(ponto) => ponto.id.toString()}
-                                renderItem={renderCard}
-                            />
-                        </View>
                     )}
-                    refreshControl={
-                        <RefreshControl
-                            refreshing={isRefreshing}
-                            onRefresh={refreshPontos}
-                            colors={['#007BFF']}
-                        />
-                    }
-                />
-            </View>
+                </View>
+
+                {user.tipo_usuario == 1 && (
+                    <View style={{ padding: 10 }}>
+                        <View style={{ width: '100%' }}>
+                            <TouchableOpacity style={styles.button} onPress={CadastrarPontoScreen}>
+                                <Text style={styles.buttonText}>Cadastrar Ponto</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                )}
+
+                <View style={{ padding: 10 }}>
+                    <FlatList
+                        data={pontos}
+                        keyExtractor={(item) => item.estado}
+                        renderItem={({ item }) => (
+                            <View>
+                                <Text style={[styles.infoTitle, { marginTop: 15, marginBottom: 15, fontSize: 18 }]}>{`${item.estado}`}</Text>
+                                <FlatList
+                                    data={item.pontos}
+                                    keyExtractor={(ponto) => ponto.id.toString()}
+                                    renderItem={renderCard}
+                                    scrollEnabled={false}
+                                />
+                            </View>
+                        )}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={isRefreshing}
+                                onRefresh={refreshPontos}
+                                colors={['#007BFF']}
+                            />
+                        }
+                        scrollEnabled={false}
+                    />
+                </View>
+            </ScrollView>
         </SafeAreaView>
     );
 };
