@@ -1,7 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Text, StyleSheet, View } from 'react-native';
+import { FontAwesome5 } from '@expo/vector-icons';
+import { display, gap } from '../assets/css/primeflex';
 
-const Toast = ({ message, position = 'top', duration = 3000, onClose, severity = 'info' }) => {
+const Toast = ({ message, position = 'top', duration = 5000, onClose, severity = 'info' }) => {
     const fadeAnim = useRef(new Animated.Value(0)).current;
 
     const colors = {
@@ -12,8 +14,17 @@ const Toast = ({ message, position = 'top', duration = 3000, onClose, severity =
         help: '#6366F1',    // Azul
     };
 
+    const icons = {
+        danger: 'times-circle',  // Ícone de erro
+        success: 'check-circle', // Ícone de sucesso
+        warning: 'exclamation-circle', // Ícone de aviso
+        info: 'info-circle',    // Ícone de info
+        help: 'question-circle', // Ícone de ajuda
+    };
+
     // Cor do fundo com base no severity
     const backgroundColor = colors[severity] || colors.info;
+    const iconName = icons[severity] || icons.info;
 
     useEffect(() => {
         // Animação de fade-in
@@ -48,7 +59,12 @@ const Toast = ({ message, position = 'top', duration = 3000, onClose, severity =
 
     return (
         <Animated.View style={[styles.toastContainer, getPositionStyle(), { opacity: fadeAnim, backgroundColor }]}>
-            <Text style={styles.toastText}>{message}</Text>
+            <View style={[display.row, display.alignItemsCenter]}>
+                <View style={styles.iconContainer}>
+                    <FontAwesome5 name={iconName} size={20} color="#fff" />
+                </View>
+                <Text style={styles.toastText}>{message}</Text>
+            </View>
         </Animated.View>
     );
 };
@@ -68,6 +84,11 @@ const styles = StyleSheet.create({
         color: '#fff',
         textAlign: 'center',
         fontWeight: 'bold',
+        flexShrink: 1,
+        flexWrap: 'wrap',
+    },
+    iconContainer: {
+        marginRight: 10, // Espaço entre o ícone e o texto
     },
     top: {
         top: 10,

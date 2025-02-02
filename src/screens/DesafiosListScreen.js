@@ -11,11 +11,10 @@ import BotaoOutLine from '../components/BotaoOutLine';
 
 export default function DesafiosListScreen({ routeData }) {
   const [activeIndex, setActiveIndex] = useState(null); // Controla qual item está aberto
-  const [toast, setToast] = useState({ visible: false, message: '', position: 'top' });
+  const [toast, setToast] = useState({ visible: false, message: '', position: 'top', severity: '' });
 
-  const showToast = (message, position) => {
-    console.log(message, position)
-    setToast({ visible: true, message, position });
+  const showToast = (message, position, severity) => {
+    setToast({ visible: true, message, position, severity });
 
     // Esconde o toast após 3 segundos
     setTimeout(() => setToast({ ...toast, visible: false }), 3000);
@@ -72,6 +71,9 @@ export default function DesafiosListScreen({ routeData }) {
         <Message severity="contrast">Contrast Message</Message>
 
         <Accordion title="Accordion Item 1" index={0} activeIndex={activeIndex} setActiveIndex={setActiveIndex}>
+          <Button title="Show Toast (Top)" onPress={() => showToast('Mensagem no Topo', 'top', 'success')} />
+          <Button title="Show Toast (Center)" onPress={() => showToast('Mensagem no Centro', 'center', 'danger')} />
+          <Button title="Show Toast (Bottom)" onPress={() => showToast('Mensagem em Baixo', 'bottom', 'help')} />
         </Accordion>
 
         <Accordion title="Accordion Item 2" index={1} activeIndex={activeIndex} setActiveIndex={setActiveIndex}>
@@ -160,16 +162,12 @@ export default function DesafiosListScreen({ routeData }) {
         </Tabs>
       </ScrollView>
 
-      <Button title="Show Toast (Top)" onPress={() => showToast('Mensagem no Topo', 'top')} />
-      <Button title="Show Toast (Center)" onPress={() => showToast('Mensagem no Centro', 'center')} />
-      <Button title="Show Toast (Bottom)" onPress={() => showToast('Mensagem em Baixo', 'bottom')} />
-
       {toast.visible && (
         <Toast
           message={toast.message}
           position={toast.position}
           onClose={() => setToast({ ...toast, visible: false })}
-          severity="success"
+          severity={toast.severity}
         />
       )}
     </View>

@@ -16,6 +16,7 @@ import styles from '../assets/css/styles';
 import { FontAwesome, FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { useEvent } from 'expo';
+import Toast from '../components/Toast';
 
 export default function PontoScreen({ route }) {
     const { id } = route.params;
@@ -24,6 +25,7 @@ export default function PontoScreen({ route }) {
     const [isLoadingComentario, setIsLoadingComentario] = useState(false);
     const [comentario, setComentario] = useState(null);
     const [videoSource, setVideoSource] = useState(null);
+    const [toast, setToast] = useState({ visible: false, message: '', position: 'bottom', severity: '' });
 
     const player = useVideoPlayer(videoSource, player => {
         player.loop = true;
@@ -61,6 +63,13 @@ export default function PontoScreen({ route }) {
         Linking.openURL(googleMapsUrl);
     };
 
+    const showToast = (message, position, severity) => {
+      setToast({ visible: true, message, position, severity });
+  
+      // Esconde o toast após 3 segundos
+      setTimeout(() => setToast({ ...toast, visible: false }), 3000);
+    };
+
     const sendComentario = async () => {
         setIsLoadingComentario(true)
         try {
@@ -80,225 +89,236 @@ export default function PontoScreen({ route }) {
 
             fetchPonto();
 
-            Alert.alert(response.data.message)
+            showToast(response.data.message, 'top', 'success')
         } catch (error) {
-            console.log(error)
+            showToast(error.response.data.error, 'top', 'danger')
         } finally {
             setIsLoadingComentario(false)
         }
     }
 
     return (
-        <ScrollView style={styles.container}>
-            {isLoading ? (
-                <>
-                    <View
-                        style={{
-                            flex: 1,
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                        }}>
-                        <ActivityIndicator size="large" color="#007BFF" />
-                    </View>
-                </>
-            ) : (
-                <>
-                    <View style={{}}>
-                        <VideoView
-                            style={styles.video}
-                            player={player}
-                            allowsFullscreen
-                            allowsPictureInPicture
-                            nativeControls={true}
-                        />
-                    </View>
-
-                    {/* Card 2: Informações */}
-                    <View style={styles.card}>
-                        <Text style={styles.infoTitle}>Informações</Text>
-
-                        <Text style={styles.infoLabel}>Informações Complementares:</Text>
-                        <Text style={styles.infoText}>
-                            {ponto?.informacoes_complementares}
-                        </Text>
-                        <Text style={styles.infoLabel}>Descrição:</Text>
-                        <Text style={styles.infoText}>{ponto?.descricao}</Text>
-                    </View>
-
-                    {/* Card 3: Horários */}
-                    <View style={styles.card}>
-                        <Text style={styles.infoTitle}>Horários</Text>
-
-                        <Text style={styles.infoLabel}>Horário de Funcionamento:</Text>
-                        <Text style={styles.infoText}>
-                            {ponto?.hora_abertura} - {ponto?.hora_fechamento}
-                        </Text>
-                    </View>
-
-                    {/* Card 4: Valores */}
-                    <View style={styles.card}>
-                        <Text style={styles.infoTitle}>Valores</Text>
-
-                        <Text style={styles.infoLabel}>Mínimo Alimentação:</Text>
-                        <Text style={styles.infoText}>
-                            {ponto?.valor_minimo_alimentaca}
-                        </Text>
-                        <Text style={styles.infoLabel}>Máximo Alimentação:</Text>
-                        <Text style={styles.infoText}>
-                            {ponto?.valor_maximo_alimentaca}
-                        </Text>
-                        <Text style={styles.infoLabel}>Mínimo Hospedagem:</Text>
-                        <Text style={styles.infoText}>
-                            {ponto?.valor_minimo_hospedagem}
-                        </Text>
-                        <Text style={styles.infoLabel}>Máximo Hospedagem:</Text>
-                        <Text style={styles.infoText}>
-                            {ponto?.valor_maximo_hospedagem}
-                        </Text>
-                    </View>
-
-                    {/* Card 5: Localização */}
-                    <View style={styles.card}>
-                        <Text style={styles.infoTitle}>Localização</Text>
-                        <Text style={styles.infoLabel}>CEP:</Text>
-                        <Text style={styles.infoText}>{ponto?.cep}</Text>
-                        <Text style={styles.infoLabel}>Rua:</Text>
-                        <Text style={styles.infoText}>
-                            {ponto?.rua}, nº {ponto?.numero}, {ponto?.bairro}
-                        </Text>
-                        <Text style={styles.infoLabel}>Cidade - Estado</Text>
-                        <Text style={styles.infoText}>
-                            {ponto?.cidade} - {ponto?.estado}
-                        </Text>
-
-                        <TouchableOpacity
-                            style={[
-                                styles.button,
-                                { flexDirection: 'row', marginBottom: 20 },
-                            ]}
-                            onPress={openMap}>
-                            <Ionicons
-                                name="location-outline"
-                                size={20}
-                                color="#fff"
-                                style={{ marginRight: 8 }}
+        <View style={{ flex: 1 }}>
+            <ScrollView style={styles.container}>
+                {isLoading ? (
+                    <>
+                        <View
+                            style={{
+                                flex: 1,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}>
+                            <ActivityIndicator size="large" color="#007BFF" />
+                        </View>
+                    </>
+                ) : (
+                    <>
+                        <View style={{}}>
+                            <VideoView
+                                style={styles.video}
+                                player={player}
+                                allowsFullscreen
+                                allowsPictureInPicture
+                                nativeControls={true}
                             />
-                            <Text style={styles.buttonText}>Abrir no Google Maps</Text>
-                        </TouchableOpacity>
-                    </View>
+                        </View>
 
-                    {/* Card 6: Galeria de Imagens */}
-                    <View style={styles.card}>
-                        <Text style={styles.infoTitle}>Galeria de Imagens</Text>
-                        {ponto?.imagens && ponto.imagens.length > 0 ? (
-                            ponto.imagens.map((imagem) => (
-                                <View
-                                    key={imagem.id}
-                                    style={{ marginBottom: 10, marginTop: 20 }}>
-                                    <Image
-                                        source={{ uri: imagem.path }}
-                                        style={{ width: '100%', height: 200, borderRadius: 10 }}
-                                        resizeMode="cover"
-                                    />
-                                </View>
-                            ))
-                        ) : (
-                            <Text style={styles.infoText}>Nenhuma imagem disponível.</Text>
-                        )}
-                    </View>
+                        {/* Card 2: Informações */}
+                        <View style={styles.card}>
+                            <Text style={styles.infoTitle}>Informações</Text>
 
-                    {/* Card 6: Comentários */}
-                    <View style={[styles.card, { marginBottom: 100 }]}>
-                        <Text style={styles.infoTitle}>Comentários</Text>
+                            <Text style={styles.infoLabel}>Informações Complementares:</Text>
+                            <Text style={styles.infoText}>
+                                {ponto?.informacoes_complementares}
+                            </Text>
+                            <Text style={styles.infoLabel}>Descrição:</Text>
+                            <Text style={styles.infoText}>{ponto?.descricao}</Text>
+                        </View>
 
-                        <TextInput
-                            style={[styles.textArea, { marginTop: 10 }]}
-                            placeholder="Deixe seu comentário"
-                            multiline
-                            numberOfLines={4}
-                            value={comentario}
-                            onChangeText={(text) => setComentario(text)}
-                        />
+                        {/* Card 3: Horários */}
+                        <View style={styles.card}>
+                            <Text style={styles.infoTitle}>Horários</Text>
 
-                        <View style={{ flex: 1 }}>
+                            <Text style={styles.infoLabel}>Horário de Funcionamento:</Text>
+                            <Text style={styles.infoText}>
+                                {ponto?.hora_abertura} - {ponto?.hora_fechamento}
+                            </Text>
+                        </View>
+
+                        {/* Card 4: Valores */}
+                        <View style={styles.card}>
+                            <Text style={styles.infoTitle}>Valores</Text>
+
+                            <Text style={styles.infoLabel}>Mínimo Alimentação:</Text>
+                            <Text style={styles.infoText}>
+                                {ponto?.valor_minimo_alimentaca}
+                            </Text>
+                            <Text style={styles.infoLabel}>Máximo Alimentação:</Text>
+                            <Text style={styles.infoText}>
+                                {ponto?.valor_maximo_alimentaca}
+                            </Text>
+                            <Text style={styles.infoLabel}>Mínimo Hospedagem:</Text>
+                            <Text style={styles.infoText}>
+                                {ponto?.valor_minimo_hospedagem}
+                            </Text>
+                            <Text style={styles.infoLabel}>Máximo Hospedagem:</Text>
+                            <Text style={styles.infoText}>
+                                {ponto?.valor_maximo_hospedagem}
+                            </Text>
+                        </View>
+
+                        {/* Card 5: Localização */}
+                        <View style={styles.card}>
+                            <Text style={styles.infoTitle}>Localização</Text>
+                            <Text style={styles.infoLabel}>CEP:</Text>
+                            <Text style={styles.infoText}>{ponto?.cep}</Text>
+                            <Text style={styles.infoLabel}>Rua:</Text>
+                            <Text style={styles.infoText}>
+                                {ponto?.rua}, nº {ponto?.numero}, {ponto?.bairro}
+                            </Text>
+                            <Text style={styles.infoLabel}>Cidade - Estado</Text>
+                            <Text style={styles.infoText}>
+                                {ponto?.cidade} - {ponto?.estado}
+                            </Text>
+
                             <TouchableOpacity
-                                style={styles.button}
-                                onPress={sendComentario}>
-                                <View
-                                    style={{
-                                        flex: 1,
-                                        flexDirection: 'row',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                    }}>
-                                    {isLoadingComentario ? (
-                                        <>
-                                            <ActivityIndicator
-                                                style={{ marginRight: 10 }}
-                                                size="small"
-                                                color="#fff"
-                                            />
-                                            <Text style={styles.buttonTextSend}>Enviando</Text>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Text style={styles.buttonText}>Enviar</Text>
-                                            <FontAwesome
-                                                name="paper-plane"
-                                                size={12}
-                                                color="#fff"
-                                                style={{ marginLeft: 8 }}
-                                            />
-                                        </>
-                                    )}
-                                </View>
+                                style={[
+                                    styles.button,
+                                    { flexDirection: 'row', marginBottom: 20 },
+                                ]}
+                                onPress={openMap}>
+                                <Ionicons
+                                    name="location-outline"
+                                    size={20}
+                                    color="#fff"
+                                    style={{ marginRight: 8 }}
+                                />
+                                <Text style={styles.buttonText}>Abrir no Google Maps</Text>
                             </TouchableOpacity>
                         </View>
 
+                        {/* Card 6: Galeria de Imagens */}
+                        <View style={styles.card}>
+                            <Text style={styles.infoTitle}>Galeria de Imagens</Text>
+                            {ponto?.imagens && ponto.imagens.length > 0 ? (
+                                ponto.imagens.map((imagem) => (
+                                    <View
+                                        key={imagem.id}
+                                        style={{ marginBottom: 10, marginTop: 20 }}>
+                                        <Image
+                                            source={{ uri: imagem.path }}
+                                            style={{ width: '100%', height: 200, borderRadius: 10 }}
+                                            resizeMode="cover"
+                                        />
+                                    </View>
+                                ))
+                            ) : (
+                                <Text style={styles.infoText}>Nenhuma imagem disponível.</Text>
+                            )}
+                        </View>
 
-                        <Text style={{ marginTop: 10 }}>
-                            Lista de comentários
-                        </Text>
+                        {/* Card 6: Comentários */}
+                        <View style={[styles.card, { marginBottom: 100 }]}>
+                            <Text style={styles.infoTitle}>Comentários</Text>
 
-                        {ponto?.comentarios && ponto.comentarios.length > 0 ? (
-                            <View style={{ marginTop: 20 }}>
-                                {ponto.comentarios.map((comentarioItem) => (
-                                    <TouchableOpacity
-                                        key={comentarioItem.id}
-                                        onPress={() => Alert.alert('Comentário', comentarioItem.comentario)}
-                                        style={{ marginBottom: 15, backgroundColor: '#f5f5f5', padding: 5, borderRadius: 10 }}
-                                    >
-                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                <Image
-                                                    source={{ uri: comentarioItem.usuario.img_perfil }}
-                                                    style={{
-                                                        width: 20,
-                                                        height: 20,
-                                                        borderRadius: 20,
-                                                        marginRight: 10,
-                                                    }}
+                            <TextInput
+                                style={[styles.textArea, { marginTop: 10 }]}
+                                placeholder="Deixe seu comentário"
+                                multiline
+                                numberOfLines={4}
+                                value={comentario}
+                                onChangeText={(text) => setComentario(text)}
+                            />
+
+                            <View style={{ flex: 1 }}>
+                                <TouchableOpacity
+                                    style={styles.button}
+                                    onPress={sendComentario}>
+                                    <View
+                                        style={{
+                                            flex: 1,
+                                            flexDirection: 'row',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                        }}>
+                                        {isLoadingComentario ? (
+                                            <>
+                                                <ActivityIndicator
+                                                    style={{ marginRight: 10 }}
+                                                    size="small"
+                                                    color="#fff"
                                                 />
-                                                <Text style={{ fontWeight: 'bold' }}>
-                                                    {comentarioItem.usuario.apelido}
-                                                </Text>
-                                            </View>
-                                            <FontAwesome5 name="eye" size={18} color="#007BFF" style={{ marginRight: 8 }} />
-                                        </View>
-                                        <Text style={{ marginTop: 15, marginLeft: 10 }}>
-                                            {comentarioItem.comentario}
-                                        </Text>
-
-                                    </TouchableOpacity>
-                                ))}
+                                                <Text style={styles.buttonTextSend}>Enviando</Text>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Text style={styles.buttonText}>Enviar</Text>
+                                                <FontAwesome
+                                                    name="paper-plane"
+                                                    size={12}
+                                                    color="#fff"
+                                                    style={{ marginLeft: 8 }}
+                                                />
+                                            </>
+                                        )}
+                                    </View>
+                                </TouchableOpacity>
                             </View>
-                        ) : (
-                            <Text style={styles.infoText}>Nenhum comentário disponível.</Text>
-                        )}
-                    </View>
-                </>
+
+
+                            <Text style={{ marginTop: 10 }}>
+                                Lista de comentários
+                            </Text>
+
+                            {ponto?.comentarios && ponto.comentarios.length > 0 ? (
+                                <View style={{ marginTop: 20 }}>
+                                    {ponto.comentarios.map((comentarioItem) => (
+                                        <TouchableOpacity
+                                            key={comentarioItem.id}
+                                            onPress={() => Alert.alert('Comentário', comentarioItem.comentario)}
+                                            style={{ marginBottom: 15, backgroundColor: '#f5f5f5', padding: 5, borderRadius: 10 }}
+                                        >
+                                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                    <Image
+                                                        source={{ uri: comentarioItem.usuario.img_perfil }}
+                                                        style={{
+                                                            width: 20,
+                                                            height: 20,
+                                                            borderRadius: 20,
+                                                            marginRight: 10,
+                                                        }}
+                                                    />
+                                                    <Text style={{ fontWeight: 'bold' }}>
+                                                        {comentarioItem.usuario.apelido}
+                                                    </Text>
+                                                </View>
+                                                <FontAwesome5 name="eye" size={18} color="#007BFF" style={{ marginRight: 8 }} />
+                                            </View>
+                                            <Text style={{ marginTop: 15, marginLeft: 10 }}>
+                                                {comentarioItem.comentario}
+                                            </Text>
+
+                                        </TouchableOpacity>
+                                    ))}
+                                </View>
+                            ) : (
+                                <Text style={styles.infoText}>Nenhum comentário disponível.</Text>
+                            )}
+                        </View>
+                    </>
+                )}
+            </ScrollView>
+
+            {toast.visible && (
+                <Toast
+                    message={toast.message}
+                    position={toast.position}
+                    onClose={() => setToast({ ...toast, visible: false })}
+                    severity={toast.severity}
+                />
             )}
-        </ScrollView>
+        </View>
     );
 }
