@@ -359,7 +359,7 @@ export default function CadastrarEncontroScreen({ navigation }) {
                                         <Text style={styles.buttonText}>Voltar</Text>
                                     </TouchableOpacity>
                                 )}
-                                {currentStep < 4 ? (
+                                {currentStep < 3 ? (
                                     <TouchableOpacity style={styles.button} onPress={handleNext}>
                                         <Text style={styles.buttonText}>Próximo</Text>
                                     </TouchableOpacity>

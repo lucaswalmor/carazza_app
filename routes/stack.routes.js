@@ -8,6 +8,7 @@ import CadastrarEventoScreen from '../src/screens/CadastrarEventoScreen';
 import EventoScreen from '../src/screens/EventoScreen';
 import MeusDesafiosScreen from '../src/screens/MeusDesafiosScreen';
 import EncontroScreen from '../src/screens/EncontroScreen'
+import CadastrarEncontroScreen from '../src/screens/CadastrarEncontroScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -31,6 +32,7 @@ export default function StackRoutes() {
             <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
             <Stack.Screen name="CadastrarPontoScreen" component={CadastrarPontoScreen} options={{ headerShown: true, headerTitle: 'Cadastrar Ponto' }} />
             <Stack.Screen name="CadastrarEventoScreen" component={CadastrarEventoScreen} options={{ headerShown: true, headerTitle: 'Cadastrar Evento' }} />
+            <Stack.Screen name="CadastrarEncontroScreen" component={CadastrarEncontroScreen} options={{ headerShown: true, headerTitle: 'Cadastrar Encontro' }} />
             <Stack.Screen name="MeusDesafiosScreen" component={MeusDesafiosScreen} options={{ headerShown: true, headerTitle: 'Meus Desafios' }} />
             <Stack.Screen name="PontoScreen" component={PontoScreen} options={{ headerShown: true, headerTitle: 'Ponto' }} />
             <Stack.Screen name="EventoScreen" component={EventoScreen} options={{ headerShown: true, headerTitle: 'Evento' }} />
