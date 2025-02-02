@@ -2,8 +2,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import EventosListScreen from '../src/screens/EventosListScreen'
 import PontoListScreen from '../src/screens/PontosListScreen'
-import EncontrosScreen from '../src/screens/EncontrosScreen'
+import EncontrosListScreen from '../src/screens/EncontrosListScreen';
 import DesafiosListScreen from '../src/screens/DesafiosListScreen';
+import MapScreen from '../src/screens/MapScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -21,6 +22,8 @@ export default function TabRoutes() {
                         iconName = 'location-outline';
                     } else if (route.name === 'Desafios') {
                         iconName = 'trophy-outline';
+                    } else if (route.name === 'Mapa') {
+                        iconName = 'map-outline';
                     }
 
                     return <Ionicons name={iconName} size={size} color={color} />;
@@ -42,8 +45,9 @@ export default function TabRoutes() {
         >
             <Tab.Screen name="Pontos" component={PontoListScreen} options={{ headerShown: false }} />
             <Tab.Screen name="Eventos" component={EventosListScreen} options={{ headerShown: false }} />
-            <Tab.Screen name="Encontros" component={EncontrosScreen} options={{ headerShown: false }} />
+            <Tab.Screen name="Encontros" component={EncontrosListScreen} options={{ headerShown: false }} />
             <Tab.Screen name="Desafios" component={DesafiosListScreen} options={{ headerShown: false }} />
+            <Tab.Screen name="Mapa" component={MapScreen} options={{ headerShown: false }} />
         </Tab.Navigator>
     );
 }

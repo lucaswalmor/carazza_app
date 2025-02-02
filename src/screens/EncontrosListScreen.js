@@ -6,16 +6,16 @@ import api from '../services/api';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFocusEffect } from '@react-navigation/native';
 
-export default function EventosListScreen({ navigation }) {
+export default function EncontrosListScreen({ navigation }) {
     const [user, setUser] = useState({});
     const [cidade, setCidade] = useState('');
-    const [eventos, setEventos] = useState([]);
-    const [allEventos, setAllEventos] = useState([]);
+    const [encontros, setEncontros] = useState([]);
+    const [allEncontros, setAllEncontros] = useState([]);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
-    const CadastrarEventoScreen = () => {
-        navigation.navigate('CadastrarEventoScreen');
+    const CadastrarEncontroScreen = () => {
+        navigation.navigate('CadastrarEncontroScreen');
     };
 
     const getUser = async () => {
@@ -26,19 +26,19 @@ export default function EventosListScreen({ navigation }) {
         }
     }
 
-    const getEventos = async () => {
+    const getEncontros = async () => {
         const token = await AsyncStorage.getItem('token');
 
         try {
             setIsLoading(true);
-            const response = await api.get('/evento/index', {
+            const response = await api.get('/encontro/index', {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             });
 
-            setEventos(response.data)
-            setAllEventos(response.data);
+            setEncontros(response.data)
+            setAllEncontros(response.data);
         } catch (error) {
             console.error('Erro ao enviar o formulário:', error);
         } finally {
@@ -48,7 +48,7 @@ export default function EventosListScreen({ navigation }) {
 
     useFocusEffect(
         useCallback(() => {
-            getEventos();
+            getEncontros();
         }, [])
     );
 
@@ -56,26 +56,26 @@ export default function EventosListScreen({ navigation }) {
         getUser();
     }, [])
 
-    const filterEventosByCidade = (text) => {
+    const filterEncontrosByCidade = (text) => {
         setCidade(text);
 
         const textoSemAcento = removeAcentos(text); // Remove acentos da entrada do usuário
         if (textoSemAcento === '') {
-            setEventos(allEventos);
+            setEncontros(allEncontros);
         } else {
-            const filteredEvents = allEventos.map((estado) => {
-                // Filtra os eventos de cada estado
-                const filteredByCidade = estado.eventos.filter((evento) => {
-                    const cidadeSemAcento = removeAcentos(evento.cidade); // Remove acentos dos nomes das cidades
-                    const nomeEventoSemAcento = removeAcentos(evento.nome); // Remove acentos dos nomes dos eventos
-                    return cidadeSemAcento.toLowerCase().includes(textoSemAcento.toLowerCase()) || nomeEventoSemAcento.toLowerCase().includes(textoSemAcento.toLowerCase());
+            const filteredEvents = allEncontros.map((estado) => {
+                // Filtra os encontros de cada estado
+                const filteredByCidade = estado.encontros.filter((encontro) => {
+                    const cidadeSemAcento = removeAcentos(encontro.cidade); // Remove acentos dos nomes das cidades
+                    const nomeEncontroSemAcento = removeAcentos(encontro.nome); // Remove acentos dos nomes dos encontros
+                    return cidadeSemAcento.toLowerCase().includes(textoSemAcento.toLowerCase()) || nomeEncontroSemAcento.toLowerCase().includes(textoSemAcento.toLowerCase());
                 });
 
-                // Retorna o estado com os eventos filtrados
-                return { ...estado, eventos: filteredByCidade };
-            }).filter((estado) => estado.eventos.length > 0); // Filtra estados sem eventos correspondentes
+                // Retorna o estado com os encontros filtrados
+                return { ...estado, encontros: filteredByCidade };
+            }).filter((estado) => estado.encontros.length > 0); // Filtra estados sem encontros correspondentes
 
-            setEventos(filteredEvents); // Atualiza a lista de eventos com os filtrados
+            setEncontros(filteredEvents); // Atualiza a lista de encontros com os filtrados
         }
     };
 
@@ -84,34 +84,25 @@ export default function EventosListScreen({ navigation }) {
     };
 
     const clearInput = () => {
-        filterEventosByCidade('');
+        filterEncontrosByCidade('');
     };
 
-    const refreshEventos = async () => {
+    const refreshEncontros = async () => {
         setIsRefreshing(true);
-        await getEventos();
+        await getEncontros();
         setIsRefreshing(false);
     };
 
     const renderCard = ({ item }) => (
-        <View style={{}}>
-            <ImageBackground
-                source={{
-                    uri: item?.path_banner,
-                }}
-                style={[styles.card, { gap: 10, borderRadius: 10, overflow: 'hidden' }]}
-                resizeMode="cover"
+        <View style={[styles.card]}>
+            <TouchableOpacity
+                onPress={() => navigation.navigate('EncontroScreen', { id: item.id })}
             >
-                <TouchableOpacity
-                    onPress={() => navigation.navigate('EventoScreen', { id: item.id })}
-                >
-                    <Text style={styles.textCardTitle}>{item.nome}</Text>
-                    <Text style={styles.textCard}>{item.cidade}, {item.estado}</Text>
-                    <Text style={styles.textInfoCard}>{item.descricao}</Text>
-                    <Text style={styles.textCard}>{item.local}</Text>
-                    <Text style={styles.textCard}>Início: {item.data_inicio}</Text>
-                </TouchableOpacity>
-            </ImageBackground>
+                <Text style={styles.textCardTitleEncontros}>{item.nome}</Text>
+                <Text style={styles.textCardEncontros}>{item.cidade}, {item.estado}</Text>
+                <Text style={styles.textCardEncontros}>{item.local}</Text>
+                <Text style={styles.textCardEncontros}>Início: {item.data_inicio}</Text>
+            </TouchableOpacity>
         </View>
     );
 
@@ -126,14 +117,15 @@ export default function EventosListScreen({ navigation }) {
     return (
         <SafeAreaView style={{ flex: 1, paddingBottom: 150 }}>
             <View style={{ backgroundColor: '#007BFF', height: 120, padding: 20, justifyContent: 'space-evenly', gap: 5, position: 'relative' }}>
-                <Text style={{ textAlign: 'center', color: '#fff', fontSize: 20, fontWeight: 'bold', marginBottom: 10 }}>
-                    Lista de Eventos
+                <Text style={{ textAlign: 'center', color: '#fff', fontSize: 20, fontWeight: 'bold', marginBottom: 10}}>
+                    Lista de Encontros
                 </Text>
+
                 <TextInput
                     style={styles.inputComum}
                     placeholder="Buscar por cidade..."
                     value={cidade}
-                    onChangeText={filterEventosByCidade}
+                    onChangeText={filterEncontrosByCidade}
                 />
                 {cidade.length > 0 && (
                     <TouchableOpacity onPress={clearInput} style={styles.clearButton}>
@@ -145,8 +137,8 @@ export default function EventosListScreen({ navigation }) {
             {(user.tipo_usuario === 1 || user.tipo_usuario === 4) && (
                 <View style={{ padding: 10 }}>
                     <View style={{ width: '100%' }}>
-                        <TouchableOpacity style={styles.button} onPress={CadastrarEventoScreen}>
-                            <Text style={styles.buttonText}>Cadastrar Evento</Text>
+                        <TouchableOpacity style={styles.button} onPress={CadastrarEncontroScreen}>
+                            <Text style={styles.buttonText}>Cadastrar Encontro</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -154,14 +146,14 @@ export default function EventosListScreen({ navigation }) {
 
             <View style={{ padding: 10 }}>
                 <FlatList
-                    data={eventos}
+                    data={encontros}
                     keyExtractor={(item) => item.estado}
                     renderItem={({ item }) => (
                         <View>
                             <Text style={[styles.infoTitle, { marginTop: 15, marginBottom: 15, fontSize: 18 }]}>{`${item.estado}`}</Text>
                             <FlatList
-                                data={item.eventos}
-                                keyExtractor={(evento) => evento.id.toString()}
+                                data={item.encontros}
+                                keyExtractor={(encontro) => encontro.id.toString()}
                                 renderItem={renderCard}
                             />
                         </View>
@@ -169,7 +161,7 @@ export default function EventosListScreen({ navigation }) {
                     refreshControl={
                         <RefreshControl
                             refreshing={isRefreshing}
-                            onRefresh={refreshEventos}
+                            onRefresh={refreshEncontros}
                             colors={['#007BFF']}
                         />
                     }

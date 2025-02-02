@@ -112,7 +112,7 @@ const PointsScreen = ({ navigation }) => {
     }
 
     const renderCard = ({ item }) => (
-        <View style={{  }}>
+        <View style={{}}>
             <ImageBackground
                 source={{
                     uri: item?.imagem?.path,
@@ -157,7 +157,10 @@ const PointsScreen = ({ navigation }) => {
 
     return (
         <SafeAreaView style={{ flex: 1, paddingBottom: 150 }}>
-            <View style={{ backgroundColor: '#007BFF', height: 80, padding: 20, justifyContent: 'center', position: 'relative' }}>
+            <View style={{ backgroundColor: '#007BFF', height: 120, padding: 20, justifyContent: 'space-evenly', gap: 5, position: 'relative' }}>
+                <Text style={{ textAlign: 'center', color: '#fff', fontSize: 20, fontWeight: 'bold', marginBottom: 10 }}>
+                    Lista de Pontos
+                </Text>
                 <TextInput
                     style={styles.inputComum}
                     placeholder="Buscar por cidade..."

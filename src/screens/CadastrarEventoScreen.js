@@ -7,7 +7,7 @@ import api from '../services/api';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Ionicons } from 'react-native-vector-icons';
 
-const CadastrarUsuarioScreen = ({ navigation }) => {
+const CadastrarEventoScreen = ({ navigation }) => {
     const [nome, setNome] = useState('Encontro Nacional de Harley-Davidson 2024');
     const [local, setLocal] = useState('Autódromo de Interlagos - SP');
     const [descricao, setDescricao] = useState('Evento anual para entusiastas da marca');
@@ -846,4 +846,4 @@ const CadastrarUsuarioScreen = ({ navigation }) => {
     );
 };
 
-export default CadastrarUsuarioScreen;
+export default CadastrarEventoScreen;

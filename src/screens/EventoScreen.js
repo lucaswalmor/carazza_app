@@ -35,7 +35,7 @@ export default function EventoScreen({ route }) {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            
+
             setEvento(response.data.data);
         } catch (error) {
             console.error(error);
@@ -76,13 +76,7 @@ export default function EventoScreen({ route }) {
             });
 
             Alert.alert(response.data.message)
-            Alert.alert(
-                response.data.message,
-                [
-                    { text: 'OK', onPress: () => fetchEvento() },
-                ],
-                { cancelable: true }
-            );
+            fetchEvento();
         } catch (error) {
             Alert.alert(error.response.data.error)
         }

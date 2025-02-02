@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     clearButton: {
         position: 'absolute',
         right: 30,
-        top: 30,
+        top: 75,
     },
     textArea: {
         height: 80,
@@ -335,6 +335,16 @@ const styles = StyleSheet.create({
         textShadowColor: 'rgba(0, 0, 0, 0.8)',
         textShadowOffset: { width: 2, height: 2 },
         textShadowRadius: 4,
+        fontSize: 16,
+        fontWeight: 'medium'
+    },
+    textCardTitleEncontros: {
+        fontWeight: 'bold',
+        color: '#007BFF',
+        fontSize: 18,
+    },
+    textCardEncontros: {
+        color: '#333333',
         fontSize: 16,
         fontWeight: 'medium'
     },

@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "scheme": "myapp",
     "splash": {
       "image": "./assets/splash-icon.png",
@@ -16,7 +16,7 @@
     "ios": {
       "supportsTablet": true,
       "config": {
-        "googleMapsApiKey": "AIzaSyAvrsH2y7aIRm6eJ-j20J5_LdpIuj_TAmg"
+        "googleMapsApiKey": "AIzaSyCTfEv1G9SBev9qGPfpIDmct4Znlbpp19A"
       },
       "infoPlist": {
         "CFBundleURLTypes": [
@@ -36,10 +36,9 @@
       "bundleIdentifier": "com.lucassteinbach.Carazza"
     },
     "android": {
-      "useNextNotificationsApi": true,
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyAPOMVj_GA0krJ0XYq4Ui0CxiB7CGZ5kmQ"
+          "apiKey": "AIzaSyBdv3cwLcyXaP7NBpw7I-scXT7raxoDDZM"
         }
       },
       "permissions": [
@@ -49,6 +48,7 @@
         "FOREGROUND_SERVICE",
         "RECEIVE_BOOT_COMPLETED"
       ],
+      "useNextNotificationsApi": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
