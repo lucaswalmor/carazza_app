@@ -1,6 +1,18 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, RefreshControl, SafeAreaView, TextInput, ImageBackground } from 'react-native';
+import {
+    View,
+    Text,
+    TouchableOpacity,
+    FlatList,
+    ActivityIndicator,
+    RefreshControl,
+    SafeAreaView,
+    TextInput,
+    Modal as RNModal,
+    Switch,
+    Alert
+} from 'react-native';
 import styles from '../assets/css/styles';
 import api from '../services/api';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -13,6 +25,16 @@ export default function EncontrosListScreen({ navigation }) {
     const [allEncontros, setAllEncontros] = useState([]);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [modalDenuncia, setModalDenuncia] = useState(false);
+    const [denuncia, setDenuncia] = useState({
+        encontro_id: null,
+        bol_spam_ou_propaganda: false,
+        bol_motivo_suspeito: false,
+        bol_encontro_ficticio: false,
+        bol_risco_seguranca: false,
+        bol_fora_tema: false,
+        bol_informacoes_falsas: false,
+    });
 
     const CadastrarEncontroScreen = () => {
         navigation.navigate('CadastrarEncontroScreen');
@@ -93,6 +115,43 @@ export default function EncontrosListScreen({ navigation }) {
         setIsRefreshing(false);
     };
 
+    const modalDenunciarEncontro = async (item) => {
+        setDenuncia({
+            'encontro_id': item.id
+        })
+        setModalDenuncia(true)
+    }
+
+    const toggleSwitch = (field) => {
+        setDenuncia((prevState) => ({
+            ...prevState,
+            [field]: !prevState[field], // Inverte o valor do campo específico
+        }));
+    };
+
+    const denunciarEncontro = async () => {
+        const token = await AsyncStorage.getItem('token');
+
+        try {
+            setIsLoading(true);
+            const response = await api.post('/denuncia/encontro', denuncia, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            console.log(response.data)
+            setModalDenuncia(false)
+            Alert.alert(response.data.message)
+
+        } catch (error) {
+            Alert.alert(error.response.data.error)
+            setModalDenuncia(false)
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
     const renderCard = ({ item }) => (
         <View style={[styles.card]}>
             <TouchableOpacity
@@ -102,6 +161,19 @@ export default function EncontrosListScreen({ navigation }) {
                 <Text style={styles.textCardEncontros}>{item.cidade}, {item.estado}</Text>
                 <Text style={styles.textCardEncontros}>{item.local}</Text>
                 <Text style={styles.textCardEncontros}>Início: {item.data_inicio}</Text>
+
+                <View style={styles.actionsContainer}>
+                    <TouchableOpacity
+                        style={styles.actionButton}
+                        onPress={() => modalDenunciarEncontro(item)}
+                    >
+                        <Ionicons
+                            name={"thumbs-down-outline"}
+                            size={24}
+                            color="#E8003F"
+                        />
+                    </TouchableOpacity>
+                </View>
             </TouchableOpacity>
         </View>
     );
@@ -117,7 +189,7 @@ export default function EncontrosListScreen({ navigation }) {
     return (
         <SafeAreaView style={{ flex: 1, paddingBottom: 150 }}>
             <View style={{ backgroundColor: '#007BFF', height: 120, padding: 20, justifyContent: 'space-evenly', gap: 5, position: 'relative' }}>
-                <Text style={{ textAlign: 'center', color: '#fff', fontSize: 20, fontWeight: 'bold', marginBottom: 10}}>
+                <Text style={{ textAlign: 'center', color: '#fff', fontSize: 20, fontWeight: 'bold', marginBottom: 10 }}>
                     Lista de Encontros
                 </Text>
 
@@ -167,6 +239,158 @@ export default function EncontrosListScreen({ navigation }) {
                     }
                 />
             </View>
+
+            <RNModal
+                animationType="slide"
+                transparent={true}
+                visible={modalDenuncia}
+                onRequestClose={() => setModalDenuncia(false)}
+            >
+                <View style={styles.modalCenteredView}>
+                    <View style={styles.modalView}>
+                        <Text style={styles.textCardEncontros}>
+                            Qual motivo da denúncia?
+                        </Text>
+
+                        <View style={{}}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Switch
+                                    trackColor={{ false: '#767577', true: '#81b0ff' }}
+                                    thumbColor={denuncia.bol_spam_ou_propaganda ? '#007BFF' : '#f4f3f4'}
+                                    ios_backgroundColor="#3e3e3e"
+                                    onValueChange={() => toggleSwitch('bol_spam_ou_propaganda')}
+                                    value={denuncia.bol_spam_ou_propaganda}
+                                />
+
+                                <Text>
+                                    Spam ou Proganda
+                                </Text>
+                            </View>
+
+                            <Text style={{ color: 'gray', fontStyle: 'italic' }}>
+                                usando o aplicativo para fazer divulgação
+                            </Text>
+                        </View>
+
+                        <View style={{}}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Switch
+                                    trackColor={{ false: '#767577', true: '#81b0ff' }}
+                                    thumbColor={denuncia.bol_motivo_suspeito ? '#007BFF' : '#f4f3f4'}
+                                    ios_backgroundColor="#3e3e3e"
+                                    onValueChange={() => toggleSwitch('bol_motivo_suspeito')}
+                                    value={denuncia.bol_motivo_suspeito}
+                                />
+
+                                <Text>
+                                    Encontro Suspeito
+                                </Text>
+                            </View>
+
+                            <Text style={{ color: 'gray', fontStyle: 'italic' }}>
+                                O encontro sugere atividades ilegais (ex.: roubo, tráfico) ou golpes (ex.: pedido de dinheiro).
+                            </Text>
+                        </View>
+
+                        <View style={{}}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Switch
+                                    trackColor={{ false: '#767577', true: '#81b0ff' }}
+                                    thumbColor={denuncia.bol_encontro_ficticio ? '#007BFF' : '#f4f3f4'}
+                                    ios_backgroundColor="#3e3e3e"
+                                    onValueChange={() => toggleSwitch('bol_encontro_ficticio')}
+                                    value={denuncia.bol_encontro_ficticio}
+                                />
+
+                                <Text>
+                                    Encontro ficctício
+                                </Text>
+                            </View>
+
+                            <Text style={{ color: 'gray', fontStyle: 'italic' }}>
+                                Evento criado apenas para trollagem, sem intenção real de acontecer.
+                            </Text>
+                        </View>
+
+                        <View style={{}}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Switch
+                                    trackColor={{ false: '#767577', true: '#81b0ff' }}
+                                    thumbColor={denuncia.bol_risco_seguranca ? '#007BFF' : '#f4f3f4'}
+                                    ios_backgroundColor="#3e3e3e"
+                                    onValueChange={() => toggleSwitch('bol_risco_seguranca')}
+                                    value={denuncia.bol_risco_seguranca}
+                                />
+
+                                <Text>
+                                    Risco de segurança
+                                </Text>
+                            </View>
+
+                            <Text style={{ color: 'gray', fontStyle: 'italic' }}>
+                                Local do encontro é perigoso ou coloca os participantes em risco (ex.: estrada abandonada à noite).
+                            </Text>
+                        </View>
+
+                        <View style={{}}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Switch
+                                    trackColor={{ false: '#767577', true: '#81b0ff' }}
+                                    thumbColor={denuncia.bol_fora_tema ? '#007BFF' : '#f4f3f4'}
+                                    ios_backgroundColor="#3e3e3e"
+                                    onValueChange={() => toggleSwitch('bol_fora_tema')}
+                                    value={denuncia.bol_fora_tema}
+                                />
+
+                                <Text>
+                                    Fora do tema
+                                </Text>
+                            </View>
+
+                            <Text style={{ color: 'gray', fontStyle: 'italic' }}>
+                                Quando o encontro não é relacionados a motociclistas
+                            </Text>
+                        </View>
+
+                        <View style={{}}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Switch
+                                    trackColor={{ false: '#767577', true: '#81b0ff' }}
+                                    thumbColor={denuncia.bol_informacoes_falsas ? '#007BFF' : '#f4f3f4'}
+                                    ios_backgroundColor="#3e3e3e"
+                                    onValueChange={() => toggleSwitch('bol_informacoes_falsas')}
+                                    value={denuncia.bol_informacoes_falsas}
+                                />
+
+                                <Text>
+                                    Informações falsas
+                                </Text>
+                            </View>
+
+                            <Text style={{ color: 'gray', fontStyle: 'italic' }}>
+                                Quando o encontro é criado em um local inexistente ou falso.
+                            </Text>
+                        </View>
+
+                        <View style={{ flexDirection: 'row', gap: 5, marginTop: 15 }}>
+
+                            <TouchableOpacity
+                                style={styles.buttonSecondary}
+                                onPress={() => setModalDenuncia(false)}
+                            >
+                                <Text style={styles.buttonText}>Fechar</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                style={styles.buttonDanger}
+                                onPress={denunciarEncontro}
+                            >
+                                <Text style={styles.buttonText}>Denunciar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </RNModal>
         </SafeAreaView>
     );
 }
