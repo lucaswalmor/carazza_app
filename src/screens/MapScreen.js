@@ -5,15 +5,6 @@ import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 import { FontAwesome5 } from '@expo/vector-icons'; // Importando o FontAwesome5
 import { borders, colors, display, paddings } from '../assets/css/primeflex';
-import * as Notifications from 'expo-notifications';
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-});
 
 const LOCATION_TASK_NAME = 'background-location-task';
 const eventEmitter = new NativeEventEmitter(NativeModules.UIManager);
@@ -46,6 +37,7 @@ const haversine = (coord1, coord2) => {
 };
 
 export default function MapScreen({ navigation }) {
+
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [tracking, setTracking] = useState(false);
@@ -116,41 +108,24 @@ export default function MapScreen({ navigation }) {
   }, []); // Removidas dependências desnecessárias
 
   // Corrigido: Função totalmente reescrita para evitar estado obsoleto
-  // const startTracking = async () => {
-  //   setTracking(true);
-
-  //   // 3. Iniciar atualizações de localização
-  //   await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-  //     accuracy: Location.Accuracy.High,
-  //     timeInterval: 1000,
-  //     distanceInterval: 1,
-  //     showsBackgroundLocationIndicator: true,
-  //     foregroundService: {
-  //       notificationTitle: 'Rastreamento Ativo',
-  //       notificationBody: `Sua rota está sendo registrada ${totalDistance}`
-  //     },
-  //   });
-  // };
   const startTracking = async () => {
+    // 1. Resetar dados primeiro
+    // setPathCoordinates([]);
+    // setTotalDistance(0);
+    // webViewRef.current.injectJavaScript(`
+    //   if (window.currentPolyline) {
+    //     window.map.removeLayer(window.currentPolyline);
+    //     window.currentPolyline = null;
+    //   }
+    //   true;
+    // `);
+
+    // // 2. Atualizar estado após limpeza
+    // setTimeout(() => {
+    // }, 200);
     setTracking(true);
 
-    // 1. Solicitar permissões para notificações
-    const { status } = await Notifications.requestPermissionsAsync();
-    if (status !== 'granted') {
-      console.log('Permissão para notificações negada!');
-    }
-
-    // 2. Configurar canal de notificação (Android)
-    await Notifications.setNotificationChannelAsync('tracking', {
-      name: 'Atualizações de Rastreamento',
-      importance: Notifications.AndroidImportance.LOW,
-      sound: false,
-      enableLights: false,
-      enableVibration: false,
-      showBadge: false,
-    });
-
-    // 3. Iniciar serviço de localização
+    // 3. Iniciar atualizações de localização
     await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
       accuracy: Location.Accuracy.High,
       timeInterval: 1000,
@@ -158,56 +133,14 @@ export default function MapScreen({ navigation }) {
       showsBackgroundLocationIndicator: true,
       foregroundService: {
         notificationTitle: 'Rastreamento Ativo',
-        notificationBody: `Distância: 0.00 km`, // Valor inicial
-        notificationColor: '#2196f3',
-        notificationChannelId: 'tracking', // Usar canal configurado
+        notificationBody: 'Sua rota está sendo registrada',
       },
-    });
-
-    // 4. Iniciar notificação dinâmica
-    await Notifications.scheduleNotificationAsync({
-      identifier: 'distance-updates',
-      content: {
-        title: 'Rastreamento em Progresso',
-        body: `Distância percorrida: 0.00 km`,
-      },
-      trigger: null,
-      channelId: 'tracking',
     });
   };
 
-  // Atualize este useEffect para modificar APENAS o foreground service
-  useEffect(() => {
-    const updateNotification = async () => {
-      if (tracking) {
-        // Para e reinicia o serviço com nova notificação
-        await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
-        await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-          accuracy: Location.Accuracy.High,
-          timeInterval: 1000,
-          distanceInterval: 1,
-          showsBackgroundLocationIndicator: true,
-          foregroundService: {
-            notificationTitle: 'Rastreamento Ativo',
-            notificationBody: `Distância: ${totalDistance.toFixed(2)} km`,
-            notificationColor: '#2196f3',
-            notificationChannelId: 'tracking',
-          },
-        });
-      }
-    };
-
-    updateNotification();
-  }, [totalDistance, tracking]);
-
   const stopTracking = async () => {
     setTracking(false);
-
     await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
-
-    // Remover notificações
-    await Notifications.dismissNotificationAsync('distance-updates');
-    await Notifications.dismissAllNotificationsAsync();
 
     // Corrigido: Delay para garantir finalização
     setTimeout(() => {
