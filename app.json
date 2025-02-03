@@ -92,6 +92,11 @@
           "supportsPictureInPicture": true,
           "cameraPermission": "Permitir acesso à câmera para gravar vídeos",
           "microphonePermission": "Permitir acesso ao microfone para gravar áudio"
+        },
+        "@rnmapbox/maps",
+        {
+          "RNMapboxMapsDownloadToken": "SEU_TOKEN_AQUI",
+          "RNMapboxMapsVersion": "11.1.0"
         }
       ]
     ]
