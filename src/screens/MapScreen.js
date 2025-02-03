@@ -194,7 +194,15 @@ export default function MapScreen({ navigation }) {
               detectRetina: true
             }).addTo(map);
 
+            // var customIcon = L.icon({
+            //   iconUrl: 'https://i.ibb.co/TMTshHnm/motorcycle.png', // Caminho do seu ícone
+            //   iconSize: [40, 40],                 // Tamanho do ícone
+            //   iconAnchor: [25, 50],               // Centro inferior do ícone
+            //   popupAnchor: [0, -50]               // Posição do popup em relação ao ícone
+            // });
+
             marker = L.marker([0, 0]).addTo(map);
+            // marker = L.marker([0, 0], { icon: customIcon }).addTo(map);
 
             document.addEventListener('message', function(e) {
               var data = JSON.parse(e.data);
