@@ -6,32 +6,32 @@ import { LinearGradient } from 'expo-linear-gradient';
 import WebView from 'react-native-webview';
 import * as TaskManager from 'expo-task-manager';
 
-const LOCATION_TASK_NAME = 'background-location-task';
+// const LOCATION_TASK_NAME = 'background-location-task';
 
-TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
-    if (error) {
-        console.error("Erro no rastreamento em segundo plano:", error);
-        return;
-    }
-    if (data) {
-        const { locations } = data; // Recebe as localizações
+// TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
+//     if (error) {
+//         console.error("Erro no rastreamento em segundo plano:", error);
+//         return;
+//     }
+//     if (data) {
+//         const { locations } = data; // Recebe as localizações
 
-        // Aqui, salve os dados no banco ou envie para a API
-        locations.forEach((location) => {
-            // Atualizando a rota com a nova localização
-            setRoute((prevRoute) => [
-                ...prevRoute,
-                { latitude: location.coords.latitude, longitude: location.coords.longitude },
-            ]);
+//         // Aqui, salve os dados no banco ou envie para a API
+//         locations.forEach((location) => {
+//             // Atualizando a rota com a nova localização
+//             setRoute((prevRoute) => [
+//                 ...prevRoute,
+//                 { latitude: location.coords.latitude, longitude: location.coords.longitude },
+//             ]);
 
-            // Você também pode continuar atualizando as cordenadas no WebView
-            setCordenatesWebview((prevCoordinates) => [
-                ...prevCoordinates,
-                { lat: location.coords.latitude, lng: location.coords.longitude },
-            ]);
-        });
-    }
-});
+//             // Você também pode continuar atualizando as cordenadas no WebView
+//             setCordenatesWebview((prevCoordinates) => [
+//                 ...prevCoordinates,
+//                 { lat: location.coords.latitude, lng: location.coords.longitude },
+//             ]);
+//         });
+//     }
+// });
 
 export default function RotaScreen() {
     const [route, setRoute] = useState([]);
