@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, StyleSheet, ActivityIndicator, Text, TouchableOpacity, Platform } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
@@ -226,7 +226,7 @@ export default function NativeMapScreen({ navigation }) {
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          style={[paddings[4], borders.borderCircle, display.flex, display.alignItemsCenter, Platform.OS === 'ios' && { display: 'none' },
+          style={[paddings[4], borders.borderCircle, display.flex, display.alignItemsCenter,
           display.justifyContentCenter, { backgroundColor: tracking ? colors.red['500'] : colors.blue['500'] }]}
           onPress={tracking ? stopTracking : startTracking}
         >
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   map: {
-    flex: 1,
+    flex: 1
   },
   marker: {
     padding: 2,
