@@ -5,6 +5,7 @@ import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { borders, colors, display, paddings } from '../assets/css/primeflex';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LOCATION_TASK_NAME = 'background-location-task';
 
@@ -38,6 +39,7 @@ export default function NativeMapScreen({ navigation }) {
   const [tracking, setTracking] = useState(false);
   const [pathCoordinates, setPathCoordinates] = useState([]);
   const [totalDistance, setTotalDistance] = useState(0);
+  const [isDarkTheme, setIsDarkTheme] = useState(false);
   const mapRef = useRef(null);
   const trackingRef = useRef(tracking);
 
@@ -62,6 +64,21 @@ export default function NativeMapScreen({ navigation }) {
 
     return () => unsubscribe();
   }, [navigation]);
+
+  useEffect(() => {
+    const loadTheme = async () => {
+      try {
+        const savedTheme = await AsyncStorage.getItem('mapTheme');
+        if (savedTheme !== null) {
+          setIsDarkTheme(savedTheme === 'dark');
+        }
+      } catch (error) {
+        console.error('Erro ao carregar o tema:', error);
+      }
+    };
+
+    loadTheme();
+  }, []);
 
   useEffect(() => {
     const handleLocationUpdate = (newLocation) => {
@@ -115,8 +132,24 @@ export default function NativeMapScreen({ navigation }) {
   const stopTracking = async () => {
     setTracking(false);
     await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+
+    const data = {
+      pathCoordinates,
+      totalDistance
+    }
+
     setPathCoordinates([]);
     setTotalDistance(0);
+  };
+
+  const toggleTheme = async () => {
+    try {
+      const newTheme = !isDarkTheme;
+      setIsDarkTheme(newTheme);
+      await AsyncStorage.setItem('mapTheme', newTheme ? 'dark' : 'light');
+    } catch (error) {
+      console.error('Erro ao salvar o tema:', error);
+    }
   };
 
   if (errorMsg) {
@@ -127,21 +160,36 @@ export default function NativeMapScreen({ navigation }) {
     return <View style={styles.container}><ActivityIndicator size="large" color="#0000ff" /></View>;
   }
 
+  const darkStyle = [
+    { elementType: 'geometry', stylers: [{ color: '#212121' }] },
+    { elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
+    { elementType: 'labels.text.fill', stylers: [{ color: '#757575' }] },
+    { elementType: 'labels.text.stroke', stylers: [{ color: '#212121' }] },
+    { featureType: 'administrative', elementType: 'geometry', stylers: [{ color: '#757575' }] },
+    { featureType: 'poi', elementType: 'geometry', stylers: [{ color: '#303030' }] },
+    { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#181818' }] },
+    { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#383838' }] },
+    { featureType: 'road', elementType: 'geometry.stroke', stylers: [{ color: '#212121' }] },
+    { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#484848' }] },
+    { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#000000' }] },
+    { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#3d3d3d' }] }
+  ];
+
   return (
     <View style={styles.container}>
       <MapView
         ref={mapRef}
         style={styles.map}
-        provider="google"
         initialRegion={{
           latitude: location.latitude,
           longitude: location.longitude,
           latitudeDelta: 0.005,
           longitudeDelta: 0.005,
         }}
+        customMapStyle={isDarkTheme ? darkStyle : []}
         showsUserLocation={true}
-        followsUserLocation={tracking}
-        showsMyLocationButton={false}
+        followsUserLocation={true}
+        showsMyLocationButton={true}
       >
         <Marker
           coordinate={{
@@ -162,10 +210,18 @@ export default function NativeMapScreen({ navigation }) {
         />
       </MapView>
 
-      <View style={styles.distanceContainer}>
+      <View style={[styles.distanceContainer, display.row, display.justifyContentBetween]}>
         <Text style={styles.distanceText}>
           Distância: {totalDistance.toFixed(2)} km
         </Text>
+        <TouchableOpacity style={styles.button} onPress={toggleTheme}>
+          <FontAwesome5
+            name={isDarkTheme ? 'sun' : 'moon'}
+            size={20}
+            color="#000"
+            style={{ marginRight: 5 }}
+          />
+        </TouchableOpacity>
       </View>
 
       <View style={styles.buttonContainer}>
