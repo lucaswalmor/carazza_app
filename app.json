@@ -38,7 +38,7 @@
     "android": {
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyBdv3cwLcyXaP7NBpw7I-scXT7raxoDDZM"
+          "apiKey": "AIzaSyBbEEOdQWeIpGE-TGVlLU4fEi9H9JckiLc"
         }
       },
       "permissions": [
@@ -92,11 +92,12 @@
           "supportsPictureInPicture": true,
           "cameraPermission": "Permitir acesso à câmera para gravar vídeos",
           "microphonePermission": "Permitir acesso ao microfone para gravar áudio"
-        },
-        "@rnmapbox/maps",
+        }
+      ],
+      [
+        "expo-location",
         {
-          "RNMapboxMapsDownloadToken": "SEU_TOKEN_AQUI",
-          "RNMapboxMapsVersion": "11.1.0"
+          "locationWhenInUsePermission": "Mostrar localização atual no mapa."
         }
       ]
     ]
