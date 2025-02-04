@@ -1,284 +1,326 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { View, StyleSheet, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
-import MapView, { Marker, Polyline } from 'react-native-maps';
-import * as Location from 'expo-location';
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+    requestForegroundPermissionsAsync,
+    getCurrentPositionAsync,
+    watchPositionAsync,
+    LocationAccuracy,
+} from 'expo-location'
+import MapView, { Marker, Polyline } from 'react-native-maps'
+import { useEffect, useRef, useState } from "react";
+import styles from "../assets/css/styles";
 import * as TaskManager from 'expo-task-manager';
+import { borders, colors, display, paddings } from "../assets/css/primeflex";
 import { FontAwesome5 } from '@expo/vector-icons';
-import { borders, colors, display, paddings } from '../assets/css/primeflex';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Location from 'expo-location';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const LOCATION_TASK_NAME = 'background-location-task';
+const BACKGROUND_LOCATION_TASK = 'background-location-task';
 
-TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
-  if (error) {
-    console.error(error);
-    return;
-  }
-  if (data) {
-    const { locations } = data;
-    Location.EventEmitter.emit('locationUpdate', locations[0].coords);
-  }
+// Definir a tarefa em segundo plano
+TaskManager.defineTask(BACKGROUND_LOCATION_TASK, async ({ data, error }) => {
+    if (error) {
+        console.error('Erro na tarefa de localização:', error);
+        return;
+    }
+    if (data) {
+        const { locations } = data;
+        console.log('Localizações recebidas:', locations);
+
+        // Você pode processar as localizações aqui, por exemplo:
+        // - Salvar no estado global
+        // - Enviar para um servidor
+        // - Atualizar o mapa (se o app estiver ativo)
+    }
 });
 
-const haversine = (coord1, coord2) => {
-  const R = 6371;
-  const dLat = (coord2.latitude - coord1.latitude) * (Math.PI / 180);
-  const dLon = (coord2.longitude - coord1.longitude) * (Math.PI / 180);
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(coord1.latitude * (Math.PI / 180)) *
-    Math.cos(coord2.latitude * (Math.PI / 180)) *
-    Math.sin(dLon / 2) * Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-};
+export default function MapScreen() {
+    const [location, setLocation] = useState(null);
+    const [initialLocation, setInitialLocation] = useState({ latitude: 0, longitude: 0 });
+    const [finalLocation, setFinalLocation] = useState({ latitude: 0, longitude: 0 });
+    const [route, setRoute] = useState([]);
+    const [routeFinish, setRouteFinish] = useState([]);
+    const [trackingFinish, setTrackingFinish] = useState(false);
+    const [tracking, setTracking] = useState(false);
+    const [distance, setDistance] = useState(0);
+    const mapRef = useRef(null);
+    const [isDarkTheme, setIsDarkTheme] = useState(false);
 
-export default function MapScreen({ navigation }) {
-  const [location, setLocation] = useState(null);
-  const [errorMsg, setErrorMsg] = useState(null);
-  const [tracking, setTracking] = useState(false);
-  const [pathCoordinates, setPathCoordinates] = useState([]);
-  const [totalDistance, setTotalDistance] = useState(0);
-  const [isDarkTheme, setIsDarkTheme] = useState(false);
-  const mapRef = useRef(null);
-  const trackingRef = useRef(tracking);
+    async function requestLocationPermission() {
+        const { granted } = await requestForegroundPermissionsAsync();
 
-  useEffect(() => {
-    trackingRef.current = tracking;
-  }, [tracking]);
+        if (granted) {
+            const location = await getCurrentPositionAsync();
 
-  useEffect(() => {
-    const fetchLocation = async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permissão de localização negada.');
-        return;
-      }
+            await requestBackgroundLocationPermission();
 
-      const currentLocation = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
-      setLocation(currentLocation.coords);
-    };
-
-    fetchLocation();
-    const unsubscribe = navigation.addListener('focus', fetchLocation);
-
-    return () => unsubscribe();
-  }, [navigation]);
-
-  useEffect(() => {
-    const loadTheme = async () => {
-      try {
-        const savedTheme = await AsyncStorage.getItem('mapTheme');
-        if (savedTheme !== null) {
-          setIsDarkTheme(savedTheme === 'dark');
+            setLocation(location.coords)
         }
-      } catch (error) {
-        console.error('Erro ao carregar o tema:', error);
-      }
+    }
+
+    async function requestBackgroundLocationPermission() {
+        const { status } = await Location.requestBackgroundPermissionsAsync();
+    }
+
+    useEffect(() => {
+        const loadTheme = async () => {
+            try {
+                const savedTheme = await AsyncStorage.getItem('mapTheme');
+                if (savedTheme !== null) {
+                    setIsDarkTheme(savedTheme === 'dark');
+                }
+            } catch (error) {
+                console.error('Erro ao carregar o tema:', error);
+            }
+        };
+
+        loadTheme();
+    }, []);
+
+    useEffect(() => {
+        requestLocationPermission();
+    }, [])
+
+    useEffect(() => {
+        watchPositionAsync({
+            accuracy: LocationAccuracy.BestForNavigation,
+            timeInterval: 1000,
+            distanceInterval: 1,
+        }, (response) => {
+            setLocation(response.coords)
+
+            if (mapRef.current) {
+                mapRef.current.animateCamera({
+                    center: response.coords,
+                    pitch: 50,
+                    heading: response.coords.heading || 0,
+                });
+            }
+
+            if (tracking) {
+                setRoute((prevRoute) => {
+
+                    if (prevRoute.length > 0) {
+                        const lastPoint = prevRoute[prevRoute.length - 1];
+                        const newDistance = calculateDistance(lastPoint, response.coords);
+                        setDistance((prevDistance) => prevDistance + newDistance);
+                    }
+
+                    return [...prevRoute, response.coords];
+                });
+            }
+        })
+    }, [tracking])
+
+    const calculateDistance = (pointA, pointB) => {
+        const R = 6371;
+        const dLat = ((pointB.latitude - pointA.latitude) * Math.PI) / 180;
+        const dLon = ((pointB.longitude - pointA.longitude) * Math.PI) / 180;
+        const a =
+            Math.sin(dLat / 2) ** 2 +
+            Math.cos((pointA.latitude * Math.PI) / 180) *
+            Math.cos((pointB.latitude * Math.PI) / 180) *
+            Math.sin(dLon / 2) ** 2;
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
     };
 
-    loadTheme();
-  }, []);
+    const startTracking = async () => {
+        setTracking(true);
 
-  useEffect(() => {
-    const handleLocationUpdate = (newLocation) => {
-      setLocation(newLocation);
+        setInitialLocation(location)
 
-      if (trackingRef.current) {
-        setPathCoordinates(prev => {
-          const newPoint = {
-            latitude: newLocation.latitude,
-            longitude: newLocation.longitude
-          };
+        setFinalLocation({latitude: 0, longitude: 0})
+        setDistance(0)
+        setRoute([])
+        setTrackingFinish(false)
 
-          if (prev.length > 0) {
-            const lastCoord = prev[prev.length - 1];
-            const distance = haversine(lastCoord, newPoint);
-            setTotalDistance(prevDist => prevDist + distance);
-          }
-
-          return [...prev, newPoint];
+        // Iniciar o rastreamento em segundo plano
+        await Location.startLocationUpdatesAsync(BACKGROUND_LOCATION_TASK, {
+            accuracy: LocationAccuracy.BestForNavigation,
+            timeInterval: 1000, // Intervalo de tempo entre atualizações (em milissegundos)
+            distanceInterval: 1, // Intervalo de distância entre atualizações (em metros)
+            showsBackgroundLocationIndicator: true, // Mostra um indicador ao usuário
+            foregroundService: {
+                notificationTitle: 'Rastreamento em andamento',
+                notificationBody: 'Seu aplicativo está rastreando sua localização.',
+            },
         });
+    }
 
-        if (mapRef.current) {
-          mapRef.current.animateToRegion({
-            latitude: newLocation.latitude,
-            longitude: newLocation.longitude,
-            latitudeDelta: 0.005,
-            longitudeDelta: 0.005,
-          }, 1000);
+    const stopTracking = async () => {
+        setTracking(false);
+
+        const data = {
+            route: route,
+            distance: distance
         }
-      }
+
+        setRouteFinish(data.route)
+
+        if (route.length > 0) {
+            setFinalLocation(route[route.length - 1]); // Define a última localização registrada
+        }
+
+        setTrackingFinish(true)
+        setDistance(0)
+        setRoute([])
+
+        // Parar o rastreamento em segundo plano
+        await Location.stopLocationUpdatesAsync(BACKGROUND_LOCATION_TASK);
+    }
+
+    const toggleTheme = async () => {
+        try {
+            const newTheme = !isDarkTheme;
+            setIsDarkTheme(newTheme);
+            await AsyncStorage.setItem('mapTheme', newTheme ? 'dark' : 'light');
+        } catch (error) {
+            console.error('Erro ao salvar o tema:', error);
+        }
     };
 
-    const subscription = Location.EventEmitter.addListener('locationUpdate', handleLocationUpdate);
-    return () => subscription.remove();
-  }, []);
+    const darkStyle = [
+        { elementType: 'geometry', stylers: [{ color: '#212121' }] },
+        { elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
+        { elementType: 'labels.text.fill', stylers: [{ color: '#757575' }] },
+        { elementType: 'labels.text.stroke', stylers: [{ color: '#212121' }] },
+        { featureType: 'administrative', elementType: 'geometry', stylers: [{ color: '#757575' }] },
+        { featureType: 'poi', elementType: 'geometry', stylers: [{ color: '#303030' }] },
+        { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#181818' }] },
+        { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#383838' }] },
+        { featureType: 'road', elementType: 'geometry.stroke', stylers: [{ color: '#212121' }] },
+        { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#484848' }] },
+        { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#000000' }] },
+        { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#3d3d3d' }] }
+    ];
 
-  const startTracking = async () => {
-    setTracking(true);
-    await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-      accuracy: Location.Accuracy.High,
-      timeInterval: 1000,
-      distanceInterval: 1,
-      showsBackgroundLocationIndicator: true,
-      foregroundService: {
-        notificationTitle: 'Rastreamento Ativo',
-        notificationBody: 'Sua rota está sendo registrada',
-      },
-    });
-  };
-
-  const stopTracking = async () => {
-    setTracking(false);
-    await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
-
-    const data = {
-      pathCoordinates,
-      totalDistance
+    if (!location) {
+        return <View style={styles.container}><ActivityIndicator size="large" color="#0000ff" /></View>;
     }
 
-    setPathCoordinates([]);
-    setTotalDistance(0);
-  };
+    return (
+        <View>
+            <MapView
+                ref={mapRef}
+                style={{ height: '100%', width: '100%' }}
+                initialRegion={{
+                    latitude: location.latitude,
+                    longitude: location.longitude,
+                    latitudeDelta: 0.001,
+                    longitudeDelta: 0.001
+                }}
+                customMapStyle={isDarkTheme ? darkStyle : []}
+                showsUserLocation={true}
+                followsUserLocation={true}
+                showsMyLocationButton={true}
+            >
+                {initialLocation.latitude != 0 && initialLocation.longitude != 0 && (
+                    <Marker
+                        coordinate={{
+                            latitude: initialLocation?.latitude,
+                            longitude: initialLocation?.longitude,
+                        }}
+                        pinColor="green"
+                    />
+                )}
 
-  const toggleTheme = async () => {
-    try {
-      const newTheme = !isDarkTheme;
-      setIsDarkTheme(newTheme);
-      await AsyncStorage.setItem('mapTheme', newTheme ? 'dark' : 'light');
-    } catch (error) {
-      console.error('Erro ao salvar o tema:', error);
-    }
-  };
+                {finalLocation.latitude != 0 && finalLocation.longitude != 0 && (
+                    <Marker
+                        coordinate={{
+                            latitude: finalLocation?.latitude,
+                            longitude: finalLocation?.longitude,
+                        }}
+                    />
+                )}
 
-  if (errorMsg) {
-    return <View style={styles.container}><Text>{errorMsg}</Text></View>;
-  }
+                {tracking && (
+                    <Polyline
+                        coordinates={route}
+                        strokeColor={colors.blue['500']}
+                        strokeWidth={7}
+                    />
+                )}
 
-  if (!location) {
-    return <View style={styles.container}><ActivityIndicator size="large" color="#0000ff" /></View>;
-  }
+                {trackingFinish && (
+                    <Polyline
+                        coordinates={routeFinish}
+                        strokeColor={colors.blue['500']}
+                        strokeWidth={7}
+                    />
+                )}
+            </MapView>
 
-  const darkStyle = [
-    { elementType: 'geometry', stylers: [{ color: '#212121' }] },
-    { elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
-    { elementType: 'labels.text.fill', stylers: [{ color: '#757575' }] },
-    { elementType: 'labels.text.stroke', stylers: [{ color: '#212121' }] },
-    { featureType: 'administrative', elementType: 'geometry', stylers: [{ color: '#757575' }] },
-    { featureType: 'poi', elementType: 'geometry', stylers: [{ color: '#303030' }] },
-    { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#181818' }] },
-    { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#383838' }] },
-    { featureType: 'road', elementType: 'geometry.stroke', stylers: [{ color: '#212121' }] },
-    { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#484848' }] },
-    { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#000000' }] },
-    { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#3d3d3d' }] }
-  ];
+            <View style={[styles2.distanceContainer, display.row, display.justifyContentBetween]}>
+                {tracking && (
+                    <Text style={styles2.distanceText}>
+                        Distância: {distance.toFixed(2)} km
+                    </Text>
+                )}
+                <TouchableOpacity style={{}} onPress={toggleTheme}>
+                    <FontAwesome5
+                        name={isDarkTheme ? 'sun' : 'moon'}
+                        size={20}
+                        color="#000"
+                        style={{ marginRight: 5 }}
+                    />
+                </TouchableOpacity>
+            </View>
 
-  return (
-    <View style={styles.container}>
-      <MapView
-        ref={mapRef}
-        style={styles.map}
-        initialRegion={{
-          latitude: location.latitude,
-          longitude: location.longitude,
-          latitudeDelta: 0.005,
-          longitudeDelta: 0.005,
-        }}
-        customMapStyle={isDarkTheme ? darkStyle : []}
-        showsUserLocation={true}
-        followsUserLocation={true}
-        showsMyLocationButton={true}
-      >
-        <Marker
-          coordinate={{
-            latitude: location.latitude,
-            longitude: location.longitude
-          }}
-          tracksViewChanges={false}
-        >
-          <View style={styles.marker}>
-            <FontAwesome5 name="map-marker-alt" size={30} color={colors.red['500']} />
-          </View>
-        </Marker>
-
-        <Polyline
-          coordinates={pathCoordinates}
-          strokeColor={colors.blue['500']}
-          strokeWidth={4}
-        />
-      </MapView>
-
-      <View style={[styles.distanceContainer, display.row, display.justifyContentBetween]}>
-        <Text style={styles.distanceText}>
-          Distância: {totalDistance.toFixed(2)} km
-        </Text>
-        <TouchableOpacity style={styles.button} onPress={toggleTheme}>
-          <FontAwesome5
-            name={isDarkTheme ? 'sun' : 'moon'}
-            size={20}
-            color="#000"
-            style={{ marginRight: 5 }}
-          />
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={[paddings[4], borders.borderCircle, display.flex, display.alignItemsCenter,
-          display.justifyContentCenter, { backgroundColor: tracking ? colors.red['500'] : colors.blue['500'] }]}
-          onPress={tracking ? stopTracking : startTracking}
-        >
-          <FontAwesome5
-            name={tracking ? 'stop-circle' : 'play-circle'}
-            size={35}
-            color="white"
-          />
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
+            <View style={styles2.buttonContainer}>
+                <TouchableOpacity
+                    style={[paddings[4], borders.borderCircle, display.flex, display.alignItemsCenter,
+                    display.justifyContentCenter, { backgroundColor: tracking ? colors.red['500'] : colors.blue['500'] }]}
+                    onPress={tracking ? stopTracking : startTracking}
+                >
+                    <FontAwesome5
+                        name={tracking ? 'stop-circle' : 'play-circle'}
+                        size={35}
+                        color="white"
+                    />
+                </TouchableOpacity>
+            </View>
+        </View>
+    )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  map: {
-    flex: 1
-  },
-  marker: {
-    padding: 2,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
-    elevation: 4,
-  },
-  buttonContainer: {
-    position: 'absolute',
-    bottom: 20,
-    left: 20,
-    right: 20,
-    alignItems: 'center',
-  },
-  distanceContainer: {
-    position: 'absolute',
-    top: 40,
-    left: 20,
-    right: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    padding: 10,
-    borderRadius: 8,
-    alignItems: 'center',
-    zIndex: 999,
-  },
-  distanceText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#2c3e50',
-  },
+const styles2 = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+    map: {
+        flex: 1
+    },
+    marker: {
+        padding: 2,
+        backgroundColor: 'white',
+        borderRadius: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 2,
+        elevation: 4,
+    },
+    buttonContainer: {
+        position: 'absolute',
+        bottom: 20,
+        left: 20,
+        right: 20,
+        alignItems: 'center',
+    },
+    distanceContainer: {
+        position: 'absolute',
+        top: 60,
+        left: 20,
+        right: 20,
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        padding: 10,
+        borderRadius: 8,
+        alignItems: 'center',
+        zIndex: 999,
+    },
+    distanceText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#2c3e50',
+    },
 });

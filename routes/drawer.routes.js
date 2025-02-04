@@ -1,7 +1,7 @@
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import TabRoutes from './tab.routes'; // Tab dentro do Drawer
 import PerfilScreen from '../src/screens/PerfilScreen';
-import RotaScreen from '../src/screens/RotaScreen';
+import RotaScreen from '../src/screens/mapasvelhosexcluirdepois/RotaScreen';
 import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import { Text } from 'react-native';
 
