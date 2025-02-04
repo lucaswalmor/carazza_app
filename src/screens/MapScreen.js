@@ -33,7 +33,7 @@ const haversine = (coord1, coord2) => {
   return R * c;
 };
 
-export default function NativeMapScreen({ navigation }) {
+export default function MapScreen({ navigation }) {
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [tracking, setTracking] = useState(false);
