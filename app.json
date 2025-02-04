@@ -28,10 +28,12 @@
           }
         ],
         "UIBackgroundModes": [
-          "remote-notification"
+          "remote-notification",
+          "location"
         ],
         "NSLocationWhenInUseUsageDescription": "Nós precisamos da sua localização para mostrar e gravar a rota.",
-        "NSLocationAlwaysUsageDescription": "Nós precisamos da sua localização mesmo quando o aplicativo está em segundo plano."
+        "NSLocationAlwaysUsageDescription": "Nós precisamos da sua localização mesmo quando o aplicativo está em segundo plano.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Precisamos da sua localização para fornecer atualizações contínuas, mesmo com o app em segundo plano."
       },
       "bundleIdentifier": "com.lucassteinbach.Carazza"
     },
@@ -97,7 +99,8 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Mostrar localização atual no mapa."
+          "locationWhenInUsePermission": "Mostrar localização atual no mapa.",
+          "locationAlwaysPermission": "Continuar rastreando sua localização em segundo plano."
         }
       ]
     ]

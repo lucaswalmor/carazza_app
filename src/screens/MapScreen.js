@@ -1,4 +1,11 @@
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+    ActivityIndicator,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+    Platform
+} from "react-native";
 import {
     requestForegroundPermissionsAsync,
     getCurrentPositionAsync,
@@ -129,7 +136,7 @@ export default function MapScreen() {
 
         setInitialLocation(location)
 
-        setFinalLocation({latitude: 0, longitude: 0})
+        setFinalLocation({ latitude: 0, longitude: 0 })
         setDistance(0)
         setRoute([])
         setTrackingFinish(false)
@@ -251,12 +258,11 @@ export default function MapScreen() {
             </MapView>
 
             <View style={[styles2.distanceContainer, display.row, display.justifyContentBetween]}>
-                {tracking && (
-                    <Text style={styles2.distanceText}>
-                        Distância: {distance.toFixed(2)} km
-                    </Text>
-                )}
-                <TouchableOpacity style={{}} onPress={toggleTheme}>
+                <Text style={styles2.distanceText}>
+                    Distância: {!tracking ? '0.00' : distance.toFixed(2)} km
+                </Text>
+
+                <TouchableOpacity onPress={toggleTheme}>
                     <FontAwesome5
                         name={isDarkTheme ? 'sun' : 'moon'}
                         size={20}
@@ -267,17 +273,19 @@ export default function MapScreen() {
             </View>
 
             <View style={styles2.buttonContainer}>
-                <TouchableOpacity
-                    style={[paddings[4], borders.borderCircle, display.flex, display.alignItemsCenter,
-                    display.justifyContentCenter, { backgroundColor: tracking ? colors.red['500'] : colors.blue['500'] }]}
-                    onPress={tracking ? stopTracking : startTracking}
-                >
-                    <FontAwesome5
-                        name={tracking ? 'stop-circle' : 'play-circle'}
-                        size={35}
-                        color="white"
-                    />
-                </TouchableOpacity>
+                {Platform.OS !== 'ios' && (
+                    <TouchableOpacity
+                        style={[paddings[4], borders.borderCircle, display.flex, display.alignItemsCenter,
+                        display.justifyContentCenter, { backgroundColor: tracking ? colors.red['500'] : colors.blue['500'] }]}
+                        onPress={tracking ? stopTracking : startTracking}
+                    >
+                        <FontAwesome5
+                            name={tracking ? 'stop-circle' : 'play-circle'}
+                            size={35}
+                            color="white"
+                        />
+                    </TouchableOpacity>
+                )}
             </View>
         </View>
     )
