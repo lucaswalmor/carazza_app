@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Text, ScrollView, Button } from 'react-native';
 import Accordion from '../components/Accordion';
-import { borders, colors, display, fontWeights, gap, paddings, textAlign, textSizes, textTransforms, widths } from '../assets/css/primeflex';
+import { borders, colors, display, fontWeights, gap, paddings, textAlign, fontSize, textTransforms, widths } from '../assets/css/primeflex';
 import Card from '../components/Card';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from '../components/Tabs';
 import Toast from '../components/Toast';
@@ -85,7 +85,7 @@ export default function DesafiosListScreen({ routeData }) {
         </Accordion>
 
         <Card
-          title="Título do Card"
+          title={<Text>Título do Card</Text>}
           content={<Text>Este é o conteúdo principal do card.</Text>}
         // footer={<Text>Teste</Text>}
         />
@@ -118,31 +118,31 @@ export default function DesafiosListScreen({ routeData }) {
             <TabPanel>
               <View style={[display.row, display.flexWrap]}>
                 <View style={[widths['5'], { backgroundColor: colors.indigo[500] }]}>
-                  <Text style={[textTransforms['none'], textAlign['center'], textSizes['xs'], fontWeights['bold'], { color: colors.alpha['1000'] }]}>
+                  <Text style={[textTransforms['none'], textAlign['center'], fontSize['xs'], fontWeights['bold'], { color: colors.alpha['1000'] }]}>
                     Lorem ipsum
                   </Text>
                 </View>
 
                 <View style={[widths['5']]}>
-                  <Text style={[textSizes['xs'], textAlign['right'], fontWeights['semibold'], { color: colors.red['600'] }]}>
+                  <Text style={[fontSize['xs'], textAlign['right'], fontWeights['semibold'], { color: colors.red['600'] }]}>
                     Lorem ipsum
                   </Text>
                 </View>
 
                 <View style={[widths['5']]}>
-                  <Text style={[textSizes['xs'], fontWeights['medium'], { color: colors.red['600'] }]}>
+                  <Text style={[fontSize['xs'], fontWeights['medium'], { color: colors.red['600'] }]}>
                     Lorem ipsum
                   </Text>
                 </View>
 
                 <View style={[widths['5']]}>
-                  <Text style={[textSizes['xs'], fontWeights['normal'], { color: colors.red['600'] }]}>
+                  <Text style={[fontSize['xs'], fontWeights['normal'], { color: colors.red['600'] }]}>
                     Lorem ipsum
                   </Text>
                 </View>
 
                 <View style={[widths['5']]}>
-                  <Text style={[textSizes['xs'], fontWeights['light'], { color: colors.red['600'] }]}>
+                  <Text style={[fontSize['xs'], fontWeights['light'], { color: colors.red['600'] }]}>
                     Lorem ipsum
                   </Text>
                 </View>

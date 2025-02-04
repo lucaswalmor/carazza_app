@@ -9,6 +9,7 @@ import EventoScreen from '../src/screens/EventoScreen';
 import MeusDesafiosScreen from '../src/screens/MeusDesafiosScreen';
 import EncontroScreen from '../src/screens/EncontroScreen'
 import CadastrarEncontroScreen from '../src/screens/CadastrarEncontroScreen';
+import PerfilPublicoScreen from '../src/screens/PerfilPublicoScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -37,6 +38,7 @@ export default function StackRoutes() {
             <Stack.Screen name="PontoScreen" component={PontoScreen} options={{ headerShown: true, headerTitle: 'Ponto' }} />
             <Stack.Screen name="EventoScreen" component={EventoScreen} options={{ headerShown: true, headerTitle: 'Evento' }} />
             <Stack.Screen name="EncontroScreen" component={EncontroScreen} options={{ headerShown: true, headerTitle: 'Encontros' }} />
+            <Stack.Screen name="PerfilPublicoScreen" component={PerfilPublicoScreen} options={{ headerShown: true, headerTitle: 'Perfil' }} />
             <Stack.Screen name="Success" component={SuccessScreen} options={{ headerShown: true }} />
             <Stack.Screen name="Main" component={DrawerRoutes} options={{ headerShown: false }} />
         </Stack.Navigator>

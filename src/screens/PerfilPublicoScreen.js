@@ -7,7 +7,8 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import Card from '../components/Card';
 import { colors, display, fontSize, fontWeights } from '../assets/css/primeflex';
 
-export default function PerfilScreen({ navigation }) {
+export default function PerfilPublicoScreen({ route }) {
+    const { id } = route.params;
     const [isLoading, setIsLoading] = useState(false);
     const [user, setUser] = useState(null);
 
@@ -15,50 +16,19 @@ export default function PerfilScreen({ navigation }) {
         getUser()
     }, [])
 
-    const handleLogout = async () => {
+    const getUser = async () => {
         setIsLoading(true)
 
-        const token = await AsyncStorage.getItem('token');
+        try {
+            setIsLoading(true);
+            const response = await api.get(`/user/public/show/${id}`);
 
-        if (token) {
-            const response = await api.post('/logout', null, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            setUser(response.data.data)
 
-            await AsyncStorage.removeItem('token');
-            navigation.navigate('Login');
-        }
-
-        setIsLoading(false)
-    };
-
-    const navigateMeusDesafios = () => {
-        navigation.navigate('MeusDesafiosScreen')
-    }
-
-    const getUser = async () => {
-        const token = await AsyncStorage.getItem('token');
-        const user = JSON.parse(await AsyncStorage.getItem('user'));
-
-        if (user && token) {
-            try {
-                setIsLoading(true);
-                const response = await api.get(`/user/show/${user.id}`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-
-                setUser(response.data.data)
-
-            } catch (error) {
-                console.log('Erro ao enviar o formulário:', error);
-            } finally {
-                setIsLoading(false)
-            }
+        } catch (error) {
+            console.log('Erro ao enviar o formulário:', error);
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -84,25 +54,6 @@ export default function PerfilScreen({ navigation }) {
                             {user?.nome}
                         </Text>
                     </View>
-
-                    <Card
-                        borderBottomColor={colors.indigo[400]}
-                        content={
-                            <View
-                                style={[display.row, display.justifyContentBetween]}
-                            >
-                                <TouchableOpacity
-                                    style={[display.flex, display.row, display.justifyContentBetween]}
-                                    onPress={navigateMeusDesafios}
-                                >
-                                    <Text style={[{ color: colors.indigo[500], fontSize: 18, fontWeight: 'bold' }]}>
-                                        Meus Desafios
-                                    </Text>
-                                    <FontAwesome5 name="arrow-right" size={20} style={[{ color: colors.indigo[500], marginRight: 8 }]} />
-                                </TouchableOpacity>
-                            </View>
-                        }
-                    />
 
                     <Card
                         title={

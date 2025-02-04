@@ -3,11 +3,11 @@ import { View, TouchableOpacity, Text, ActivityIndicator, Image, Alert } from 'r
 import api from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../assets/css/styles';
-import { FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome5, FontAwesome6, Ionicons } from '@expo/vector-icons';
 import Card from '../components/Card';
-import { colors, display, fontSize, fontWeights } from '../assets/css/primeflex';
+import { colors, display } from '../assets/css/primeflex';
 
-export default function PerfilScreen({ navigation }) {
+export default function ConfiguracoesScreen({ navigation }) {
     const [isLoading, setIsLoading] = useState(false);
     const [user, setUser] = useState(null);
 
@@ -34,10 +34,6 @@ export default function PerfilScreen({ navigation }) {
         setIsLoading(false)
     };
 
-    const navigateMeusDesafios = () => {
-        navigation.navigate('MeusDesafiosScreen')
-    }
-
     const getUser = async () => {
         const token = await AsyncStorage.getItem('token');
         const user = JSON.parse(await AsyncStorage.getItem('user'));
@@ -56,6 +52,40 @@ export default function PerfilScreen({ navigation }) {
 
             } catch (error) {
                 console.log('Erro ao enviar o formulário:', error);
+            } finally {
+                setIsLoading(false)
+            }
+        }
+    }
+
+    const confirmPause = async () => {
+        Alert.alert(
+            'Deseja realmente pausar esta assinatura?',
+            'Você poderá reativar a assinatura a qualquer momento depois',
+            [
+                { text: 'Cancelar', onPress: () => { }, style: 'cancel' },
+                { text: 'OK', onPress: () => handlePauseSubscription() },
+            ],
+            { cancelable: true }
+        );
+    }
+
+    const handlePauseSubscription = async () => {
+        const token = await AsyncStorage.getItem('token');
+        setIsLoading(true)
+
+        if (token) {
+            try {
+                const response = await api.get(`/asaas/subscription/status?email=${user.email}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                handleLogout();
+            } catch (error) {
+                console.log(error)
             } finally {
                 setIsLoading(false)
             }
@@ -85,54 +115,37 @@ export default function PerfilScreen({ navigation }) {
                         </Text>
                     </View>
 
+                    {/* Card 2: Logout */}
+                    <View style={[styles.cardDanger, { gap: 10, flexDirection: 'row', alignItems: 'center' }]}>
+                        <TouchableOpacity
+                            style={{ flex: 1, alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}
+                            onPress={confirmPause}
+                        >
+                            <Text style={[styles.textDanger, { fontSize: 18, fontWeight: 'bold' }]}>
+                                Pausar Assinatura
+                            </Text>
+
+                            <FontAwesome6 name="circle-pause" size={20} style={[styles.textDanger, { marginRight: 8 }]} />
+                        </TouchableOpacity>
+                    </View>
+
                     <Card
-                        borderBottomColor={colors.indigo[400]}
+                        borderBottomColor={colors.gray[400]}
                         content={
                             <View
                                 style={[display.row, display.justifyContentBetween]}
                             >
                                 <TouchableOpacity
-                                    style={[display.flex, display.row, display.justifyContentBetween]}
-                                    onPress={navigateMeusDesafios}
+                                    style={[ display.flex , display.row, display.justifyContentBetween]}
+                                    onPress={handleLogout}
                                 >
-                                    <Text style={[{ color: colors.indigo[500], fontSize: 18, fontWeight: 'bold' }]}>
-                                        Meus Desafios
+                                    <Text style={[{ color: colors.gray[400], fontSize: 18, fontWeight: 'bold' }]}>
+                                        Logout
                                     </Text>
-                                    <FontAwesome5 name="arrow-right" size={20} style={[{ color: colors.indigo[500], marginRight: 8 }]} />
+
+                                    <Ionicons name="log-out-outline" size={20} style={[{ color: colors.gray[400], marginRight: 8 }]} />
                                 </TouchableOpacity>
                             </View>
-                        }
-                    />
-
-                    <Card
-                        title={
-                            <View style={[display.row, display.justifyContentBetween]}>
-                                <Text style={[fontWeights['bold'], fontSize['lg'], { color: colors.blue[500] }]}>
-                                    Quadro de Medalhas
-                                </Text>
-                                <FontAwesome5 name="medal" size={20} style={[{ color: colors.blue[500], marginRight: 8 }]} />
-                            </View>
-                        }
-                        content={
-                            <Text>
-                                Aqui será o quadro de medalhas
-                            </Text>
-                        }
-                    />
-
-                    <Card
-                        title={
-                            <View style={[display.row, display.justifyContentBetween]}>
-                                <Text style={[fontWeights['bold'], fontSize['lg'], { color: colors.blue[500] }]}>
-                                    Rotas
-                                </Text>
-                                <FontAwesome5 name="map" size={20} style={[{ color: colors.blue[500], marginRight: 8 }]} />
-                            </View>
-                        }
-                        content={
-                            <Text>
-                                Aqui será as rotas salvas pelo usuário
-                            </Text>
                         }
                     />
                 </>

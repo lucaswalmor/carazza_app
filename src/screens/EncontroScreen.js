@@ -15,12 +15,14 @@ import api from '../services/api';
 import styles from '../assets/css/styles';
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import Toast from '../components/Toast';
+import { useNavigation } from '@react-navigation/native';
 
 export default function EncontroScreen({ route }) {
   const { id } = route.params;
   const [encontro, setEncontro] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [toast, setToast] = useState({ visible: false, message: '', position: 'bottom', severity: '' });
+  const navigation = useNavigation();
 
   useEffect(() => {
     fetchEncontro();
@@ -85,6 +87,10 @@ export default function EncontroScreen({ route }) {
     } catch (error) {
       showToast(error.response.data.error, 'top', 'danger')
     }
+  }
+
+  const lookPerfil = async (item) => {
+      navigation.navigate('PerfilPublicoScreen', { id: item.user_id });
   }
 
   return (
@@ -232,7 +238,7 @@ export default function EncontroScreen({ route }) {
                   {encontro.participantes.map((participante) => (
                     <TouchableOpacity
                       key={participante.id}
-                      onPress={() => Alert.alert('Participante', participante.apelido)}
+                      onPress={() => lookPerfil(participante)}
                       style={{ marginBottom: 15, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f5f5f5', padding: 10, borderRadius: 10 }}
                     >
                       <View style={{ flexDirection: 'row', alignItems: 'center' }}>

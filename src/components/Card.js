@@ -2,11 +2,10 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import PropTypes from 'prop-types';
 
-const Card = ({ title, content, footer, borderBottomColor = '#007BFF', color = '#007BFF' }) => {
+const Card = ({ title, content, footer, borderBottomColor = '#007BFF' }) => {
     return (
         <View style={[styles.card, { borderBottomColor }]}>
-            {/* Verificar se title foi passado */}
-            {title && <Text style={[styles.cardTitle, { color }]}>{title}</Text>}
+            {title && <View style={styles.cardTitle}>{title}</View>}
 
             {/* Verificar se content foi passado */}
             {content && <View style={styles.cardContent}>{content}</View>}
@@ -37,7 +36,6 @@ const styles = StyleSheet.create({
     },
     cardContent: {
         fontSize: 14,
-        marginBottom: 10,
     },
     cardFooter: {
         marginTop: 10,
@@ -49,7 +47,7 @@ const styles = StyleSheet.create({
 
 // Definindo as propTypes
 Card.propTypes = {
-    title: PropTypes.string,
+    title: PropTypes.node,
     content: PropTypes.node,
     footer: PropTypes.node,
 };

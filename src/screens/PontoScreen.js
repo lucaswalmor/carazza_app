@@ -17,9 +17,11 @@ import { FontAwesome, FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { useEvent } from 'expo';
 import Toast from '../components/Toast';
+import { useNavigation } from '@react-navigation/native';
 
 export default function PontoScreen({ route }) {
     const { id } = route.params;
+    const navigation = useNavigation();
     const [ponto, setPonto] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isLoadingComentario, setIsLoadingComentario] = useState(false);
@@ -95,6 +97,10 @@ export default function PontoScreen({ route }) {
         } finally {
             setIsLoadingComentario(false)
         }
+    }
+
+    const lookPerfil = async (item) => {
+        navigation.navigate('PerfilPublicoScreen', { id: item.user_id });
     }
 
     return (
@@ -276,7 +282,7 @@ export default function PontoScreen({ route }) {
                                     {ponto.comentarios.map((comentarioItem) => (
                                         <TouchableOpacity
                                             key={comentarioItem.id}
-                                            onPress={() => Alert.alert('Comentário', comentarioItem.comentario)}
+                                            onPress={() => lookPerfil(comentarioItem)}
                                             style={{ marginBottom: 15, backgroundColor: '#f5f5f5', padding: 5, borderRadius: 10 }}
                                         >
                                             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
