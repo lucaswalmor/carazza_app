@@ -105,12 +105,13 @@ export default function PerfilScreen({ navigation }) {
                     />
 
                     <Card
+                        borderBottomColor={colors.blueGray[500]}
                         title={
                             <View style={[display.row, display.justifyContentBetween]}>
-                                <Text style={[fontWeights['bold'], fontSize['lg'], { color: colors.blue[500] }]}>
+                                <Text style={[fontWeights['bold'], fontSize['lg'], { color: colors.blueGray[500] }]}>
                                     Quadro de Medalhas
                                 </Text>
-                                <FontAwesome5 name="medal" size={20} style={[{ color: colors.blue[500], marginRight: 8 }]} />
+                                <FontAwesome5 name="medal" size={20} style={[{ color: colors.blueGray[500], marginRight: 8 }]} />
                             </View>
                         }
                         content={
@@ -121,12 +122,13 @@ export default function PerfilScreen({ navigation }) {
                     />
 
                     <Card
+                        borderBottomColor={colors.teal[500]}
                         title={
                             <View style={[display.row, display.justifyContentBetween]}>
-                                <Text style={[fontWeights['bold'], fontSize['lg'], { color: colors.blue[500] }]}>
+                                <Text style={[fontWeights['bold'], fontSize['lg'], { color: colors.teal[500] }]}>
                                     Rotas
                                 </Text>
-                                <FontAwesome5 name="map" size={20} style={[{ color: colors.blue[500], marginRight: 8 }]} />
+                                <FontAwesome5 name="map" size={20} style={[{ color: colors.teal[500], marginRight: 8 }]} />
                             </View>
                         }
                         content={
