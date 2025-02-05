@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../assets/css/styles';
 import { FontAwesome5 } from '@expo/vector-icons';
 import Card from '../components/Card';
-import { colors, display, fontSize, fontWeights, gap, margins, shadows } from '../assets/css/primeflex';
+import { borders, colors, display, fontSize, fontWeights, gap, margins, paddings, shadows } from '../assets/css/primeflex';
 import { useFocusEffect } from '@react-navigation/native';
 
 export default function PerfilScreen({ navigation }) {
@@ -25,7 +25,7 @@ export default function PerfilScreen({ navigation }) {
             const token = await AsyncStorage.getItem('token');
             const user = JSON.parse(await AsyncStorage.getItem('user')); ''
 
-            const response = await api.get(`/user/public/show/${user.id}`, {
+            const response = await api.get(`/user/show/${user.id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -44,7 +44,7 @@ export default function PerfilScreen({ navigation }) {
     }
 
     const navigateRotasPublicas = () => {
-        navigation.navigate('RotasPublicasUsuarioScreen')
+        navigation.navigate('ListaRotasPublicasUsuarioScreen', { id: user.id })
     }
 
     return (
@@ -59,16 +59,45 @@ export default function PerfilScreen({ navigation }) {
                 <View style={{ flex: 1 }}>
                     <ScrollView style={{ flex: 1 }}>
                         {/* Card 1: Avatar */}
-                        <View style={[styles.card, { gap: 10, flexDirection: 'row', alignItems: 'center' }]}>
-                            <Image
-                                source={{ uri: user?.img_perfil || 'https://i.ibb.co/5kkRBSS/default-Avatar.png' }}
-                                style={styles.avatar}
-                                onError={() => console.log('Erro ao carregar a imagem.')}
-                            />
+                        <View style={[styles.card, gap[7]]}>
+                            <View style={{ gap: 10, flexDirection: 'row', alignItems: 'center' }}>
+                                <Image
+                                    source={{ uri: user?.img_perfil || 'https://i.ibb.co/5kkRBSS/default-Avatar.png' }}
+                                    style={styles.avatar}
+                                    onError={() => console.log('Erro ao carregar a imagem.')}
+                                />
 
-                            <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
-                                {user?.nome}
-                            </Text>
+                                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
+                                    {user?.nome}
+                                </Text>
+                            </View>
+
+                            <View style={{ gap: 10, flexDirection: 'row', alignItems: 'center' }}>
+                                <View>
+                                    <Text
+                                        style={{ color: '#000', fontWeight: 'bold' }}
+                                    >
+                                        Seguidores
+                                    </Text>
+                                    <Text
+                                        style={[{ color: '#000', textAlign: 'center' }, fontWeights['bold'], fontSize['sm']]}
+                                    >
+                                        {user?.seguidores}
+                                    </Text>
+                                </View>
+                                <View>
+                                    <Text
+                                        style={{ color: '#000', fontWeight: 'bold' }}
+                                    >
+                                        Seguindo
+                                    </Text>
+                                    <Text
+                                        style={[{ color: '#000', textAlign: 'center' }, fontWeights['bold'], fontSize['sm']]}
+                                    >
+                                        {user?.seguindo}
+                                    </Text>
+                                </View>
+                            </View>
                         </View>
 
                         {/* Card de quadro de meus desafios */}

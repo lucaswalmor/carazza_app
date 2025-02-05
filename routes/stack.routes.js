@@ -11,7 +11,8 @@ import EncontroScreen from '../src/screens/EncontroScreen'
 import CadastrarEncontroScreen from '../src/screens/CadastrarEncontroScreen';
 import PerfilPublicoScreen from '../src/screens/PerfilPublicoScreen';
 import RotaUsuarioScreen from '../src/screens/RotaUsuarioScreen';
-import RotasPublicasUsuarioScreen from '../src/screens/RotasPublicasUsuarioScreen';
+import ListaRotasPublicasUsuarioScreen from '../src/screens/ListaRotasPublicasUsuarioScreen';
+import NotificacoesScreen from '../src/screens/NotificacoesScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -41,8 +42,9 @@ export default function StackRoutes() {
             <Stack.Screen name="EventoScreen" component={EventoScreen} options={{ headerShown: true, headerTitle: 'Evento' }} />
             <Stack.Screen name="EncontroScreen" component={EncontroScreen} options={{ headerShown: true, headerTitle: 'Encontros' }} />
             <Stack.Screen name="PerfilPublicoScreen" component={PerfilPublicoScreen} options={{ headerShown: true, headerTitle: 'Perfil' }} />
-            <Stack.Screen name="RotasPublicasUsuarioScreen" component={RotasPublicasUsuarioScreen} options={{ headerShown: true, headerTitle: 'Rotas' }} />
+            <Stack.Screen name="ListaRotasPublicasUsuarioScreen" component={ListaRotasPublicasUsuarioScreen} options={{ headerShown: true, headerTitle: 'Rotas' }} />
             <Stack.Screen name="RotaUsuarioScreen" component={RotaUsuarioScreen} options={{ headerShown: true, headerTitle: 'Rota' }} />
+            <Stack.Screen name="NotificacoesScreen" component={NotificacoesScreen} options={{ headerShown: true, headerTitle: 'Notificações' }} />
             <Stack.Screen name="Success" component={SuccessScreen} options={{ headerShown: true }} />
             <Stack.Screen name="Main" component={DrawerRoutes} options={{ headerShown: false }} />
         </Stack.Navigator>

@@ -1,12 +1,41 @@
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import TabRoutes from './tab.routes'; // Tab dentro do Drawer
 import { MaterialIcons, FontAwesome6 } from '@expo/vector-icons';
-import { Text } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import ConfiguracoesScreen from '../src/screens/ConfiguracoesScreen';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useCallback, useEffect, useState } from 'react';
+import api from '../src/services/api';
 
 const Drawer = createDrawerNavigator();
 
 export default function DrawerRoutes() {
+    const [notificacoes, setNotificacoes] = useState(0);
+    const navigation = useNavigation();
+
+    // Função para buscar a contagem de notificações não lidas
+    const buscarContagemNotificacoes = async () => {
+        const token = await AsyncStorage.getItem('token');
+
+        try {
+            const response = await api.get('/notificacoes/nao-lidas', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            setNotificacoes(response.data);
+        } catch (error) {
+            console.error('Erro ao buscar contagem de notificações:', error);
+        }
+    };
+
+
+    useFocusEffect(
+        useCallback(() => {
+            buscarContagemNotificacoes();
+        }, [])
+    );
+
     return (
         <Drawer.Navigator
             screenOptions={({ route }) => ({
@@ -21,7 +50,17 @@ export default function DrawerRoutes() {
                         default:
                             return <Text style={{ color: '#ffffff', fontWeight: 'bold', fontSize: 18 }}>Início</Text>
                     }
-                }
+                },
+                headerRight: () => (
+                    <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('NotificacoesScreen')}>
+                        <FontAwesome6 name="bell" size={28} color="#FFF" />
+                        {notificacoes > 0 && (
+                            <View style={styles.badge}>
+                                <Text style={styles.badgeText}>{notificacoes}</Text>
+                            </View>
+                        )}
+                    </TouchableOpacity>
+                ),
             })}
         >
             <Drawer.Screen
@@ -47,3 +86,31 @@ export default function DrawerRoutes() {
         </Drawer.Navigator>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    iconContainer: {
+        marginRight: 15,
+    },
+    badge: {
+        position: 'absolute',
+        right: -2,
+        top: -4,
+        backgroundColor: 'red',
+        borderRadius: 8,
+        minWidth: 18,
+        height: 18,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 3,
+    },
+    badgeText: {
+        color: 'white',
+        fontSize: 10,
+        fontWeight: 'bold',
+    },
+});

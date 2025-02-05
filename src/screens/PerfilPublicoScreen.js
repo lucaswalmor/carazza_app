@@ -5,15 +5,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../assets/css/styles';
 import { FontAwesome5 } from '@expo/vector-icons';
 import Card from '../components/Card';
-import { colors, display, fontSize, fontWeights, gap, margins } from '../assets/css/primeflex';
+import { borders, colors, display, fontSize, fontWeights, gap, margins, paddings, widths } from '../assets/css/primeflex';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import { useFocusEffect } from '@react-navigation/native';
+import Toast from '../components/Toast';
 
 export default function PerfilPublicoScreen({ navigation, route }) {
     const { id } = route.params;
     const [isLoading, setIsLoading] = useState(false);
     const [user, setUser] = useState(null);
     const [rotas, setRotas] = useState([]);
+    const [toast, setToast] = useState({ visible: false, message: '', position: 'bottom', severity: '' });
 
     useFocusEffect(
         useCallback(() => {
@@ -21,18 +23,24 @@ export default function PerfilPublicoScreen({ navigation, route }) {
         }, [])
     );
 
+    const showToast = (message, position, severity) => {
+        setToast({ visible: true, message, position, severity });
+
+        // Esconde o toast após 3 segundos
+        setTimeout(() => setToast({ ...toast, visible: false }), 3000);
+    };
+
     const getPublicUser = async () => {
         setIsLoading(true)
         try {
             const token = await AsyncStorage.getItem('token');
-            const user = JSON.parse(await AsyncStorage.getItem('user')); ''
 
-            const response = await api.get(`/user/public/show/${user.id}`, {
+            const response = await api.get(`/user/public/show/${id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             });
-
+ 
             setUser(response.data.data)
         } catch (error) {
             console.log('Erro ao enviar o formulário:', error);
@@ -41,67 +49,50 @@ export default function PerfilPublicoScreen({ navigation, route }) {
         }
     }
 
-    const calculateRegion = (coordinates) => {
-        let minLat = Math.min(...coordinates.map((coord) => coord.latitude));
-        let maxLat = Math.max(...coordinates.map((coord) => coord.latitude));
-        let minLng = Math.min(...coordinates.map((coord) => coord.longitude));
-        let maxLng = Math.max(...coordinates.map((coord) => coord.longitude));
+    const seguir = async () => {
+        setIsLoading(true)
+        try {
+            const token = await AsyncStorage.getItem('token');
 
-        const latitudeDelta = maxLat - minLat;
-        const longitudeDelta = maxLng - minLng;
+            const response = await api.get(`/user/seguir/${53}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
 
-        return {
-            latitude: (minLat + maxLat) / 2,
-            longitude: (minLng + maxLng) / 2,
-            latitudeDelta: latitudeDelta * 1.1, // Adiciona margem
-            longitudeDelta: longitudeDelta * 1.1, // Adiciona margem
-        };
-    };
-
-    // Função para calcular a distância entre dois pontos (Fórmula de Haversine)
-    const haversineDistance = (coord1, coord2) => {
-        const toRad = (value) => (value * Math.PI) / 180;
-        const R = 6371; // Raio da Terra em km
-
-        const dLat = toRad(coord2.latitude - coord1.latitude);
-        const dLon = toRad(coord2.longitude - coord1.longitude);
-
-        const a =
-            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(toRad(coord1.latitude)) *
-            Math.cos(toRad(coord2.latitude)) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
-
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c; // Distância em km
-    };
-
-    // Função para calcular métricas da rota
-    const calculateMetrics = (rota) => {
-        let totalDistance = 0;
-        let totalTime = 0;
-
-        for (let i = 1; i < rota.length; i++) {
-            totalDistance += haversineDistance(rota[i - 1], rota[i]);
-            if (rota[i].timestamp && rota[i - 1].timestamp) {
-                totalTime += (rota[i].timestamp - rota[i - 1].timestamp) / 3600; // Tempo em horas
-            }
+            console.log(response.data)
+            showToast(response.data.message, 'top', 'success')
+            await getPublicUser();
+        } catch (error) {
+            showToast(error.response.data.error, 'top', 'danger')
+        } finally {
+            setIsLoading(false)
         }
+    }
 
-        const averageSpeed = totalTime > 0 ? totalDistance / totalTime : 0; // km/h
-        return {
-            distance: totalDistance.toFixed(2), // em km
-            time: totalTime.toFixed(2),         // em horas
-            speed: averageSpeed.toFixed(2),     // em km/h
-        };
-    };
+    const pararSeguir = async () => {
+        setIsLoading(true)
+        try {
+            const token = await AsyncStorage.getItem('token');
 
-    const rotaUsuario = async (id) => {
-        navigation.navigate('RotaUsuarioScreen', { id });
+            const response = await api.get(`/user/parar-seguir/${53}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            console.log(response.data)
+            showToast(response.data.message, 'top', 'success')
+            await getPublicUser();
+        } catch (error) {
+            showToast(error.response.data.error, 'top', 'danger')
+        } finally {
+            setIsLoading(false)
+        }
     }
 
     const navigateRotasPublicas = () => {
-        navigation.navigate('RotasPublicasUsuarioScreen')
+        navigation.navigate('ListaRotasPublicasUsuarioScreen', { id: id })
     }
 
     return (
@@ -116,16 +107,79 @@ export default function PerfilPublicoScreen({ navigation, route }) {
                 <View style={{ flex: 1 }}>
                     <ScrollView style={{ flex: 1 }}>
                         {/* Card 1: Avatar */}
-                        <View style={[styles.card, { gap: 10, flexDirection: 'row', alignItems: 'center' }]}>
-                            <Image
-                                source={{ uri: user?.img_perfil || 'https://i.ibb.co/5kkRBSS/default-Avatar.png' }}
-                                style={styles.avatar}
-                                onError={() => console.log('Erro ao carregar a imagem.')}
-                            />
 
-                            <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
-                                {user?.nome}
-                            </Text>
+                        <View style={[styles.card, gap[7]]}>
+                            <View style={{ gap: 10, flexDirection: 'row', alignItems: 'center' }}>
+                                <Image
+                                    source={{ uri: user?.img_perfil || 'https://i.ibb.co/5kkRBSS/default-Avatar.png' }}
+                                    style={styles.avatar}
+                                    onError={() => console.log('Erro ao carregar a imagem.')}
+                                />
+
+                                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
+                                    {user?.nome}
+                                </Text>
+                            </View>
+
+                            <View style={{ gap: 10, flexDirection: 'row', alignItems: 'center' }}>
+                                <View>
+                                    <Text
+                                        style={{ color: colors.blue[500] }}
+                                    >
+                                        Seguidores
+                                    </Text>
+                                    <Text
+                                        style={[{ color: colors.blue[500], textAlign: 'center' }, fontWeights['bold'], fontSize['sm']]}
+                                    >
+                                        {user?.seguidores}
+                                    </Text>
+                                </View>
+
+                                {user?.isMyPerfil && (
+                                    <View>
+                                        <Text
+                                            style={{ color: colors.blue[500] }}
+                                        >
+                                            Seguindo
+                                        </Text>
+                                        <Text
+                                            style={[{ color: colors.blue[500], textAlign: 'center' }, fontWeights['bold'], fontSize['sm']]}
+                                        >
+                                            {user?.seguindo}
+                                        </Text>
+                                    </View>
+                                )}
+                            </View>
+
+                            <View style={{ gap: 10, flexDirection: 'row', alignItems: 'center' }}>
+                                {!user?.isMyPerfil && (
+                                    <>
+                                        {!user?.isFollowing ? (
+                                            <TouchableOpacity
+                                                style={[{ backgroundColor: colors.blue[500] }, paddings[2], borders.borderRound, widths[4]]}
+                                                onPress={seguir}
+                                            >
+                                                <Text
+                                                    style={[{ color: colors.alpha[1000], textAlign: 'center' }]}
+                                                >
+                                                    Seguir
+                                                </Text>
+                                            </TouchableOpacity>
+                                        ) : (
+                                            <TouchableOpacity
+                                                style={[{}, paddings[2], borders.borderRound]}
+                                                onPress={pararSeguir}
+                                            >
+                                                <Text
+                                                    style={[{ color: colors.blue[500], textAlign: 'center', borderWidth: 2, borderColor: colors.blue[500] }, borders.borderRound, paddings[1]]}
+                                                >
+                                                    Parar de Seguir
+                                                </Text>
+                                            </TouchableOpacity>
+                                        )}
+                                    </>
+                                )}
+                            </View>
                         </View>
 
                         <Card
@@ -170,6 +224,16 @@ export default function PerfilPublicoScreen({ navigation, route }) {
                         />
                     </ScrollView>
                 </View>
+            )}
+
+
+            {toast.visible && (
+                <Toast
+                    message={toast.message}
+                    position={toast.position}
+                    onClose={() => setToast({ ...toast, visible: false })}
+                    severity={toast.severity}
+                />
             )}
         </View >
     );

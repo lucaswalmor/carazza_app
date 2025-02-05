@@ -8,7 +8,8 @@ import { borders, colors, display, fontSize, fontWeights, gap, margins, shadows 
 import { FontAwesome5 } from '@expo/vector-icons';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 
-export default function RotasPublicasUsuarioScreen({ navigation }) {
+export default function ListaRotasPublicasUsuarioScreen({ navigation, route }) {
+    const { id } = route.params
     const [rotas, setRotas] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -24,14 +25,13 @@ export default function RotasPublicasUsuarioScreen({ navigation }) {
             const token = await AsyncStorage.getItem('token');
             const user = JSON.parse(await AsyncStorage.getItem('user')); ''
 
-            const response = await api.get(`/rota/user/${user.id}`, {
+            const response = await api.get(`/rota/user/${id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             });
 
             setRotas(response.data)
-            // setUser(response.data.data)
         } catch (error) {
             console.log('Erro ao enviar o formulário:', error);
         } finally {
