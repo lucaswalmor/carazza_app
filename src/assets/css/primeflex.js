@@ -184,6 +184,8 @@ export const colors = {
 };
 
 export const fontSize = {
+    '3xs': { fontSize: 8 },
+    '2xs': { fontSize: 10 },
     base: { fontSize: 12 },
     xs: { fontSize: 14 },
     sm: { fontSize: 16 },
@@ -212,6 +214,17 @@ export const textAlign = {
     left: { textAlign: 'left' },
     right: { textAlign: 'right' },
 
+};
+
+export const shadows = {
+    shadow1: { boxShadow: '0px 3px 5px rgba(0, 0, 0, 0.02), 0px 0px 2px rgba(0, 0, 0, 0.05), 0px 1px 4px rgba(0, 0, 0, 0.08)' },
+    shadow2: { boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.03), 0px 0px 2px rgba(0, 0, 0, 0.06), 0px 2px 6px rgba(0, 0, 0, 0.12)' },
+    shadow3: { boxShadow: '0px 1px 8px rgba(0, 0, 0, 0.08), 0px 3px 4px rgba(0, 0, 0, 0.1), 0px 1px 4px -1px rgba(0, 0, 0, 0.1)' },
+    shadow4: { boxShadow: '0px 1px 10px rgba(0, 0, 0, 0.12), 0px 4px 5px rgba(0, 0, 0, 0.14), 0px 2px 4px -1px rgba(0, 0, 0, 0.2)' },
+    shadow5: { boxShadow: '0px 1px 7px rgba(0, 0, 0, 0.1), 0px 4px 5px -2px rgba(0, 0, 0, 0.12), 0px 10px 15px -5px rgba(0, 0, 0, 0.2)' },
+    shadow6: { boxShadow: '0px 3px 5px rgba(0, 0, 0, 0.06), 0px 7px 9px rgba(0, 0, 0, 0.12), 0px 20px 25px -8px rgba(0, 0, 0, 0.18)' },
+    shadow7: { boxShadow: '0px 7px 30px rgba(0, 0, 0, 0.08), 0px 22px 30px 2px rgba(0, 0, 0, 0.15), 0px 8px 10px rgba(0, 0, 0, 0.15)' },
+    shadow8: { boxShadow: '0px 9px 46px 8px rgba(0, 0, 0, 0.12), 0px 24px 38px 3px rgba(0, 0, 0, 0.14), 0px 11px 15px rgba(0, 0, 0, 0.2)' },
 };
 
 export const widths = {

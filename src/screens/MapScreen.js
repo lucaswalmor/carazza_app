@@ -16,10 +16,12 @@ import MapView, { Marker, Polyline } from 'react-native-maps'
 import { useEffect, useRef, useState } from "react";
 import styles from "../assets/css/styles";
 import * as TaskManager from 'expo-task-manager';
-import { borders, colors, display, paddings } from "../assets/css/primeflex";
+import { borders, colors, display, fontSize, gap, paddings } from "../assets/css/primeflex";
 import { FontAwesome5 } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import api from "../services/api";
+import Toast from "../components/Toast";
 
 const BACKGROUND_LOCATION_TASK = 'background-location-task';
 
@@ -31,12 +33,6 @@ TaskManager.defineTask(BACKGROUND_LOCATION_TASK, async ({ data, error }) => {
     }
     if (data) {
         const { locations } = data;
-        console.log('Localizações recebidas:', locations);
-
-        // Você pode processar as localizações aqui, por exemplo:
-        // - Salvar no estado global
-        // - Enviar para um servidor
-        // - Atualizar o mapa (se o app estiver ativo)
     }
 });
 
@@ -51,22 +47,9 @@ export default function MapScreen() {
     const [distance, setDistance] = useState(0);
     const mapRef = useRef(null);
     const [isDarkTheme, setIsDarkTheme] = useState(false);
-
-    async function requestLocationPermission() {
-        const { granted } = await requestForegroundPermissionsAsync();
-
-        if (granted) {
-            const location = await getCurrentPositionAsync();
-
-            await requestBackgroundLocationPermission();
-
-            setLocation(location.coords)
-        }
-    }
-
-    async function requestBackgroundLocationPermission() {
-        const { status } = await Location.requestBackgroundPermissionsAsync();
-    }
+    const [isLoading, setIsLoading] = useState(false);
+    const [dados, setDados] = useState({});
+    const [toast, setToast] = useState({ visible: false, message: '', position: 'bottom', severity: '' });
 
     useEffect(() => {
         const loadTheme = async () => {
@@ -118,6 +101,22 @@ export default function MapScreen() {
         })
     }, [tracking])
 
+    async function requestLocationPermission() {
+        const { granted } = await requestForegroundPermissionsAsync();
+
+        if (granted) {
+            const location = await getCurrentPositionAsync();
+
+            await requestBackgroundLocationPermission();
+
+            setLocation(location.coords)
+        }
+    }
+
+    async function requestBackgroundLocationPermission() {
+        const { status } = await Location.requestBackgroundPermissionsAsync();
+    }
+
     const calculateDistance = (pointA, pointB) => {
         const R = 6371;
         const dLat = ((pointB.latitude - pointA.latitude) * Math.PI) / 180;
@@ -162,6 +161,7 @@ export default function MapScreen() {
             distance: distance
         }
 
+        setDados(data)
         setRouteFinish(data.route)
 
         if (route.length > 0) {
@@ -184,6 +184,37 @@ export default function MapScreen() {
         } catch (error) {
             console.error('Erro ao salvar o tema:', error);
         }
+    };
+
+    const saveRoute = async () => {
+        const token = await AsyncStorage.getItem('token');
+
+        try {
+            setIsLoading(true)
+            const response = await api.post('/user/store/rotas', dados, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                }
+            })
+
+            setRoute([])
+            setInitialLocation({ latitude: 0, longitude: 0 })
+            setFinalLocation({ latitude: 0, longitude: 0 })
+            
+            showToast(response.data.message, 'top', 'success')
+        } catch (error) {
+            showToast(error.response.data.error, 'top', 'danger')
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const showToast = (message, position, severity) => {
+        setToast({ visible: true, message, position, severity });
+
+        // Esconde o toast após 3 segundos
+        setTimeout(() => setToast({ ...toast, visible: false }), 3000);
     };
 
     const darkStyle = [
@@ -273,18 +304,61 @@ export default function MapScreen() {
             </View>
 
             <View style={styles2.buttonContainer}>
-                <TouchableOpacity
-                    style={[paddings[4], borders.borderCircle, display.flex, display.alignItemsCenter,
-                    display.justifyContentCenter, { backgroundColor: tracking ? colors.red['500'] : colors.blue['500'] }]}
-                    onPress={tracking ? stopTracking : startTracking}
-                >
-                    <FontAwesome5
-                        name={tracking ? 'stop-circle' : 'play-circle'}
-                        size={35}
-                        color="white"
-                    />
-                </TouchableOpacity>
+                <View style={[display.row, gap[2]]}>
+                    <View>
+                        <TouchableOpacity
+                            style={[paddings[4], borders.borderCircle, display.flex, display.alignItemsCenter,
+                            display.justifyContentCenter, { backgroundColor: tracking ? colors.red['500'] : colors.blue['500'] }]}
+                            onPress={tracking ? stopTracking : startTracking}
+                        >
+                            <FontAwesome5
+                                name={tracking ? 'stop-circle' : 'play-circle'}
+                                size={35}
+                                color="white"
+                            />
+                        </TouchableOpacity>
+                    </View>
+
+                    {finalLocation.latitude != 0 && finalLocation.longitude != 0 && (
+                        <TouchableOpacity
+                            style={[paddings[4], borders.borderCircle, display.row, display.alignItemsCenter, gap[4],
+                            display.justifyContentBetween, { backgroundColor: colors.indigo['600'] }]}
+                            onPress={saveRoute}
+                            disabled={isLoading}
+                        >
+                            <FontAwesome5
+                                name={'cloud-upload-alt'}
+                                size={20}
+                                color="white"
+                            />
+
+                            {isLoading ? (
+                                <>
+                                    <Text style={[fontSize['lg'], { color: colors.alpha[1000] }]}>
+                                        Salvando...
+                                    </Text>
+                                </>
+                            ) : (
+                                <>
+                                    <Text style={[fontSize['lg'], { color: colors.alpha[1000] }]}>
+                                        Salvar Rota
+                                    </Text>
+                                </>
+                            )}
+
+                        </TouchableOpacity>
+                    )}
+                </View>
             </View>
+
+            {toast.visible && (
+                <Toast
+                    message={toast.message}
+                    position={toast.position}
+                    onClose={() => setToast({ ...toast, visible: false })}
+                    severity={toast.severity}
+                />
+            )}
         </View>
     )
 }

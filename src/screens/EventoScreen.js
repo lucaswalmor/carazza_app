@@ -90,7 +90,6 @@ export default function EventoScreen({ route }) {
             fetchEvento();
         } catch (error) {
             showToast(error.response.data.error, 'top', 'danger')
-            Alert.alert(error.response.data.error)
         }
     }
 
