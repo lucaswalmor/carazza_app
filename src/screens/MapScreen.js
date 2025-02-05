@@ -273,19 +273,17 @@ export default function MapScreen() {
             </View>
 
             <View style={styles2.buttonContainer}>
-                {Platform.OS !== 'ios' && (
-                    <TouchableOpacity
-                        style={[paddings[4], borders.borderCircle, display.flex, display.alignItemsCenter,
-                        display.justifyContentCenter, { backgroundColor: tracking ? colors.red['500'] : colors.blue['500'] }]}
-                        onPress={tracking ? stopTracking : startTracking}
-                    >
-                        <FontAwesome5
-                            name={tracking ? 'stop-circle' : 'play-circle'}
-                            size={35}
-                            color="white"
-                        />
-                    </TouchableOpacity>
-                )}
+                <TouchableOpacity
+                    style={[paddings[4], borders.borderCircle, display.flex, display.alignItemsCenter,
+                    display.justifyContentCenter, { backgroundColor: tracking ? colors.red['500'] : colors.blue['500'] }]}
+                    onPress={tracking ? stopTracking : startTracking}
+                >
+                    <FontAwesome5
+                        name={tracking ? 'stop-circle' : 'play-circle'}
+                        size={35}
+                        color="white"
+                    />
+                </TouchableOpacity>
             </View>
         </View>
     )
