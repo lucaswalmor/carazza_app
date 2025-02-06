@@ -1,165 +1,102 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Text, ScrollView, Button } from 'react-native';
-import Accordion from '../components/Accordion';
-import { borders, colors, display, fontWeights, gap, paddings, textAlign, fontSize, textTransforms, widths } from '../assets/css/primeflex';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, ActivityIndicator, RefreshControl, SafeAreaView, ScrollView, Alert } from 'react-native';
+import styles from '../assets/css/styles';
+import api from '../services/api';
+import { useFocusEffect } from '@react-navigation/native';
 import Card from '../components/Card';
-import { Tab, TabList, TabPanel, TabPanels, Tabs } from '../components/Tabs';
+import { borders, colors, display, fontSize, fontWeights, gap, paddings, widths } from '../assets/css/primeflex';
 import Toast from '../components/Toast';
-import Message from '../components/Message';
-import Botao from '../components/Botao';
-import BotaoOutLine from '../components/BotaoOutLine';
+import { FontAwesome5 } from '@expo/vector-icons';
 
-export default function DesafiosListScreen({ routeData }) {
-  const [activeIndex, setActiveIndex] = useState(null); // Controla qual item está aberto
-  const [toast, setToast] = useState({ visible: false, message: '', position: 'top', severity: '' });
+export default function DesafioListScreen({ navigation, route }) {
+  const { desafio } = route.params;
+  const [user, setUser] = useState({});
+  const [desafios, setDesafios] = useState([]);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [toast, setToast] = useState({ visible: false, message: '', position: 'bottom', severity: '' });
 
-  const showToast = (message, position, severity) => {
-    setToast({ visible: true, message, position, severity });
+  useFocusEffect(
+    useCallback(() => {
+      getDesafiosPorTipo();
+    }, [])
+  );
 
-    // Esconde o toast após 3 segundos
-    setTimeout(() => setToast({ ...toast, visible: false }), 3000);
+  useEffect(() => {
+    getUser();
+  }, [])
+
+  const navigateToDesafio = (id) => {
+    navigation.navigate('DetalhesDesafioScreen', {id: id});
   };
 
+  const getUser = async () => {
+    const user = await AsyncStorage.getItem('user');
+
+    if (user) {
+      setUser(JSON.parse(user))
+    }
+  }
+
+  const getDesafiosPorTipo = async () => {
+    const token = await AsyncStorage.getItem('token');
+
+    try {
+      setIsLoading(true);
+      const response = await api.get(`/desafio/index/${desafio}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      setDesafios(response.data)
+    } catch (error) {
+      console.error('Erro ao enviar o formulário:', error);
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const refreshDesafios = async () => {
+    setIsRefreshing(true);
+    await getDesafiosPorTipo();
+    setIsRefreshing(false);
+  };
+
+  if (isLoading && !isRefreshing) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#007BFF" />
+      </View>
+    );
+  }
+
   return (
-    <View style={{ flex: 1 }}>
-      <ScrollView style={{ padding: 20 }}>
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <BotaoOutLine severity="success" onPress={() => alert('Botão de Sucesso pressionado!')}>
-            <Text style={{ color: 'green' }}>Success Button</Text>
-          </BotaoOutLine>
-
-          <BotaoOutLine severity="warn" onPress={() => alert('Botão de Sucesso pressionado!')}>
-            <Text style={{ color: colors.orange[500] }}>Warning Button</Text>
-          </BotaoOutLine>
-
-          <BotaoOutLine severity="error" onPress={() => alert('Botão de Erro pressionado!')} />
-
-          <BotaoOutLine severity="info" onPress={() => alert('Botão de Informação pressionado!')}>
-            <Text style={{ color: 'blue', fontSize: 18 }}>Informative Button</Text>
-          </BotaoOutLine>
-
-          <BotaoOutLine severity="secondary" onPress={() => alert('Botão de Sucesso pressionado!')}>
-            <Text style={{ color: colors.gray[500] }}>secondary Button</Text>
-          </BotaoOutLine>
-        </View>
-
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <Botao severity="success" onPress={() => alert('Botão de Sucesso pressionado!')}>
-            <Text style={{ color: 'white', fontSize: 18 }}>Success Botao</Text>
-          </Botao>
-
-          <Botao severity="info" onPress={() => alert('Botão de Informação pressionado!')}>
-            <Text style={{ color: 'white', fontSize: 18 }}>Informative Botao</Text>
-          </Botao>
-
-          <Botao severity="warn" onPress={() => alert('Botão de Informação pressionado!')}>
-            <Text style={{ color: 'white', fontSize: 18 }}>Warning Botao</Text>
-          </Botao>
-
-          <Botao severity="error" onPress={() => alert('Botão de Erro pressionado!')} />
-
-          <Botao severity="secondary" onPress={() => alert('Botão de Informação pressionado!')}>
-            <Text style={{ color: 'white', fontSize: 18 }}>Secondary Botao</Text>
-          </Botao>
-        </View>
-
-        <Message severity="success">Success Message</Message>
-        <Message severity="info">Info Message</Message>
-        <Message severity="warn">Warn Message</Message>
-        <Message severity="error">Error Message</Message>
-        <Message severity="secondary">Secondary Message</Message>
-        <Message severity="contrast">Contrast Message</Message>
-
-        <Accordion title="Accordion Item 1" index={0} activeIndex={activeIndex} setActiveIndex={setActiveIndex}>
-          <Button title="Show Toast (Top)" onPress={() => showToast('Mensagem no Topo', 'top', 'success')} />
-          <Button title="Show Toast (Center)" onPress={() => showToast('Mensagem no Centro', 'center', 'danger')} />
-          <Button title="Show Toast (Bottom)" onPress={() => showToast('Mensagem em Baixo', 'bottom', 'help')} />
-        </Accordion>
-
-        <Accordion title="Accordion Item 2" index={1} activeIndex={activeIndex} setActiveIndex={setActiveIndex}>
-          <Text style={{ fontSize: 16 }}>Este é o conteúdo do item 2. Pode ser um texto diferente ou qualquer outro conteúdo.</Text>
-        </Accordion>
-
-        <Accordion title="Accordion Item 3" index={2} activeIndex={activeIndex} setActiveIndex={setActiveIndex}>
-          <Text style={{ fontSize: 16 }}>Aqui está o conteúdo do item 3. Expanda para ver mais.</Text>
-        </Accordion>
-
-        <Card
-          title={<Text>Título do Card</Text>}
-          content={<Text>Este é o conteúdo principal do card.</Text>}
-        // footer={<Text>Teste</Text>}
-        />
-
-        <Tabs initialValue={0}>
-          <TabList>
-            <Tab
-            // activeBackgroundColor="#28a745"
-            // activeBackgroundColor={colors.green['500']}
-            // inactiveBackgroundColor="#f8f9fa"
-            // activeTextColor="#fff"
-            // inactiveTextColor="#6c757d"
-            >
-              Pontos
-            </Tab>
-            <Tab>
-              Eventos
-            </Tab>
-            <Tab>Encontros</Tab>
-          </TabList>
-
-          <TabPanels
-            // backgroundColor="#6c757d"
-            // backgroundColor={colors.cyan['500']}
-            borderRadius={borders.borderRoundSm}
-            padding={paddings[3]}
-          // borderRoundLeft={borders.borderRoundLeft}
-          // borderRoundBottom={borders.borderRoundBottomSm}
+    <SafeAreaView style={{ flex: 1, paddingBottom: 150 }}>
+      <ScrollView
+        style={{ flex: 1, padding: 10 }}
+        contentContainerStyle={{ paddingBottom: 200 }}
+        keyboardShouldPersistTaps="handled"
+        refreshControl={
+          <RefreshControl refreshing={isRefreshing} onRefresh={refreshDesafios} />
+        }
+      >
+        {desafios.map((desafio) => (
+          <TouchableOpacity
+            onPress={() => navigateToDesafio(desafio.id)}
           >
-            <TabPanel>
-              <View style={[display.row, display.flexWrap]}>
-                <View style={[widths['5'], { backgroundColor: colors.indigo[500] }]}>
-                  <Text style={[textTransforms['none'], textAlign['center'], fontSize['xs'], fontWeights['bold'], { color: colors.alpha['1000'] }]}>
-                    Lorem ipsum
-                  </Text>
+            <Card
+              key={desafio.id}
+              content={
+                <View style={[display.row, display.justifyContentBetween, display.alignItemsCenter]}>
+                  <Text style={[{ color: colors.blue[500] }, fontWeights['bold'], fontSize['xl']]}>{desafio.nome}</Text>
+                  <FontAwesome5 name="arrow-right" size={20} style={[{ color: colors.blue[500], marginRight: 8 }]} />
                 </View>
-
-                <View style={[widths['5']]}>
-                  <Text style={[fontSize['xs'], textAlign['right'], fontWeights['semibold'], { color: colors.red['600'] }]}>
-                    Lorem ipsum
-                  </Text>
-                </View>
-
-                <View style={[widths['5']]}>
-                  <Text style={[fontSize['xs'], fontWeights['medium'], { color: colors.red['600'] }]}>
-                    Lorem ipsum
-                  </Text>
-                </View>
-
-                <View style={[widths['5']]}>
-                  <Text style={[fontSize['xs'], fontWeights['normal'], { color: colors.red['600'] }]}>
-                    Lorem ipsum
-                  </Text>
-                </View>
-
-                <View style={[widths['5']]}>
-                  <Text style={[fontSize['xs'], fontWeights['light'], { color: colors.red['600'] }]}>
-                    Lorem ipsum
-                  </Text>
-                </View>
-              </View>
-            </TabPanel>
-            <TabPanel>
-              <Text>
-                Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.
-              </Text>
-            </TabPanel>
-            <TabPanel>
-              <Text>
-                At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti.
-              </Text>
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
+              }
+            />
+          </TouchableOpacity>
+        ))}
       </ScrollView>
 
       {toast.visible && (
@@ -170,19 +107,6 @@ export default function DesafiosListScreen({ routeData }) {
           severity={toast.severity}
         />
       )}
-    </View>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  text: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-});

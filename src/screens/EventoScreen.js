@@ -20,7 +20,7 @@ import { useNavigation } from '@react-navigation/native';
 export default function EventoScreen({ route }) {
     const { id } = route.params;
     const [evento, setEvento] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const [toast, setToast] = useState({ visible: false, message: '', position: 'bottom', severity: '' });
     const navigation = useNavigation();
 

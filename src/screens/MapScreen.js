@@ -199,6 +199,7 @@ export default function MapScreen() {
             })
 
             setRoute([])
+            setRouteFinish([])
             setInitialLocation({ latitude: 0, longitude: 0 })
             setFinalLocation({ latitude: 0, longitude: 0 })
             

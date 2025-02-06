@@ -40,7 +40,7 @@ export default function PerfilPublicoScreen({ navigation, route }) {
                     Authorization: `Bearer ${token}`
                 }
             });
- 
+
             setUser(response.data.data)
         } catch (error) {
             console.log('Erro ao enviar o formulário:', error);
@@ -124,12 +124,12 @@ export default function PerfilPublicoScreen({ navigation, route }) {
                             <View style={{ gap: 10, flexDirection: 'row', alignItems: 'center' }}>
                                 <View>
                                     <Text
-                                        style={{ color: colors.blue[500] }}
+                                        style={{ color: '#000', fontWeight: 'bold' }}
                                     >
                                         Seguidores
                                     </Text>
                                     <Text
-                                        style={[{ color: colors.blue[500], textAlign: 'center' }, fontWeights['bold'], fontSize['sm']]}
+                                        style={[{ color: '#000', textAlign: 'center' }, fontWeights['bold'], fontSize['sm']]}
                                     >
                                         {user?.seguidores}
                                     </Text>
@@ -138,12 +138,12 @@ export default function PerfilPublicoScreen({ navigation, route }) {
                                 {user?.isMyPerfil && (
                                     <View>
                                         <Text
-                                            style={{ color: colors.blue[500] }}
+                                            style={{ color: '#000', fontWeight: 'bold' }}
                                         >
                                             Seguindo
                                         </Text>
                                         <Text
-                                            style={[{ color: colors.blue[500], textAlign: 'center' }, fontWeights['bold'], fontSize['sm']]}
+                                            style={[{ color: '#000', textAlign: 'center' }, fontWeights['bold'], fontSize['sm']]}
                                         >
                                             {user?.seguindo}
                                         </Text>

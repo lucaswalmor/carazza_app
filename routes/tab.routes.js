@@ -3,9 +3,9 @@ import { Ionicons } from '@expo/vector-icons';
 import EventosListScreen from '../src/screens/EventosListScreen'
 import PontoListScreen from '../src/screens/PontosListScreen'
 import EncontrosListScreen from '../src/screens/EncontrosListScreen';
-import DesafiosListScreen from '../src/screens/DesafiosListScreen';
 import MapScreen from '../src/screens/MapScreen';
 import PerfilScreen from '../src/screens/PerfilScreen';
+import DesafiosScreen from '../src/screens/DesafiosScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -50,7 +50,7 @@ export default function TabRoutes() {
             <Tab.Screen name="Pontos" component={PontoListScreen} options={{ headerShown: false }} />
             <Tab.Screen name="Eventos" component={EventosListScreen} options={{ headerShown: false }} />
             <Tab.Screen name="Encontros" component={EncontrosListScreen} options={{ headerShown: false }} />
-            <Tab.Screen name="Desafios" component={DesafiosListScreen} options={{ headerShown: false }} />
+            <Tab.Screen name="Desafios" component={DesafiosScreen} options={{ headerShown: false }} />
             <Tab.Screen name="Mapa" component={MapScreen} options={{ headerShown: false }} />
         </Tab.Navigator>
     );

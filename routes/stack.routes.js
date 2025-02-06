@@ -13,6 +13,9 @@ import PerfilPublicoScreen from '../src/screens/PerfilPublicoScreen';
 import RotaUsuarioScreen from '../src/screens/RotaUsuarioScreen';
 import ListaRotasPublicasUsuarioScreen from '../src/screens/ListaRotasPublicasUsuarioScreen';
 import NotificacoesScreen from '../src/screens/NotificacoesScreen';
+import DesafiosListScreen from '../src/screens/DesafiosListScreen';
+import DetalhesDesafioScreen from '../src/screens/DetalhesDesafioScreen';
+import RankingGeralScreen from '../src/screens/RankingGeralScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -37,7 +40,6 @@ export default function StackRoutes() {
             <Stack.Screen name="CadastrarPontoScreen" component={CadastrarPontoScreen} options={{ headerShown: true, headerTitle: 'Cadastrar Ponto' }} />
             <Stack.Screen name="CadastrarEventoScreen" component={CadastrarEventoScreen} options={{ headerShown: true, headerTitle: 'Cadastrar Evento' }} />
             <Stack.Screen name="CadastrarEncontroScreen" component={CadastrarEncontroScreen} options={{ headerShown: true, headerTitle: 'Cadastrar Encontro' }} />
-            <Stack.Screen name="MeusDesafiosScreen" component={MeusDesafiosScreen} options={{ headerShown: true, headerTitle: 'Meus Desafios' }} />
             <Stack.Screen name="PontoScreen" component={PontoScreen} options={{ headerShown: true, headerTitle: 'Ponto' }} />
             <Stack.Screen name="EventoScreen" component={EventoScreen} options={{ headerShown: true, headerTitle: 'Evento' }} />
             <Stack.Screen name="EncontroScreen" component={EncontroScreen} options={{ headerShown: true, headerTitle: 'Encontros' }} />
@@ -45,6 +47,10 @@ export default function StackRoutes() {
             <Stack.Screen name="ListaRotasPublicasUsuarioScreen" component={ListaRotasPublicasUsuarioScreen} options={{ headerShown: true, headerTitle: 'Rotas' }} />
             <Stack.Screen name="RotaUsuarioScreen" component={RotaUsuarioScreen} options={{ headerShown: true, headerTitle: 'Rota' }} />
             <Stack.Screen name="NotificacoesScreen" component={NotificacoesScreen} options={{ headerShown: true, headerTitle: 'Notificações' }} />
+            <Stack.Screen name="DesafiosListScreen" component={DesafiosListScreen} options={{ headerShown: true, headerTitle: 'Lista de Desafios' }} />
+            <Stack.Screen name="DetalhesDesafioScreen" component={DetalhesDesafioScreen} options={{ headerShown: true, headerTitle: 'Detalhes do Desafio' }} />
+            <Stack.Screen name="MeusDesafiosScreen" component={MeusDesafiosScreen} options={{ headerShown: true, headerTitle: 'Meus Desafios' }} />
+            <Stack.Screen name="RankingGeralScreen" component={RankingGeralScreen} options={{ headerShown: true, headerTitle: 'Maiores Pontuadores' }} />
             <Stack.Screen name="Success" component={SuccessScreen} options={{ headerShown: true }} />
             <Stack.Screen name="Main" component={DrawerRoutes} options={{ headerShown: false }} />
         </Stack.Navigator>

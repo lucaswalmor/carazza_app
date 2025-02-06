@@ -1,17 +1,16 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { View, TouchableOpacity, Text, ActivityIndicator, Image, Alert, StyleSheet, ScrollView } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { View, TouchableOpacity, Text, ActivityIndicator, Image, ScrollView } from 'react-native';
 import api from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../assets/css/styles';
 import { FontAwesome5 } from '@expo/vector-icons';
 import Card from '../components/Card';
-import { borders, colors, display, fontSize, fontWeights, gap, margins, paddings, shadows } from '../assets/css/primeflex';
+import { borders, colors, display, fontSize, fontWeights, gap } from '../assets/css/primeflex';
 import { useFocusEffect } from '@react-navigation/native';
 
 export default function PerfilScreen({ navigation }) {
     const [isLoading, setIsLoading] = useState(false);
     const [user, setUser] = useState(null);
-    const [rotas, setRotas] = useState([]);
 
     useFocusEffect(
         useCallback(() => {
@@ -43,6 +42,10 @@ export default function PerfilScreen({ navigation }) {
         navigation.navigate('MeusDesafiosScreen')
     }
 
+    const navigateToRankingGeral = () => {
+        navigation.navigate('RankingGeralScreen')
+    }
+
     const navigateRotasPublicas = () => {
         navigation.navigate('ListaRotasPublicasUsuarioScreen', { id: user.id })
     }
@@ -67,9 +70,11 @@ export default function PerfilScreen({ navigation }) {
                                     onError={() => console.log('Erro ao carregar a imagem.')}
                                 />
 
-                                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
-                                    {user?.nome}
-                                </Text>
+                                <View style={[]}>
+                                    <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
+                                        {user?.nome}
+                                    </Text>
+                                </View>
                             </View>
 
                             <View style={{ gap: 10, flexDirection: 'row', alignItems: 'center' }}>
@@ -99,6 +104,48 @@ export default function PerfilScreen({ navigation }) {
                                 </View>
                             </View>
                         </View>
+
+                        {/* Card de quadro de meus desafios */}
+                        <TouchableOpacity
+                            onPress={() => navigateToRankingGeral()}
+                        >
+                            <Card
+                                borderBottomColor={colors.pink[500]}
+                                title={
+                                    <Text style={[{ padding: 4, color: colors.pink[500] }, fontWeights['bold'], fontSize['lg'], borders.borderRound3xl]}>
+                                        Ranking Geral
+                                    </Text>
+                                }
+                                content={
+                                    <View style={[display.row, display.alignItemsCenter, gap[5]]}>
+                                        <Image
+                                            source={
+                                                user?.posicao === 1
+                                                    ? require('../assets/icons/gold-medal8.png')
+                                                    : user?.posicao === 2
+                                                        ? require('../assets/icons/silver-medal8.png')
+                                                        : require('../assets/icons/bronze-medal8.png')
+                                            }
+                                            style={{ width: 40, height: 40 }}
+                                        />
+                                        <View><Text
+                                            style={[
+                                                {
+                                                    padding: 4,
+                                                    color: colors.pink[500],
+                                                    letterSpacing: 1,
+                                                },
+                                                fontSize['2xl'],
+                                                fontWeights['semibold'],
+                                            ]}
+                                        >
+                                            {user?.posicao}º Coloção
+                                        </Text>
+                                        </View>
+                                    </View>
+                                }
+                            />
+                        </TouchableOpacity>
 
                         {/* Card de quadro de meus desafios */}
                         <Card

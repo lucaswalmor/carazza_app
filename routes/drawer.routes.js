@@ -7,12 +7,14 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback, useEffect, useState } from 'react';
 import api from '../src/services/api';
+import AdminScreen from '../src/screens/AdminScreen';
 
 const Drawer = createDrawerNavigator();
 
 export default function DrawerRoutes() {
     const [notificacoes, setNotificacoes] = useState(0);
     const navigation = useNavigation();
+    const [user, setUser] = useState(null);
 
     // Função para buscar a contagem de notificações não lidas
     const buscarContagemNotificacoes = async () => {
@@ -29,6 +31,14 @@ export default function DrawerRoutes() {
         }
     };
 
+    async function getUser() {
+        const user = JSON.parse(await AsyncStorage.getItem('user'));
+        setUser(user);
+    }
+
+    useEffect(() => {
+        getUser();
+    }, [])
 
     useFocusEffect(
         useCallback(() => {
@@ -73,6 +83,18 @@ export default function DrawerRoutes() {
                     drawerLabel: 'Início'
                 }}
             />
+            {user?.tipo_usuario === 1 && (
+                <Drawer.Screen
+                    name="Admin"
+                    component={AdminScreen}
+                    options={{
+                        drawerIcon: ({ color, size }) => (
+                            <MaterialIcons name="admin-panel-settings" color={color} size={size} />
+                        ),
+                        drawerLabel: 'Admin'
+                    }}
+                />
+            )}
             <Drawer.Screen
                 name="configuracoes"
                 component={ConfiguracoesScreen}
