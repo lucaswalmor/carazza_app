@@ -203,53 +203,58 @@ export default function DetalhesDesafioScreen({ navigation, route }) {
                     }
                     content={
                         <View>
-                            {desafio.ranking && desafio.ranking.length > 0 ? (
-                                desafio.ranking.map((participante, index) => (
-                                    <View key={index} style={[display.row, display.alignItemsCenter, { marginBottom: 10 }]}>
-                                        {/* Imagem fixa para os três primeiros */}
-                                        {index < 3 ? (
-                                            <View style={{ width: 40, height: 40, marginRight: 10 }}>
-                                                <Image
-                                                    source={
-                                                        index === 0
-                                                            ? require('../assets/icons/gold-medal.png')
-                                                            : index === 1
-                                                                ? require('../assets/icons/silver-medal.png')
-                                                                : require('../assets/icons/bronze-medal.png')
-                                                    }
-                                                    style={{ width: '100%', height: '100%' }}
-                                                />
-                                            </View>
-                                        ) : (
-                                            <Text style={[fontWeights['bold'], { width: 40, textAlign: 'center' }]}>
-                                                {index + 1}º
-                                            </Text>
-                                        )}
+                            {
+                                desafio.ranking && (
+                                    <ScrollView>
+                                        {Array.from({ length: 20 }).map((_, index) => {
+                                            const participante = desafio.ranking[index];
+                                            const posicaoVazia = !participante;
 
-                                        <Text style={[fontSize['lg'], { flex: 1 }]}>{participante.nome}</Text>
+                                            return (
+                                                <View key={index} style={{ flexDirection: 'row', alignItems: 'center', padding: 10 }}>
+                                                    {/* Posição */}
+                                                    <Text style={{ fontWeight: 'bold', marginRight: 10 }}>
+                                                        {index + 1}º
+                                                    </Text>
 
-                                        <Text style={[fontSize['md'], { color: colors.blue[500] }]}>
-                                            {participante.km_percorrido} km
-                                        </Text>
-                                    </View>
-                                ))
-                            ) : (
-                                Array.from({ length: 20 }).map((_, index) => (
-                                    <View key={index} style={[display.row, display.alignItemsCenter, { marginBottom: 10 }]}>
-                                        <Text style={[fontWeights['bold'], { width: 40, textAlign: 'center' }]}>
-                                            {index + 1}º
-                                        </Text>
+                                                    {/* Imagem ou Placeholder */}
+                                                    {index < 3 && participante ? (
+                                                        <View style={{ width: 40, height: 40, marginRight: 10 }}>
+                                                            <Image
+                                                                source={
+                                                                    index === 0
+                                                                        ? require('../assets/icons/gold-medal.png')
+                                                                        : index === 1
+                                                                            ? require('../assets/icons/silver-medal.png')
+                                                                            : require('../assets/icons/bronze-medal.png')
+                                                                }
+                                                                style={{ width: '100%', height: '100%' }}
+                                                            />
+                                                        </View>
+                                                    ) : (
+                                                        <View style={{ width: 30, height: 30, marginRight: 10 }}>
+                                                            <Image
+                                                                source={require('../assets/icons/medal-participacao.png')}
+                                                                style={{ width: '100%', height: '100%' }}
+                                                            />
+                                                        </View>
+                                                    )}
 
-                                        <Text style={[fontSize['lg'], { flex: 1, color: colors.gray[500] }]}>
-                                            ---
-                                        </Text>
+                                                    {/* Nome do Participante */}
+                                                    <Text style={{ flex: 1 }}>
+                                                        {posicaoVazia ? '---' : participante.nome}
+                                                    </Text>
 
-                                        <Text style={[fontSize['md'], { color: colors.gray[400] }]}>
-                                            0 km
-                                        </Text>
-                                    </View>
-                                ))
-                            )}
+                                                    {/* Distância Percorrida */}
+                                                    <Text>
+                                                        {posicaoVazia ? '0 km' : `${participante.km_percorrido} km`}
+                                                    </Text>
+                                                </View>
+                                            );
+                                        })}
+                                    </ScrollView>
+                                )
+                            }
                         </View>
                     }
                 />
