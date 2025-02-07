@@ -213,7 +213,7 @@ export default function EncontrosListScreen({ navigation }) {
                     )}
                 </View>
 
-                {(user.tipo_usuario === 1 || user.tipo_usuario === 4) && (
+                {(user.tipo_usuario === 1 || user.tipo_usuario === 4 || user.tipo_usuario === 5) && (
                     <View style={{ padding: 10 }}>
                         <View style={{ width: '100%' }}>
                             <TouchableOpacity style={styles.button} onPress={CadastrarEncontroScreen}>

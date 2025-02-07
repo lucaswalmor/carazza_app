@@ -39,11 +39,13 @@ export default function EventoScreen({ route }) {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            
-            setEvento(response.data.data);
+
+            if (response.data.data) {
+                setEvento(response.data.data);
+                setIsLoading(false);
+            }
         } catch (error) {
-            console.error(error);
-        } finally {
+            console.log(error.response.data);
             setIsLoading(false);
         }
     };
@@ -96,6 +98,8 @@ export default function EventoScreen({ route }) {
     const lookPerfil = async (item) => {
         navigation.navigate('PerfilPublicoScreen', { id: item.user_id });
     }
+
+    if (!evento) return <Text>Carregando evento...</Text>;
 
     return (
         <View style={{ flex: 1 }}>

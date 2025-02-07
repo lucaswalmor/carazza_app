@@ -2,19 +2,42 @@ import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import Card from "../components/Card";
 import { FontAwesome6, MaterialIcons } from '@expo/vector-icons';
 import { colors, display } from "../assets/css/primeflex";
+import { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import styles from "../assets/css/styles";
 
 export default function Desafios({ navigation }) {
-    const navigateDesafios = (tipo) => {
-        navigation.navigate('DesafiosListScreen', { desafio: tipo });
-    };
+    const [user, setUser] = useState({});
 
-    const navigateRankingGeral = async () => {
-        navigation.navigate('RankingGeralScreen');
+    useEffect(() => {
+        getUser();
+    }, [])
+
+    const getUser = async () => {
+        const user = await AsyncStorage.getItem('user');
+
+        if (user) {
+            setUser(JSON.parse(user))
+        }
+    }
+
+    const navigateCadastrarDesafio = async () => {
+        navigation.navigate('CadastrarDesafioScreen');
     };
 
     return (
         <View style={{ flex: 1 }}>
             <ScrollView style={{ flex: 1, padding: 10 }}>
+                {(user.tipo_usuario === 1) && (
+                    <View style={{ marginBottom: 10 }}>
+                        <View style={{ width: '100%' }}>
+                            <TouchableOpacity style={styles.button} onPress={navigateCadastrarDesafio}>
+                                <Text style={styles.buttonText}>Cadastrar Desafio</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                )}
+
                 <Card
                     borderBottomColor={colors.pink[500]}
                     content={

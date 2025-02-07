@@ -16,6 +16,7 @@ import NotificacoesScreen from '../src/screens/NotificacoesScreen';
 import DesafiosListScreen from '../src/screens/DesafiosListScreen';
 import DetalhesDesafioScreen from '../src/screens/DetalhesDesafioScreen';
 import RankingGeralScreen from '../src/screens/RankingGeralScreen';
+import CadastrarDesafioScreen from '../src/screens/CadastrarDesafioScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -47,6 +48,7 @@ export default function StackRoutes() {
             <Stack.Screen name="ListaRotasPublicasUsuarioScreen" component={ListaRotasPublicasUsuarioScreen} options={{ headerShown: true, headerTitle: 'Rotas' }} />
             <Stack.Screen name="RotaUsuarioScreen" component={RotaUsuarioScreen} options={{ headerShown: true, headerTitle: 'Rota' }} />
             <Stack.Screen name="NotificacoesScreen" component={NotificacoesScreen} options={{ headerShown: true, headerTitle: 'Notificações' }} />
+            <Stack.Screen name="CadastrarDesafioScreen" component={CadastrarDesafioScreen} options={{ headerShown: true, headerTitle: 'Cadastrar Desafio' }} />
             <Stack.Screen name="DesafiosListScreen" component={DesafiosListScreen} options={{ headerShown: true, headerTitle: 'Lista de Desafios' }} />
             <Stack.Screen name="DetalhesDesafioScreen" component={DetalhesDesafioScreen} options={{ headerShown: true, headerTitle: 'Detalhes do Desafio' }} />
             <Stack.Screen name="MeusDesafiosScreen" component={MeusDesafiosScreen} options={{ headerShown: true, headerTitle: 'Meus Desafios' }} />
