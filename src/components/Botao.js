@@ -1,7 +1,8 @@
 import React from 'react';
 import { Text, View, TouchableOpacity, StyleSheet } from 'react-native';
+import { colors } from '../assets/css/primeflex';
 
-const Botao = ({ severity, children, onPress }) => {
+const Botao = ({ severity, children, onPress, style }) => {
     // Definir cores para cada "severity"
     const severityStyles = {
         success: {
@@ -24,6 +25,10 @@ const Botao = ({ severity, children, onPress }) => {
             backgroundColor: '#6B7280', // Cinza
             textColor: '#FFFFFF', // Branco
         },
+        help: {
+            backgroundColor: colors.indigo[500], // Cinza
+            textColor: '#FFFFFF', // Branco
+        },
     };
 
     // Atribuindo as cores com fallback para 'info' caso o tipo não seja válido
@@ -31,7 +36,7 @@ const Botao = ({ severity, children, onPress }) => {
 
     return (
         <TouchableOpacity
-            style={[styles.buttonContainer, { backgroundColor }]}
+            style={[styles.buttonContainer, { backgroundColor }, style]}
             onPress={onPress}
         >
             <View style={styles.buttonContent}>

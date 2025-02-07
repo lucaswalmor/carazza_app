@@ -16,11 +16,15 @@ import styles from '../assets/css/styles';
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import Toast from '../components/Toast';
 import { useNavigation } from '@react-navigation/native';
+import * as Location from 'expo-location';
+import Botao from '../components/Botao';
+import { colors, fontSize, shadows } from '../assets/css/primeflex';
 
 export default function EventoScreen({ route }) {
     const { id } = route.params;
     const [evento, setEvento] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingCheckin, setIsLoadingCheckin] = useState(false);
     const [toast, setToast] = useState({ visible: false, message: '', position: 'bottom', severity: '' });
     const navigation = useNavigation();
 
@@ -95,6 +99,41 @@ export default function EventoScreen({ route }) {
         }
     }
 
+    const handleCheckin = async () => {
+        try {
+            const token = await AsyncStorage.getItem('token');
+            setIsLoadingCheckin(true)
+
+            // Solicita a permissão apenas quando o usuário clicar no botão
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                Alert.alert('Permissão negada', 'Você precisa conceder acesso à localização para fazer o check-in.');
+                return;
+            }
+
+            // Obtém a localização do usuário
+            let userLocation = await Location.getCurrentPositionAsync({});
+            const { latitude, longitude } = userLocation.coords;
+
+            // Envia as coordenadas para o Laravel
+            const response = await api.post(`/evento/${evento.id}/checkin`, {
+                latitude,
+                longitude,
+            }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            showToast(response.data.message, 'top', 'success')
+        } catch (error) {
+            showToast(error.response.data.error, 'top', 'danger')
+        } finally {
+            setIsLoadingCheckin(false)
+        }
+    };
+
     const lookPerfil = async (item) => {
         navigation.navigate('PerfilPublicoScreen', { id: item.user_id });
     }
@@ -130,6 +169,29 @@ export default function EventoScreen({ route }) {
                                 {evento?.nome}
                             </Text>
                         </View>
+
+
+                        {/* Botao de CHECKIN */}
+                        {evento.encontro_acontecendo && (
+                            <View>
+                                <Botao severity="help" style={[shadows['shadow5']]} onPress={() => handleCheckin()}>
+                                    <View style={styles.buttonContent}>
+                                        {isLoadingCheckin ? (
+                                            <>
+                                                <ActivityIndicator
+                                                    style={styles.loadingIndicator}
+                                                    size="small"
+                                                    color="#fff"
+                                                />
+                                                <Text style={styles.buttonText}>Aguarde</Text>
+                                            </>
+                                        ) : (
+                                            <Text style={[fontSize['lg'], { color: colors.alpha[1000] }]}>Fazer Check-In</Text>
+                                        )}
+                                    </View>
+                                </Botao>
+                            </View>
+                        )}
 
                         {/* Card 2: Datas e horários */}
                         <View style={styles.card}>
