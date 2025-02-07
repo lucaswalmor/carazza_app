@@ -28,7 +28,7 @@ export default function DesafioListScreen({ navigation, route }) {
   }, [])
 
   const navigateToDesafio = (id) => {
-    navigation.navigate('DetalhesDesafioScreen', {id: id});
+    navigation.navigate('DetalhesDesafioScreen', { id: id });
   };
 
   const getUser = async () => {
@@ -84,10 +84,10 @@ export default function DesafioListScreen({ navigation, route }) {
       >
         {desafios.map((desafio) => (
           <TouchableOpacity
+            key={desafio.id}
             onPress={() => navigateToDesafio(desafio.id)}
           >
             <Card
-              key={desafio.id}
               content={
                 <View style={[display.row, display.justifyContentBetween, display.alignItemsCenter]}>
                   <Text style={[{ color: colors.blue[500] }, fontWeights['bold'], fontSize['xl']]}>{desafio.nome}</Text>

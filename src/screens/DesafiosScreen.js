@@ -25,6 +25,11 @@ export default function Desafios({ navigation }) {
         navigation.navigate('CadastrarDesafioScreen');
     };
 
+    const navigateDesafios = async (id) => {
+        navigation.navigate('DesafiosListScreen', {desafio: id});
+    };
+
+
     return (
         <View style={{ flex: 1 }}>
             <ScrollView style={{ flex: 1, padding: 10 }}>
