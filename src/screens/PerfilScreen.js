@@ -105,7 +105,7 @@ export default function PerfilScreen({ navigation }) {
                             </View>
                         </View>
 
-                        {/* Card de quadro de meus desafios */}
+                        {/* Card de ranking geral */}
                         <TouchableOpacity
                             onPress={() => navigateToRankingGeral()}
                         >
@@ -117,7 +117,7 @@ export default function PerfilScreen({ navigation }) {
                                     </Text>
                                 }
                                 content={
-                                    <View style={[display.row, display.alignItemsCenter, gap[5]]}>
+                                    <View style={[display.row, display.alignItemsCenter, display.justifyContentBetween, gap[5]]}>
                                         <Image
                                             source={
                                                 user?.posicao === 1
@@ -128,19 +128,33 @@ export default function PerfilScreen({ navigation }) {
                                             }
                                             style={{ width: 40, height: 40 }}
                                         />
-                                        <View><Text
-                                            style={[
+                                        <View>
+                                            <Text
+                                                style={[
+                                                    {
+                                                        padding: 4,
+                                                        color: colors.pink[500],
+                                                        letterSpacing: 1,
+                                                    },
+                                                    fontSize['2xl'],
+                                                    fontWeights['semibold'],
+                                                ]}
+                                            >
+                                                {user?.posicao}º Coloção
+                                            </Text>
+                                        </View>
+                                        <View>
+                                            <Text style={[
                                                 {
                                                     padding: 4,
                                                     color: colors.pink[500],
                                                     letterSpacing: 1,
                                                 },
-                                                fontSize['2xl'],
+                                                fontSize['lg'],
                                                 fontWeights['semibold'],
-                                            ]}
-                                        >
-                                            {user?.posicao}º Coloção
-                                        </Text>
+                                            ]}>
+                                                {user?.pontuacao_ranking} Pts
+                                            </Text>
                                         </View>
                                     </View>
                                 }
