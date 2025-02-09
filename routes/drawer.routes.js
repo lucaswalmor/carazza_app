@@ -1,6 +1,6 @@
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import TabRoutes from './tab.routes'; // Tab dentro do Drawer
-import { MaterialIcons, FontAwesome6 } from '@expo/vector-icons';
+import { MaterialIcons, FontAwesome6, FontAwesome5 } from '@expo/vector-icons';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import ConfiguracoesScreen from '../src/screens/ConfiguracoesScreen';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -9,6 +9,7 @@ import { useCallback, useEffect, useState } from 'react';
 import api from '../src/services/api';
 import AdminScreen from '../src/screens/AdminScreen';
 import MapMarkersPontos from '../src/screens/MapMarkersPontos';
+import GPSNavigatorScreen from '../src/screens/GPSNavigatorScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -92,6 +93,16 @@ export default function DrawerRoutes() {
                         <MaterialIcons name="map" color={color} size={size} />
                     ),
                     drawerLabel: 'Locais Parceiros'
+                }}
+            />
+            <Drawer.Screen
+                name="GPSNavigatorScreen"
+                component={GPSNavigatorScreen}
+                options={{
+                    drawerIcon: ({ color, size }) => (
+                        <FontAwesome5 name="route"  color={color} size={size} />
+                    ),
+                    drawerLabel: 'GPS'
                 }}
             />
             {user?.tipo_usuario === 1 && (
