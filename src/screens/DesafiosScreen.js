@@ -29,6 +29,10 @@ export default function Desafios({ navigation }) {
         navigation.navigate('DesafiosListScreen', {desafio: id});
     };
 
+    const navigateToRankingGeral = async () => {
+        navigation.navigate('RankingGeralScreen');
+    };
+
 
     return (
         <View style={{ flex: 1 }}>
@@ -51,7 +55,7 @@ export default function Desafios({ navigation }) {
                         >
                             <TouchableOpacity
                                 style={[display.flex, display.row, display.justifyContentBetween]}
-                                onPress={() => navigateRankingGeral()}
+                                onPress={() => navigateToRankingGeral()}
                             >
                                 <Text style={[{ color: colors.pink[500], fontSize: 18, fontWeight: 'bold' }]}>
                                     Ranking Geral

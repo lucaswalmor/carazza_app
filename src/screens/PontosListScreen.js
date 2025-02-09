@@ -156,10 +156,9 @@ const PointsScreen = ({ navigation }) => {
     }
 
     return (
-        <SafeAreaView style={{ flex: 1, paddingBottom: 150 }}>
+        <SafeAreaView style={{ flex: 1 }}>
             <ScrollView
                 style={{ flex: 1 }}
-                contentContainerStyle={{ paddingBottom: 200 }}
                 keyboardShouldPersistTaps="handled"
             >
                 <View style={{ backgroundColor: '#007BFF', height: 120, padding: 20, justifyContent: 'space-evenly', gap: 5, position: 'relative' }}>

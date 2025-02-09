@@ -8,6 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback, useEffect, useState } from 'react';
 import api from '../src/services/api';
 import AdminScreen from '../src/screens/AdminScreen';
+import MapMarkersPontos from '../src/screens/MapMarkersPontos';
 
 const Drawer = createDrawerNavigator();
 
@@ -81,6 +82,16 @@ export default function DrawerRoutes() {
                         <MaterialIcons name="home" color={color} size={size} />
                     ),
                     drawerLabel: 'Início'
+                }}
+            />
+            <Drawer.Screen
+                name="MapMarkersPontos"
+                component={MapMarkersPontos}
+                options={{
+                    drawerIcon: ({ color, size }) => (
+                        <MaterialIcons name="map" color={color} size={size} />
+                    ),
+                    drawerLabel: 'Locais Parceiros'
                 }}
             />
             {user?.tipo_usuario === 1 && (

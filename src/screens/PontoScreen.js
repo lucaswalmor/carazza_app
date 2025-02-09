@@ -55,6 +55,7 @@ export default function PontoScreen({ route }) {
                     Authorization: `Bearer ${token}`,
                 },
             });
+
             setVideoSource(`https://carazza.lksoftware.com.br/public/storage/${response.data.data.video_path}`)
             setPonto(response.data.data);
         } catch (error) {
@@ -110,6 +111,7 @@ export default function PontoScreen({ route }) {
 
             // Solicita a permissão apenas quando o usuário clicar no botão
             let { status } = await Location.requestForegroundPermissionsAsync();
+
             if (status !== 'granted') {
                 Alert.alert('Permissão negada', 'Você precisa conceder acesso à localização para fazer o check-in.');
                 return;
