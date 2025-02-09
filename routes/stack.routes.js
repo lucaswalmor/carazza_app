@@ -3,7 +3,6 @@ import LoginScreen from '../src/screens/LoginScreen';
 import DrawerRoutes from './drawer.routes';
 import CadastrarPontoScreen from '../src/screens/CadastrarPontoScreen';
 import PontoScreen from '../src/screens/PontoScreen';
-import SuccessScreen from '../src/screens/SuccessScreen';
 import CadastrarEventoScreen from '../src/screens/CadastrarEventoScreen';
 import EventoScreen from '../src/screens/EventoScreen';
 import MeusDesafiosScreen from '../src/screens/MeusDesafiosScreen';
@@ -53,7 +52,6 @@ export default function StackRoutes() {
             <Stack.Screen name="DetalhesDesafioScreen" component={DetalhesDesafioScreen} options={{ headerShown: true, headerTitle: 'Detalhes do Desafio' }} />
             <Stack.Screen name="MeusDesafiosScreen" component={MeusDesafiosScreen} options={{ headerShown: true, headerTitle: 'Meus Desafios' }} />
             <Stack.Screen name="RankingGeralScreen" component={RankingGeralScreen} options={{ headerShown: true, headerTitle: 'Maiores Pontuadores' }} />
-            <Stack.Screen name="Success" component={SuccessScreen} options={{ headerShown: true }} />
             <Stack.Screen name="Main" component={DrawerRoutes} options={{ headerShown: false }} />
         </Stack.Navigator>
     );

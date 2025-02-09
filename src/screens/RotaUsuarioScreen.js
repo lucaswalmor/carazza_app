@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
-import MapView, { Polyline } from "react-native-maps";
+import MapView, { Marker, Polyline } from "react-native-maps";
 import api from "../services/api";
 
 export default function RotaUsuarioScreen({ route }) {
@@ -14,6 +14,7 @@ export default function RotaUsuarioScreen({ route }) {
     const getRoute = async () => {
         try {
             const response = await api.get(`rota/${id}`);
+
             setRota(response.data);
         } catch (error) {
             console.log(error.response?.data?.error || "Erro ao carregar a rota");
@@ -49,6 +50,32 @@ export default function RotaUsuarioScreen({ route }) {
                     style={styles.map}
                     initialRegion={region}
                 >
+                    {/* Marcador do ponto inicial */}
+                    {rota.length > 0 && (
+                        <Marker
+                            coordinate={{
+                                latitude: rota[0].latitude,
+                                longitude: rota[0].longitude
+                            }}
+                            title="Início"
+                            description="Ponto inicial da rota"
+                            pinColor="green" // Define a cor do marcador
+                        />
+                    )}
+
+                    {/* Marcador do ponto final */}
+                    {rota.length > 0 && (
+                        <Marker
+                            coordinate={{
+                                latitude: rota[rota.length - 1].latitude,
+                                longitude: rota[rota.length - 1].longitude
+                            }}
+                            title="Fim"
+                            description="Ponto final da rota"
+                            pinColor="red" // Define a cor do marcador
+                        />
+                    )}
+
                     {/* Desenha a rota */}
                     <Polyline
                         coordinates={rota}
