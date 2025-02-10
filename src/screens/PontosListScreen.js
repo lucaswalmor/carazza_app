@@ -7,7 +7,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { TextInput } from 'react-native-gesture-handler';
 import { useFocusEffect } from '@react-navigation/native';
 
-const PointsScreen = ({ navigation }) => {
+const PontosListScreen = ({ navigation }) => {
     const [user, setUser] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
@@ -268,4 +268,4 @@ const stylesPontoListScreen = StyleSheet.create({
     }
 });
 
-export default PointsScreen;
+export default PontosListScreen;

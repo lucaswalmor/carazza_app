@@ -140,7 +140,7 @@ export default function PerfilScreen({ navigation }) {
                                                     fontWeights['semibold'],
                                                 ]}
                                             >
-                                                {user?.posicao}º Coloção
+                                                {user?.posicao}º Colocação
                                             </Text>
                                         </View>
                                         <View>

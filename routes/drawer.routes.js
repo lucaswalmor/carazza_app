@@ -9,7 +9,8 @@ import { useCallback, useEffect, useState } from 'react';
 import api from '../src/services/api';
 import AdminScreen from '../src/screens/AdminScreen';
 import MapMarkersPontos from '../src/screens/MapMarkersPontos';
-import GPSNavigatorScreen from '../src/screens/GPSNavigatorScreen';
+import DesafiosScreen from '../src/screens/DesafiosScreen';
+import TodosComponentes from '../src/components/TodosComponentes';
 
 const Drawer = createDrawerNavigator();
 
@@ -96,13 +97,13 @@ export default function DrawerRoutes() {
                 }}
             />
             <Drawer.Screen
-                name="GPSNavigatorScreen"
-                component={GPSNavigatorScreen}
+                name="DesafiosScreen"
+                component={DesafiosScreen}
                 options={{
                     drawerIcon: ({ color, size }) => (
-                        <FontAwesome5 name="route"  color={color} size={size} />
+                        <FontAwesome5 name="trophy"  color={color} size={size} />
                     ),
-                    drawerLabel: 'GPS'
+                    drawerLabel: 'Desafios'
                 }}
             />
             {user?.tipo_usuario === 1 && (
@@ -125,6 +126,16 @@ export default function DrawerRoutes() {
                         <FontAwesome6 name="user-gear" color={color} size={size} />
                     ),
                     drawerLabel: 'Configurações'
+                }}
+            />
+            <Drawer.Screen
+                name="Componentes"
+                component={TodosComponentes}
+                options={{
+                    drawerIcon: ({ color, size }) => (
+                        <FontAwesome6 name="user-gear" color={color} size={size} />
+                    ),
+                    drawerLabel: 'Componentes'
                 }}
             />
         </Drawer.Navigator>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { View, StyleSheet, Alert, Text } from "react-native";
-import MapView, { Marker } from "react-native-maps";
+import { View, StyleSheet, Alert, Text, TouchableOpacity } from "react-native";
+import MapView, { Callout, Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import api from "../services/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -73,12 +73,21 @@ export default function MapMarkersPontos() {
                     <MapView style={styles.map} initialRegion={region}>
                         {markers.map((marker) => (
                             <Marker
-                                image={marker.bol_parceiro === 1 ? require("../assets/icons/pin-green.png") : require("../assets/icons/pin-red.png") }
                                 key={marker.id}
                                 coordinate={{ latitude: parseFloat(marker?.latitude), longitude: parseFloat(marker?.longitude) }}
+                                image={marker.bol_parceiro === 1 ? require("../assets/icons/pin-green.png") : require("../assets/icons/pin-red.png")}
                                 title={marker?.nome}
                                 pinColor={marker.bol_parceiro === 1 ? colors.green[500] : colors.red[500]}
-                            />
+                            >
+                                <Callout>
+                                    <View>
+                                        <Text>{marker.nome}</Text>
+                                        <TouchableOpacity onPress={() => console.log(`Clicou no marcador ${marker.id}`)}>
+                                            <Text style={{ color: "blue", marginTop: 5 }}>Ver detalhes</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </Callout>
+                            </Marker>
                         ))}
                     </MapView>
                 </>

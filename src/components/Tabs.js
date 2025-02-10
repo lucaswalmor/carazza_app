@@ -38,12 +38,14 @@ const Tab = ({
             { backgroundColor: isActive ? activeBackgroundColor : inactiveBackgroundColor }
         ]}
     >
-        <Text style={{
-            color: isActive ? activeTextColor : inactiveTextColor,
-            fontWeight: 'bold'
-        }}>
-            {children}
-        </Text>
+        {typeof children === 'function' ? children({ isActive }) : (
+            <Text style={{
+                color: isActive ? activeTextColor : inactiveTextColor,
+                fontWeight: 'bold'
+            }}>
+                {children}
+            </Text>
+        )}
     </TouchableOpacity>
 );
 
@@ -77,13 +79,12 @@ const TabPanels = ({
     </View>
 );
 
-const TabPanel = ({ children }) => <View style={styles.tabPanel}>{children}</View>;
+const TabPanel = ({ children, padding = 0 }) => <View style={{ padding }}>{children}</View>;
 
 const styles = StyleSheet.create({
     tabList: {
         flexDirection: 'row',
         backgroundColor: '#e9ecef',
-        marginBottom: 5,
         overflow: 'hidden',
     },
     tab: {

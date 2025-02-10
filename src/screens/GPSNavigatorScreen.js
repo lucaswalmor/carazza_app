@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TextInput, Button, ActivityIndicator } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, Polyline } from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
 import * as Location from 'expo-location';
 import axios from 'axios';
@@ -10,15 +10,18 @@ import Botao from '../components/Botao';
 import { colors } from '../assets/css/primeflex';
 
 const GOOGLE_MAPS_API_KEY = 'AIzaSyAu4BOiZIT9Y4eHn81U5Uf98ZTBt8jUjyU';
+const LOCATIONIQ_API_KEY = 'pk.7179dc15856b3b310d544e4c66101b1b';
 
 export default function GPSNavigatorScreen() {
     const [currentLocation, setCurrentLocation] = useState(null);
-    const [destinationCoords, setDestinationCoords] = useState(null);
+    const [destinationCoords, setDestinationCoords] = useState([]);
     const [destinationCep, setDestinationCep] = useState('');
     const [destinationNumber, setDestinationNumber] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [hasRota, setHasRota] = useState(false);
     const [activeIndex, setActiveIndex] = useState(null);
     const mapRef = useRef(null);
+    const [hasRecalculated, setHasRecalculated] = useState(false);
 
     useEffect(() => {
         (async () => {
@@ -29,39 +32,78 @@ export default function GPSNavigatorScreen() {
             }
 
             let location = await Location.getCurrentPositionAsync({});
+
             setCurrentLocation({
                 latitude: location.coords.latitude,
                 longitude: location.coords.longitude,
             });
         })();
     }, []);
-
+    
     useEffect(() => {
-        currentPosition();
-    }, [])
+        let locationSubscription = null; // Variável para armazenar a Subscription
 
-    const currentPosition = () => {
-        Location.watchPositionAsync(
-            {
-                accuracy: Location.Accuracy.High,
-                distanceInterval: 100,
-            },
-            (location) => {
-                const { latitude, longitude } = location.coords;
+        const startWatchingPosition = async () => {
+            locationSubscription = await Location.watchPositionAsync(
+                {
+                    accuracy: Location.Accuracy.High,
+                    distanceInterval: 10, // Reduzi para testar melhor
+                },
+                (location) => {
+                    const { latitude, longitude } = location.coords;
+                    setCurrentLocation({ latitude, longitude });
 
-                if (mapRef.current) {
-                    mapRef.current.animateCamera({
-                        center: location.coords,
-                        pitch: 50,
-                        heading: location.coords.heading || 0,
-                    });
+                    if (mapRef.current) {
+                        mapRef.current.animateCamera({
+                            center: location.coords,
+                            pitch: 50,
+                            heading: location.coords.heading || 0,
+                        });
+                    }
+
+
+                    if (destinationCoords.length > 0) {
+                        const isOnRoute = destinationCoords.some(({ latitude: lat, longitude: lon }) => {
+                            const distance = getDistance(latitude, longitude, lat, lon);
+                            return distance <= 150;
+                        });
+    
+                        if (!isOnRoute && !hasRecalculated) {
+                            setHasRecalculated(true);
+                            calculateRoute();
+                            
+                            // Reseta a flag depois de um tempo para permitir um novo recálculo, se necessário
+                            setTimeout(() => setHasRecalculated(false), 5000); // Aguarda 5 segundos antes de permitir um novo recálculo
+                        }
+                    }
                 }
+            );
+        };
 
-                setCurrentLocation({ latitude: latitude, longitude: longitude })
+        startWatchingPosition();
+
+        return () => {
+            if (locationSubscription) {
+                locationSubscription.remove(); // Garante que o watchPositionAsync será cancelado ao desmontar
             }
-        );
-    }
+        };
+    }, [destinationCoords, hasRecalculated]); 
 
+    // Função para calcular a distância entre dois pontos (Haversine)
+    const getDistance = (lat1, lon1, lat2, lon2) => {
+        const R = 6371e3; // Raio da Terra em metros
+        const toRad = (angle) => (angle * Math.PI) / 180;
+        const dLat = toRad(lat2 - lat1);
+        const dLon = toRad(lon2 - lon1);
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c; // Retorna a distância em metros
+    };
+
+    // Função para buscar o endereço completo a partir do cep
     const pesquisacep = async (valor) => {
         const cep = valor.replace(/\D/g, '');
         try {
@@ -74,41 +116,117 @@ export default function GPSNavigatorScreen() {
         }
     };
 
+    // Função para calcular a rota
     const calculateRoute = async () => {
-        setIsLoading(true)
-
-        const getDestinationCepAddress = await pesquisacep(destinationCep);
-        const destinationAddress = `${getDestinationCepAddress.logradouro}, ${destinationNumber}, ${getDestinationCepAddress.bairro}, ${getDestinationCepAddress.localidade}, ${getDestinationCepAddress.estado}`;
-
-        const geocodeEndpoint = (address) =>
-            `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${GOOGLE_MAPS_API_KEY}`;
+        setIsLoading(true);
 
         try {
-            const destinationResponse = await axios.get(geocodeEndpoint(destinationAddress));
+            const getDestinationCepAddress = await pesquisacep(destinationCep);
+            const destinationAddress = `${getDestinationCepAddress.logradouro}, ${destinationNumber}, ${getDestinationCepAddress.bairro}, ${getDestinationCepAddress.localidade}, ${getDestinationCepAddress.estado}`;
 
-            if (destinationResponse.data.status === 'OK') {
-                const destinationCoords = destinationResponse.data.results[0].geometry.location;
+            const destinationCoords = await getCoordinatesFromAddress(destinationAddress);
 
-                // Chamada para calcular a rota
-                const directionsEndpoint = `https://maps.googleapis.com/maps/api/directions/json?origin=${currentLocation.latitude},${currentLocation.longitude}&destination=${destinationCoords.lat},${destinationCoords.lng}&key=${GOOGLE_MAPS_API_KEY}`;
-                const directionsResponse = await axios.get(directionsEndpoint);
-
-                if (directionsResponse.data.status === 'OK') {
-
-                    const destinationCoords = destinationResponse.data.results[0].geometry.location;
-                    setDestinationCoords(destinationCoords)
-                } else {
-                    console.error('Erro ao calcular a rota:', directionsResponse.data.error_message);
-                }
-            } else {
+            if (!destinationCoords) {
                 Alert.alert('Erro ao obter coordenadas do destino');
+                return;
+            }
+
+            const routeData = await getRouteFromLocationIQ(currentLocation, destinationCoords);
+            if (routeData) {
+                setHasRota(true);
+                setDestinationCoords(routeData);
+            }
+        } catch (error) {
+            console.error('Erro ao calcular a rota:', error.response.data);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // Função para buscar o array de polyline
+    const getRouteFromLocationIQ = async (origin, destination) => {
+        try {
+            const response = await axios.get(
+                `https://us1.locationiq.com/v1/directions/driving/${origin.longitude},${origin.latitude};${destination.lng},${destination.lat}?key=${LOCATIONIQ_API_KEY}&steps=true&alternatives=true&geometries=polyline&overview=full`
+            );
+
+            if (response.data.routes.length > 0 && response.data.routes[0].geometry) {
+                return decodePolyline(response.data.routes[0].geometry);
+            } else {
+                throw new Error('Nenhuma rota encontrada');
             }
         } catch (error) {
             console.error('Erro ao calcular a rota:', error);
-        } finally {
-            setIsLoading(false)
+            return null;
         }
     };
+
+    // Função parade codificar o array de polyline
+    const decodePolyline = (encoded) => {
+        let index = 0;
+        const coordinates = [];
+        let lat = 0, lng = 0;
+
+        while (index < encoded.length) {
+            let shift = 0, result = 0;
+            let byte;
+
+            // Decodifica latitude
+            do {
+                byte = encoded.charCodeAt(index++) - 63;
+                result |= (byte & 0x1F) << shift;
+                shift += 5;
+            } while (byte >= 0x20);
+
+            let deltaLat = (result & 1) ? ~(result >> 1) : (result >> 1);
+            lat += deltaLat;
+
+            // Decodifica longitude
+            shift = 0;
+            result = 0;
+
+            do {
+                byte = encoded.charCodeAt(index++) - 63;
+                result |= (byte & 0x1F) << shift;
+                shift += 5;
+            } while (byte >= 0x20);
+
+            let deltaLng = (result & 1) ? ~(result >> 1) : (result >> 1);
+            lng += deltaLng;
+
+            coordinates.push({ latitude: lat / 1e5, longitude: lng / 1e5 });
+        }
+
+        return coordinates;
+    };
+
+    // Função para obter coordenadas a partir do endereço
+    const getCoordinatesFromAddress = async (address) => {
+        try {
+            const response = await axios.get(
+                `https://us1.locationiq.com/v1/search.php?key=${LOCATIONIQ_API_KEY}&q=${encodeURIComponent(address)}&format=json`
+            );
+
+            if (response.data.length > 0) {
+                return {
+                    lat: parseFloat(response.data[0].lat),
+                    lng: parseFloat(response.data[0].lon),
+                };
+            } else {
+                throw new Error('Endereço não encontrado');
+            }
+        } catch (error) {
+            console.error('Erro ao obter coordenadas:', error.response.data);
+            return null;
+        }
+    };
+
+    const limparRota = async () => {
+        setDestinationCoords([])
+        setDestinationCep("")
+        setDestinationNumber("")
+        setHasRota(false)
+    }
 
     if (!currentLocation) return <Text>Carregando mapa...</Text>;
 
@@ -119,21 +237,17 @@ export default function GPSNavigatorScreen() {
                 region={{
                     latitude: currentLocation.latitude,
                     longitude: currentLocation.longitude,
-                    latitudeDelta: 0.03,
-                    longitudeDelta: 0.03,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
                 }}
                 showsUserLocation={true}
                 followUserLocation={true}
                 ref={mapRef}
             >
-                {destinationCoords && (
-                    <MapViewDirections
-                        origin={currentLocation}
-                        destination={{
-                            latitude: destinationCoords.lat,
-                            longitude: destinationCoords.lng,
-                        }}
-                        apikey={GOOGLE_MAPS_API_KEY}
+                {/* Desenhando a rota manualmente */}
+                {destinationCoords.length > 0 && (
+                    <Polyline
+                        coordinates={destinationCoords}
                         strokeWidth={4}
                         strokeColor={colors.blue[500]}
                     />
@@ -158,6 +272,7 @@ export default function GPSNavigatorScreen() {
                             keyboardType="numeric"
                         />
 
+
                         <Botao onPress={calculateRoute}>
                             <View style={styles.buttonContent}>
                                 {isLoading ? (
@@ -170,10 +285,28 @@ export default function GPSNavigatorScreen() {
                                         <Text style={styles.buttonText}>Trançando a rota...</Text>
                                     </>
                                 ) : (
-                                    <Text style={{ color: colors.alpha[1000] }}>Traçar Rota</Text>
+                                    <Text style={styles.buttonText}>Traçar Rota</Text>
                                 )}
                             </View>
                         </Botao>
+                        {hasRota && (
+                            <Botao onPress={limparRota} severity="error">
+                                <View style={styles.buttonContent}>
+                                    {isLoading ? (
+                                        <>
+                                            <ActivityIndicator
+                                                style={styles.loadingIndicator}
+                                                size="small"
+                                                color="#fff"
+                                            />
+                                            <Text style={styles.buttonText}>Limpando a rota...</Text>
+                                        </>
+                                    ) : (
+                                        <Text style={styles.buttonText}>Limpar Rota</Text>
+                                    )}
+                                </View>
+                            </Botao>
+                        )}
                     </Accordion>
                 </View>
             </View>

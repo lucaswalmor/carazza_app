@@ -1,11 +1,9 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Ionicons } from '@expo/vector-icons';
-import EventosListScreen from '../src/screens/EventosListScreen'
-import PontoListScreen from '../src/screens/PontosListScreen'
-import EncontrosListScreen from '../src/screens/EncontrosListScreen';
+import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import MapScreen from '../src/screens/MapScreen';
 import PerfilScreen from '../src/screens/PerfilScreen';
-import DesafiosScreen from '../src/screens/DesafiosScreen';
+import GPSNavigatorScreen from '../src/screens/GPSNavigatorScreen';
+import EventosEncontros from '../src/screens/EventosEncontros';
 
 const Tab = createBottomTabNavigator();
 
@@ -15,21 +13,17 @@ export default function TabRoutes() {
             screenOptions={({ route }) => ({
                 tabBarIcon: ({ color, size }) => {
                     let iconName;
-                    if (route.name === 'Pontos') {
-                        iconName = 'home-outline';
-                    } else if (route.name === 'Eventos') {
-                        iconName = 'calendar-outline';
-                    } else if (route.name === 'Encontros') {
-                        iconName = 'location-outline';
-                    } else if (route.name === 'Desafios') {
-                        iconName = 'trophy-outline';
-                    } else if (route.name === 'Mapa') {
-                        iconName = 'map-outline';
+                    if (route.name === 'GPS') {
+                        iconName = 'route';
+                    } else if (route.name === 'Gravar') {
+                        iconName = 'record-vinyl';
                     } else if (route.name === 'Perfil') {
-                        iconName = 'person-outline';
+                        iconName = 'user-alt';
+                    } else if (route.name === 'Geral') {
+                        iconName = 'home';
                     }
 
-                    return <Ionicons name={iconName} size={size} color={color} />;
+                    return <FontAwesome5 name={iconName} size={20} color={color} />;
                 },
                 tabBarActiveTintColor: '#fff', // Cor dos ícones ativos
                 tabBarInactiveTintColor: '#000c19', // Cor dos ícones inativos
@@ -47,11 +41,9 @@ export default function TabRoutes() {
             })}
         >
             <Tab.Screen name="Perfil" component={PerfilScreen} options={{ headerShown: false }} />
-            <Tab.Screen name="Pontos" component={PontoListScreen} options={{ headerShown: false }} />
-            <Tab.Screen name="Eventos" component={EventosListScreen} options={{ headerShown: false }} />
-            <Tab.Screen name="Encontros" component={EncontrosListScreen} options={{ headerShown: false }} />
-            <Tab.Screen name="Desafios" component={DesafiosScreen} options={{ headerShown: false }} />
-            <Tab.Screen name="Mapa" component={MapScreen} options={{ headerShown: false }} />
+            <Tab.Screen name="GPS" component={GPSNavigatorScreen} options={{ headerShown: false }} />
+            <Tab.Screen name="Gravar" component={MapScreen} options={{ headerShown: false }} />
+            <Tab.Screen name="Geral" component={EventosEncontros} options={{ headerShown: false }} />
         </Tab.Navigator>
     );
 }

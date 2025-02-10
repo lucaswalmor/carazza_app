@@ -9,7 +9,7 @@ import Message from '../components/Message';
 import Botao from '../components/Botao';
 import BotaoOutLine from '../components/BotaoOutLine';
 
-export default function Componentes({ routeData }) {
+export default function TodosComponentes({ routeData }) {
     const [activeIndex, setActiveIndex] = useState(null); // Controla qual item está aberto
     const [toast, setToast] = useState({ visible: false, message: '', position: 'top', severity: '' });
 
