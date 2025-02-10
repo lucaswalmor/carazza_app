@@ -14,7 +14,6 @@ export default function PerfilPublicoScreen({ navigation, route }) {
     const { id } = route.params;
     const [isLoading, setIsLoading] = useState(false);
     const [user, setUser] = useState(null);
-    const [rotas, setRotas] = useState([]);
     const [toast, setToast] = useState({ visible: false, message: '', position: 'bottom', severity: '' });
 
     useFocusEffect(
@@ -54,13 +53,12 @@ export default function PerfilPublicoScreen({ navigation, route }) {
         try {
             const token = await AsyncStorage.getItem('token');
 
-            const response = await api.get(`/user/seguir/${53}`, {
+            const response = await api.get(`/user/seguir/${id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             });
 
-            console.log(response.data)
             showToast(response.data.message, 'top', 'success')
             await getPublicUser();
         } catch (error) {

@@ -1,19 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, TextInput, Button, Alert } from 'react-native';
-import MapView, { Polyline, Marker } from 'react-native-maps';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, TextInput, Button, ActivityIndicator } from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
+import MapViewDirections from 'react-native-maps-directions';
 import * as Location from 'expo-location';
 import axios from 'axios';
 import Accordion from '../components/Accordion';
+import styles from '../assets/css/styles';
+import Botao from '../components/Botao';
 import { colors } from '../assets/css/primeflex';
 
 const GOOGLE_MAPS_API_KEY = 'AIzaSyAu4BOiZIT9Y4eHn81U5Uf98ZTBt8jUjyU';
 
 export default function GPSNavigatorScreen() {
+    const [currentLocation, setCurrentLocation] = useState(null);
+    const [destinationCoords, setDestinationCoords] = useState(null);
     const [destinationCep, setDestinationCep] = useState('');
     const [destinationNumber, setDestinationNumber] = useState('');
-    const [currentLocation, setCurrentLocation] = useState(null);
-    const [routeCoordinates, setRouteCoordinates] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
     const [activeIndex, setActiveIndex] = useState(null);
+    const mapRef = useRef(null);
 
     useEffect(() => {
         (async () => {
@@ -23,27 +28,39 @@ export default function GPSNavigatorScreen() {
                 return;
             }
 
-            // Inicializa a posição do usuário
             let location = await Location.getCurrentPositionAsync({});
             setCurrentLocation({
                 latitude: location.coords.latitude,
                 longitude: location.coords.longitude,
             });
-
-            // Monitorar a posição do usuário em tempo real
-            Location.watchPositionAsync(
-                {
-                    accuracy: Location.Accuracy.High,
-                    distanceInterval: 10, // Atualizar a cada 10 metros
-                },
-                (location) => {
-                    const { latitude, longitude } = location.coords;
-                    setCurrentLocation({ latitude, longitude });
-                    checkDistance(latitude, longitude);  // Verifica a distância sempre que a posição mudar
-                }
-            );
         })();
     }, []);
+
+    useEffect(() => {
+        currentPosition();
+    }, [])
+
+    const currentPosition = () => {
+        Location.watchPositionAsync(
+            {
+                accuracy: Location.Accuracy.High,
+                distanceInterval: 100,
+            },
+            (location) => {
+                const { latitude, longitude } = location.coords;
+
+                if (mapRef.current) {
+                    mapRef.current.animateCamera({
+                        center: location.coords,
+                        pitch: 50,
+                        heading: location.coords.heading || 0,
+                    });
+                }
+
+                setCurrentLocation({ latitude: latitude, longitude: longitude })
+            }
+        );
+    }
 
     const pesquisacep = async (valor) => {
         const cep = valor.replace(/\D/g, '');
@@ -58,7 +75,7 @@ export default function GPSNavigatorScreen() {
     };
 
     const calculateRoute = async () => {
-        if (!currentLocation) return;
+        setIsLoading(true)
 
         const getDestinationCepAddress = await pesquisacep(destinationCep);
         const destinationAddress = `${getDestinationCepAddress.logradouro}, ${destinationNumber}, ${getDestinationCepAddress.bairro}, ${getDestinationCepAddress.localidade}, ${getDestinationCepAddress.estado}`;
@@ -77,9 +94,9 @@ export default function GPSNavigatorScreen() {
                 const directionsResponse = await axios.get(directionsEndpoint);
 
                 if (directionsResponse.data.status === 'OK') {
-                    const points = directionsResponse.data.routes[0].overview_polyline.points;
-                    const decodedPoints = decodePolyline(points);
-                    setRouteCoordinates(decodedPoints);
+
+                    const destinationCoords = destinationResponse.data.results[0].geometry.location;
+                    setDestinationCoords(destinationCoords)
                 } else {
                     console.error('Erro ao calcular a rota:', directionsResponse.data.error_message);
                 }
@@ -88,95 +105,44 @@ export default function GPSNavigatorScreen() {
             }
         } catch (error) {
             console.error('Erro ao calcular a rota:', error);
+        } finally {
+            setIsLoading(false)
         }
     };
 
-    const decodePolyline = (encoded) => {
-        const points = [];
-        let index = 0;
-        const len = encoded.length;
-        let lat = 0, lng = 0;
-
-        while (index < len) {
-            let b, shift = 0, result = 0;
-            do {
-                b = encoded.charCodeAt(index++) - 63;
-                result |= (b & 0x1f) << shift;
-                shift += 5;
-            } while (b >= 0x20);
-            const dlat = (result & 1) ? ~(result >> 1) : (result >> 1);
-            lat += dlat;
-
-            shift = 0;
-            result = 0;
-            do {
-                b = encoded.charCodeAt(index++) - 63;
-                result |= (b & 0x1f) << shift;
-                shift += 5;
-            } while (b >= 0x20);
-            const dlng = (result & 1) ? ~(result >> 1) : (result >> 1);
-            lng += dlng;
-
-            points.push({ latitude: lat / 1e5, longitude: lng / 1e5 });
-        }
-
-        return points;
-    };
-
-    const checkDistance = (latitude, longitude) => {
-        if (routeCoordinates.length === 0) return;
-
-        // Função para calcular a distância de um ponto a uma linha poligonal
-        const haversine = (lat1, lon1, lat2, lon2) => {
-            const toRad = (value) => (value * Math.PI) / 180;
-            const R = 6371000; // Raio da Terra em metros
-            const dLat = toRad(lat2 - lat1);
-            const dLon = toRad(lon2 - lon1);
-            const a =
-                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-                Math.sin(dLon / 2) * Math.sin(dLon / 2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            return R * c; // Distância em metros
-        };
-
-        let minDistance = Infinity;
-        for (let i = 0; i < routeCoordinates.length - 1; i++) {
-            const start = routeCoordinates[i];
-            const end = routeCoordinates[i + 1];
-            const dist = haversine(latitude, longitude, start.latitude, start.longitude);
-            if (dist < minDistance) {
-                minDistance = dist;
-            }
-        }
-
-        // Se a distância for maior que 50 metros, recalcule a rota
-        if (minDistance > 50) {
-            calculateRoute();
-        }
-    };
+    if (!currentLocation) return <Text>Carregando mapa...</Text>;
 
     return (
-        <View style={styles.container}>
+        <View style={{ flex: 1, position: 'relative' }}>
             <MapView
-                style={styles.map}
+                style={{ flex: 1 }}
                 region={{
-                    latitude: currentLocation?.latitude || -23.5505,
-                    longitude: currentLocation?.longitude || -46.6333,
+                    latitude: currentLocation.latitude,
+                    longitude: currentLocation.longitude,
                     latitudeDelta: 0.03,
                     longitudeDelta: 0.03,
                 }}
                 showsUserLocation={true}
                 followUserLocation={true}
+                ref={mapRef}
             >
-                {routeCoordinates.length > 0 && (
-                    <Polyline coordinates={routeCoordinates} strokeWidth={4} strokeColor={colors.blue[500]} />
+                {destinationCoords && (
+                    <MapViewDirections
+                        origin={currentLocation}
+                        destination={{
+                            latitude: destinationCoords.lat,
+                            longitude: destinationCoords.lng,
+                        }}
+                        apikey={GOOGLE_MAPS_API_KEY}
+                        strokeWidth={4}
+                        strokeColor={colors.blue[500]}
+                    />
                 )}
             </MapView>
 
             {/* Inputs para Destino */}
-            <View style={styles.inputsContainer}>
-                <View style={{flex: 1}}>
+            <View style={{ position: 'absolute', top: 0, width: '85%', padding: 10 }}>
+                <View style={{ flex: 1 }}>
                     <Accordion title="Rota" index={0} activeIndex={activeIndex} setActiveIndex={setActiveIndex}>
                         <TextInput
                             style={styles.input}
@@ -191,34 +157,26 @@ export default function GPSNavigatorScreen() {
                             onChangeText={setDestinationNumber}
                             keyboardType="numeric"
                         />
-                        <Button title="Traçar Rota" onPress={calculateRoute} />
+
+                        <Botao onPress={calculateRoute}>
+                            <View style={styles.buttonContent}>
+                                {isLoading ? (
+                                    <>
+                                        <ActivityIndicator
+                                            style={styles.loadingIndicator}
+                                            size="small"
+                                            color="#fff"
+                                        />
+                                        <Text style={styles.buttonText}>Trançando a rota...</Text>
+                                    </>
+                                ) : (
+                                    <Text style={{ color: colors.alpha[1000] }}>Traçar Rota</Text>
+                                )}
+                            </View>
+                        </Botao>
                     </Accordion>
                 </View>
             </View>
-
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        position: 'relative'
-    },
-    map: {
-        flex: 1,
-    },
-    inputsContainer: {
-        position: 'absolute',
-        top: 0,
-        width: '85%',
-        padding: 10
-    },
-    input: {
-        height: 40,
-        borderColor: 'gray',
-        borderWidth: 1,
-        marginBottom: 10,
-        paddingHorizontal: 10,
-    },
-});

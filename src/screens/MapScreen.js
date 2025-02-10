@@ -51,6 +51,7 @@ export default function MapScreen() {
     const [dados, setDados] = useState({});
     const [toast, setToast] = useState({ visible: false, message: '', position: 'bottom', severity: '' });
 
+    // Carrega o tema
     useEffect(() => {
         const loadTheme = async () => {
             try {
@@ -65,7 +66,7 @@ export default function MapScreen() {
 
         loadTheme();
     }, []);
-
+    
     useEffect(() => {
         requestLocationPermission();
     }, [])
