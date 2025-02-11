@@ -17,10 +17,10 @@ import {
 import styles from '../assets/css/styles';
 import api from '../services/api';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import Toast from '../components/Toast';
 
-export default function EncontrosListScreen({ navigation }) {
+export default function EncontrosListScreen({  }) {
     const [user, setUser] = useState({});
     const [cidade, setCidade] = useState('');
     const [encontros, setEncontros] = useState([]);
@@ -29,6 +29,7 @@ export default function EncontrosListScreen({ navigation }) {
     const [isLoading, setIsLoading] = useState(false);
     const [modalDenuncia, setModalDenuncia] = useState(false);
     const [toast, setToast] = useState({ visible: false, message: '', position: 'bottom', severity: '' });
+    const navigation = useNavigation();
     const [denuncia, setDenuncia] = useState({
         encontro_id: null,
         bol_spam_ou_propaganda: false,

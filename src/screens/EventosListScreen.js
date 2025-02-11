@@ -4,15 +4,16 @@ import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, RefreshContr
 import styles from '../assets/css/styles';
 import api from '../services/api';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
-export default function EventosListScreen({ navigation }) {
+export default function EventosListScreen({ }) {
     const [user, setUser] = useState({});
     const [cidade, setCidade] = useState('');
     const [eventos, setEventos] = useState([]);
     const [allEventos, setAllEventos] = useState([]);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const navigation = useNavigation();
 
     const CadastrarEventoScreen = () => {
         navigation.navigate('CadastrarEventoScreen');

@@ -6,7 +6,7 @@ import PontosListScreen from './PontosListScreen';
 import { borders, display, gap, paddings } from '../assets/css/primeflex';
 import { FontAwesome5 } from '@expo/vector-icons';
 
-export default function EventosEncontros() {
+export default function EventosEncontros({ navigation }) {
 
     return (
         <View style={{ flex: 1 }}>

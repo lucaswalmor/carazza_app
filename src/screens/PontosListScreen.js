@@ -5,15 +5,16 @@ import api from '../services/api';
 import styles from '../assets/css/styles';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { TextInput } from 'react-native-gesture-handler';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
-const PontosListScreen = ({ navigation }) => {
+const PontosListScreen = ({  }) => {
     const [user, setUser] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [pontos, setPontos] = useState([]);
     const [cidade, setCidade] = useState('');
     const [allPontos, setAllPontos] = useState([]);
+    const navigation = useNavigation();
 
     const CadastrarPontoScreen = () => {
         navigation.navigate('CadastrarPontoScreen');
