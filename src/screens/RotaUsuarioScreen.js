@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native"; // Importe o componente Image
+import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from "react-native"; // Importe o componente Image
 import MapView, { Marker, Polyline } from "react-native-maps";
 import api from "../services/api";
 import * as Sharing from "expo-sharing";
@@ -12,6 +12,7 @@ export default function RotaUsuarioScreen({ route }) {
     const [rota, setRota] = useState([]);
     const [distancia, setDistancia] = useState([]);
     const [velocidadeMedia, setVelocidadeMedia] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
     const mapViewRef = useRef(null); // Ref para o mapa
     const mapContainerRef = useRef(null); // Ref para o contêiner do mapa
 
@@ -50,6 +51,7 @@ export default function RotaUsuarioScreen({ route }) {
     const region = calculateRegion(rota);
 
     const handleShare = async () => {
+        setIsLoading(true)
         try {
             // Captura apenas o contêiner do mapa (incluindo o logo)
             const uri = await captureRef(mapContainerRef, {
@@ -61,10 +63,13 @@ export default function RotaUsuarioScreen({ route }) {
             // Verifica se a plataforma suporta o compartilhamento
             if (await Sharing.isAvailableAsync()) {
                 await Sharing.shareAsync(uri); // Compartilha a imagem
+                setIsLoading(false)
             } else {
                 alert("Compartilhamento não suportado neste dispositivo.");
+                setIsLoading(false)
             }
         } catch (error) {
+            setIsLoading(false)
             console.log("Erro ao capturar e compartilhar o mapa:", error);
         }
     };
@@ -73,9 +78,18 @@ export default function RotaUsuarioScreen({ route }) {
         <View style={styles.container}>
             {region ? (
                 <>
-                    <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
-                        <FontAwesome5 name="share-alt" size={24} color="#FFF" />
+                    <TouchableOpacity
+                        style={[styles.shareButton, isLoading && { opacity: 0.5 }]}
+                        onPress={handleShare}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? (
+                            <ActivityIndicator size="small" color="#FFF" />
+                        ) : (
+                            <FontAwesome5 name="share-alt" size={24} color="#FFF" />
+                        )}
                     </TouchableOpacity>
+
 
                     {/* Contêiner do mapa com ref */}
                     <View ref={mapContainerRef} collapsable={false} style={[styles.mapContainer]}>
