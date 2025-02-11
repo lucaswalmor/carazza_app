@@ -16,6 +16,7 @@ import DesafiosListScreen from '../src/screens/DesafiosListScreen';
 import DetalhesDesafioScreen from '../src/screens/DetalhesDesafioScreen';
 import RankingGeralScreen from '../src/screens/RankingGeralScreen';
 import CadastrarDesafioScreen from '../src/screens/CadastrarDesafioScreen';
+import GPSNavigatorByMarkerScreen from '../src/screens/GPSNavigatorByMarkerScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -52,6 +53,7 @@ export default function StackRoutes() {
             <Stack.Screen name="DetalhesDesafioScreen" component={DetalhesDesafioScreen} options={{ headerShown: true, headerTitle: 'Detalhes do Desafio' }} />
             <Stack.Screen name="MeusDesafiosScreen" component={MeusDesafiosScreen} options={{ headerShown: true, headerTitle: 'Meus Desafios' }} />
             <Stack.Screen name="RankingGeralScreen" component={RankingGeralScreen} options={{ headerShown: true, headerTitle: 'Maiores Pontuadores' }} />
+            <Stack.Screen name="GPSNavigatorByMarkerScreen" component={GPSNavigatorByMarkerScreen} options={{ headerShown: true, headerTitle: 'GPS' }} />
             <Stack.Screen name="Main" component={DrawerRoutes} options={{ headerShown: false }} />
         </Stack.Navigator>
     );

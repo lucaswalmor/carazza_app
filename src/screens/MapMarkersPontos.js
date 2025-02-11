@@ -4,12 +4,14 @@ import MapView, { Callout, Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import api from "../services/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { colors } from "../assets/css/primeflex";
+import { colors, display, gap } from "../assets/css/primeflex";
 import { useFocusEffect } from "@react-navigation/native";
+import { FontAwesome5 } from '@expo/vector-icons';
 
-export default function MapMarkersPontos() {
+export default function MapMarkersPontos({ navigation }) {
     const [markers, setMarkers] = useState([]);
     const [region, setRegion] = useState(null);
+    const [coordinates, setCoordinates] = useState({ latitude: 0, longitude: 0 });
 
     useFocusEffect(
         useCallback(() => {
@@ -51,6 +53,14 @@ export default function MapMarkersPontos() {
         }
     }
 
+    const addCoordinates = async (event) => {
+        setCoordinates({ latitude: event.coordinate.latitude, longitude: event.coordinate.longitude })
+    }
+
+    const redirectToGps = async () => {
+        navigation.navigate('GPSNavigatorByMarkerScreen', { destLatitude: coordinates.latitude, destLongitude: coordinates.longitude, hasRouteParam: true });
+    }
+
     return (
         <View style={styles.container}>
 
@@ -69,6 +79,20 @@ export default function MapMarkersPontos() {
                         </View>
                     </View>
 
+                    {coordinates.latitude != 0 && coordinates.longitude != 0 && (
+                        <TouchableOpacity
+                            style={styles.redirect}
+                            onPress={() => redirectToGps()}
+                        >
+                            <View style={[display.row, gap[5], display.alignItemsCenter]}>
+                                <Text style={styles.redirectTitle}>
+                                    Ir para GPS
+                                </Text>
+                                <FontAwesome5 name="arrow-right" size={20} style={[{ color: colors.alpha[1000], marginRight: 8 }]} />
+                            </View>
+                        </TouchableOpacity>
+                    )}
+
                     {/* 🗺️ Mapa */}
                     <MapView style={styles.map} initialRegion={region}>
                         {markers.map((marker) => (
@@ -78,16 +102,8 @@ export default function MapMarkersPontos() {
                                 image={marker.bol_parceiro === 1 ? require("../assets/icons/pin-green.png") : require("../assets/icons/pin-red.png")}
                                 title={marker?.nome}
                                 pinColor={marker.bol_parceiro === 1 ? colors.green[500] : colors.red[500]}
-                            >
-                                <Callout>
-                                    <View>
-                                        <Text>{marker.nome}</Text>
-                                        <TouchableOpacity onPress={() => console.log(`Clicou no marcador ${marker.id}`)}>
-                                            <Text style={{ color: "blue", marginTop: 5 }}>Ver detalhes</Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                </Callout>
-                            </Marker>
+                                onPress={e => addCoordinates(e.nativeEvent)}
+                            />
                         ))}
                     </MapView>
                 </>
@@ -129,6 +145,36 @@ const styles = StyleSheet.create({
         marginBottom: 5,
     },
     legendItem: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginTop: 5,
+    },
+    redirect: {
+        position: "absolute",
+        top: 10,
+        right: 10,
+        zIndex: 1,
+        backgroundColor: "#007BFF",
+        padding: 10,
+        borderRadius: 8,
+        elevation: 5, // Sombras no Android
+        shadowColor: "#000", // Sombras no iOS
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 3,
+        flexDirection: 'row',
+        gap: 5
+    },
+    redirectTitle: {
+        fontWeight: "bold",
+        fontSize: 16,
+        color: "#FFF",
+    },
+    redirectText: {
+        fontSize: 14,
+        color: "black",
+    },
+    redirectItem: {
         flexDirection: "row",
         alignItems: "center",
         marginTop: 5,

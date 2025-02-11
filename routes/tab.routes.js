@@ -1,5 +1,5 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { FontAwesome5, Ionicons } from '@expo/vector-icons';
+import { FontAwesome5 } from '@expo/vector-icons';
 import MapScreen from '../src/screens/MapScreen';
 import PerfilScreen from '../src/screens/PerfilScreen';
 import GPSNavigatorScreen from '../src/screens/GPSNavigatorScreen';

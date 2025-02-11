@@ -355,6 +355,12 @@ const styles = StyleSheet.create({
       borderRadius: 10,
       overflow: 'hidden'
     },
+    registerLink: {
+      fontSize: 14,
+      fontWeight: 'bold',
+      color: '#007BFF',
+      marginLeft: 5,
+    },
 })
 
 export default styles

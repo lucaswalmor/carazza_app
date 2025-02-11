@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, Button, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { View, Text, TextInput, Modal as RNModal, ActivityIndicator, Alert, TouchableOpacity } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
 import axios from 'axios';
@@ -7,11 +7,11 @@ import Accordion from '../components/Accordion';
 import styles from '../assets/css/styles';
 import Botao from '../components/Botao';
 import { colors } from '../assets/css/primeflex';
+import { useFocusEffect } from '@react-navigation/native';
 
-const GOOGLE_MAPS_API_KEY = 'AIzaSyAu4BOiZIT9Y4eHn81U5Uf98ZTBt8jUjyU';
 const LOCATIONIQ_API_KEY = 'pk.7179dc15856b3b310d544e4c66101b1b';
 
-export default function GPSNavigatorScreen() {
+export default function GPSNavigatorByMarkerScreen({ route }) {
     const [currentLocation, setCurrentLocation] = useState(null);
     const [destinationCoords, setDestinationCoords] = useState([]);
     const [destinationCep, setDestinationCep] = useState('');
@@ -21,6 +21,8 @@ export default function GPSNavigatorScreen() {
     const [activeIndex, setActiveIndex] = useState(null);
     const mapRef = useRef(null);
     const [hasRecalculated, setHasRecalculated] = useState(false);
+    const { destLatitude, destLongitude } = route.params || {};
+    const [modalVisible, setModalVisible] = useState(false);
 
     useEffect(() => {
         (async () => {
@@ -31,13 +33,24 @@ export default function GPSNavigatorScreen() {
             }
 
             let location = await Location.getCurrentPositionAsync({});
-
             setCurrentLocation({
                 latitude: location.coords.latitude,
                 longitude: location.coords.longitude,
             });
+
+            if (destLatitude && destLongitude) {
+                setModalVisible(true)
+            }
         })();
     }, []);
+
+    useFocusEffect(
+        useCallback(() => {
+            if (currentLocation) {
+                setModalVisible(true)
+            }
+        }, [])
+    );
 
     useEffect(() => {
         let locationSubscription = null; // Variável para armazenar a Subscription
@@ -120,10 +133,25 @@ export default function GPSNavigatorScreen() {
         setIsLoading(true);
 
         try {
-            const getDestinationCepAddress = await pesquisacep(destinationCep);
-            const destinationAddress = `${getDestinationCepAddress.logradouro}, ${destinationNumber}, ${getDestinationCepAddress.bairro}, ${getDestinationCepAddress.localidade}, ${getDestinationCepAddress.estado}`;
+            let destinationCoords = null;
 
-            const destinationCoords = await getCoordinatesFromAddress(destinationAddress);
+            if (destLatitude && destLongitude) {
+                // Se recebeu as props, usa diretamente
+                destinationCoords = { lat: destLatitude, lng: destLongitude };
+            } else {
+                // Se não recebeu, busca pelo CEP digitado
+                const getDestinationCepAddress = await pesquisacep(destinationCep);
+
+                if (!getDestinationCepAddress) {
+                    Alert.alert("Erro ao buscar endereço pelo CEP");
+                    setIsLoading(false);
+                    return;
+                }
+
+                const destinationAddress = `${getDestinationCepAddress.logradouro}, ${destinationNumber}, ${getDestinationCepAddress.bairro}, ${getDestinationCepAddress.localidade}, ${getDestinationCepAddress.estado}`;
+
+                destinationCoords = await getCoordinatesFromAddress(destinationAddress);
+            }
 
             if (!destinationCoords) {
                 Alert.alert('Erro ao obter coordenadas do destino');
@@ -131,12 +159,20 @@ export default function GPSNavigatorScreen() {
             }
 
             const routeData = await getRouteFromLocationIQ(currentLocation, destinationCoords);
+
             if (routeData) {
                 setHasRota(true);
+                setModalVisible(false)
                 setDestinationCoords(routeData);
             }
         } catch (error) {
-            console.error('Erro ao calcular a rota:', error.response.data);
+            if (error.response) {
+                console.error(`Erro ao calcular a rota: ${error.response.status} - ${error.response.data}`);
+            } else if (error.request) {
+                console.error('Erro ao calcular a rota: Nenhuma resposta recebida do servidor.');
+            } else {
+                console.error('Erro ao calcular a rota:', error.message);
+            }
         } finally {
             setIsLoading(false);
         }
@@ -245,12 +281,12 @@ export default function GPSNavigatorScreen() {
             >
                 {destinationCoords.length > 0 && (
                     <Marker
-                        coordinate={{
-                            latitude: destinationCoords[destinationCoords.length - 1].latitude,
-                            longitude: destinationCoords[destinationCoords.length - 1].longitude,
-                        }}
+                        coordinate={destinationCoords[destinationCoords.length - 1]}
+                        title="Destino"
+                        description="Última posição do trajeto"
                     />
                 )}
+
                 {/* Desenhando a rota manualmente */}
                 {destinationCoords.length > 0 && (
                     <Polyline
@@ -261,62 +297,28 @@ export default function GPSNavigatorScreen() {
                 )}
             </MapView>
 
-            {/* Inputs para Destino */}
-            <View style={{ position: 'absolute', top: 0, width: '85%', padding: 10 }}>
-                <View style={{ flex: 1 }}>
-                    <Accordion title="Rota" index={0} activeIndex={activeIndex} setActiveIndex={setActiveIndex}>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="CEP de Destino"
-                            value={destinationCep}
-                            onChangeText={setDestinationCep}
-                            keyboardType="numeric"
-                        />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Número de Destino"
-                            value={destinationNumber}
-                            onChangeText={setDestinationNumber}
-                            keyboardType="numeric"
-                        />
+            <RNModal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View style={styles.modalCenteredView}>
+                    <View style={styles.modalView}>
+                        <Text style={{ marginBottom: 20 }}>
+                            Identificamos uma nova rota, o que gostaria de fazer?
+                        </Text>
 
-                        <Botao onPress={calculateRoute}>
-                            <View style={styles.buttonContent}>
-                                {isLoading ? (
-                                    <>
-                                        <ActivityIndicator
-                                            style={styles.loadingIndicator}
-                                            size="small"
-                                            color="#fff"
-                                        />
-                                        <Text style={styles.buttonText}>Trançando a rota...</Text>
-                                    </>
-                                ) : (
-                                    <Text style={styles.buttonText}>Traçar Rota</Text>
-                                )}
-                            </View>
-                        </Botao>
-                        {hasRota && (
-                            <Botao onPress={limparRota} severity="error">
-                                <View style={styles.buttonContent}>
-                                    {isLoading ? (
-                                        <>
-                                            <ActivityIndicator
-                                                style={styles.loadingIndicator}
-                                                size="small"
-                                                color="#fff"
-                                            />
-                                            <Text style={styles.buttonText}>Limpando a rota...</Text>
-                                        </>
-                                    ) : (
-                                        <Text style={styles.buttonText}>Limpar Rota</Text>
-                                    )}
-                                </View>
-                            </Botao>
-                        )}
-                    </Accordion>
+                        <TouchableOpacity onPress={() => calculateRoute()} style={{ marginBottom: 20, flexDirection: 'row' }}>
+                            <Text style={{ fontSize: 14, color: colors.blue[500] }}>Traçar rota? </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity onPress={() => setModalVisible(false)} style={{ marginBottom: 20, flexDirection: 'row' }}>
+                            <Text style={{ fontSize: 14 }}>Fechar Janela </Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
-            </View>
+            </RNModal>
         </View>
     );
 }
