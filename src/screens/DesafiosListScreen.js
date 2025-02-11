@@ -84,7 +84,7 @@ export default function DesafioListScreen({ navigation, route }) {
       >
         {desafios.map((desafio) => (
           <TouchableOpacity
-            key={desafio.id}
+            key={desafio.id ?? `desafio-${index}`}
             onPress={() => navigateToDesafio(desafio.id)}
           >
             <Card
