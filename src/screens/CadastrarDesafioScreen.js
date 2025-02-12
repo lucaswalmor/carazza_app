@@ -23,6 +23,9 @@ export default function CadastrarDesafioScreen({ navigation }) {
 
     const tiposDesafios = [
         { label: 'Quilometragem', value: 1 },
+        { label: 'Chek-in em Eventos', value: 2 },
+        { label: 'Chek-in em Encontros', value: 3 },
+        { label: 'Chek-in em Pontos', value: 4 },
     ];
 
     const handleRegister = async () => {
