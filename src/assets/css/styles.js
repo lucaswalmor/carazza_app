@@ -361,6 +361,9 @@ const styles = StyleSheet.create({
       color: '#007BFF',
       marginLeft: 5,
     },
+    map: {
+        flex: 1
+    }
 })
 
 export default styles

@@ -15,6 +15,7 @@ export default function PerfilPublicoScreen({ navigation, route }) {
     const [isLoading, setIsLoading] = useState(false);
     const [user, setUser] = useState(null);
     const [toast, setToast] = useState({ visible: false, message: '', position: 'bottom', severity: '' });
+    const [conquistas, setConquistas] = useState(null);
 
     useFocusEffect(
         useCallback(() => {
@@ -40,6 +41,7 @@ export default function PerfilPublicoScreen({ navigation, route }) {
                 }
             });
 
+            setConquistas(response.data.data.conquistas)
             setUser(response.data.data)
         } catch (error) {
             console.log('Erro ao enviar o formulário:', error);
@@ -114,7 +116,7 @@ export default function PerfilPublicoScreen({ navigation, route }) {
                                     onError={() => console.log('Erro ao carregar a imagem.')}
                                 />
 
-                                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
+                                <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.blue[900] }}>
                                     {user?.nome}
                                 </Text>
                             </View>
@@ -122,12 +124,12 @@ export default function PerfilPublicoScreen({ navigation, route }) {
                             <View style={{ gap: 10, flexDirection: 'row', alignItems: 'center' }}>
                                 <View>
                                     <Text
-                                        style={{ color: '#000', fontWeight: 'bold' }}
+                                        style={{ color: colors.blue[900], fontWeight: 'bold' }}
                                     >
                                         Seguidores
                                     </Text>
                                     <Text
-                                        style={[{ color: '#000', textAlign: 'center' }, fontWeights['bold'], fontSize['sm']]}
+                                        style={[{ color: colors.blue[900], textAlign: 'center' }, fontWeights['bold'], fontSize['sm']]}
                                     >
                                         {user?.seguidores}
                                     </Text>
@@ -136,12 +138,12 @@ export default function PerfilPublicoScreen({ navigation, route }) {
                                 {user?.isMyPerfil && (
                                     <View>
                                         <Text
-                                            style={{ color: '#000', fontWeight: 'bold' }}
+                                            style={{ color: colors.blue[900], fontWeight: 'bold' }}
                                         >
                                             Seguindo
                                         </Text>
                                         <Text
-                                            style={[{ color: '#000', textAlign: 'center' }, fontWeights['bold'], fontSize['sm']]}
+                                            style={[{ color: colors.blue[900], textAlign: 'center' }, fontWeights['bold'], fontSize['sm']]}
                                         >
                                             {user?.seguindo}
                                         </Text>
@@ -154,7 +156,7 @@ export default function PerfilPublicoScreen({ navigation, route }) {
                                     <>
                                         {!user?.isFollowing ? (
                                             <TouchableOpacity
-                                                style={[{ backgroundColor: colors.blue[500] }, paddings[2], borders.borderRound, widths[4]]}
+                                                style={[{ backgroundColor: colors.blue[900] }, paddings[2], borders.borderRound, widths[4]]}
                                                 onPress={seguir}
                                             >
                                                 <Text
@@ -169,7 +171,7 @@ export default function PerfilPublicoScreen({ navigation, route }) {
                                                 onPress={pararSeguir}
                                             >
                                                 <Text
-                                                    style={[{ color: colors.blue[500], textAlign: 'center', borderWidth: 2, borderColor: colors.blue[500] }, borders.borderRound, paddings[1]]}
+                                                    style={[{ color: colors.blue[900], textAlign: 'center', borderWidth: 2, borderColor: colors.blue[900] }, borders.borderRound, paddings[1]]}
                                                 >
                                                     Parar de Seguir
                                                 </Text>
@@ -180,44 +182,85 @@ export default function PerfilPublicoScreen({ navigation, route }) {
                             </View>
                         </View>
 
-                        <Card
-                            borderBottomColor={colors.blueGray[500]}
-                            title={
-                                <View style={[display.row, display.justifyContentBetween]}>
-                                    <Text style={[fontWeights['bold'], fontSize['lg'], { color: colors.blueGray[500] }]}>
-                                        Quadro de Medalhas
-                                    </Text>
-                                    <FontAwesome5 name="medal" size={20} style={[{ color: colors.blueGray[500], marginRight: 8 }]} />
-                                </View>
-                            }
-                            content={
-                                <Text>
-                                    Aqui será o quadro de medalhas
-                                </Text>
-                            }
-                        />
-
                         {/* Card de rotas */}
                         <Card
-                            borderBottomColor={colors.teal[500]}
+                            borderBottomColor={colors.blue[900]}
                             content={
                                 <TouchableOpacity
                                     onPress={navigateRotasPublicas}
                                     style={[display.row, display.justifyContentBetween]}
                                 >
                                     <View style={[display.row, display.alignItemsCenter, gap[5]]}>
-                                        <FontAwesome5 name="route" size={20} style={[{ color: colors.teal[500], marginRight: 8 }]} />
+                                        <FontAwesome5 name="route" size={20} style={[{ color: colors.blue[900], marginRight: 8 }]} />
                                         <View>
-                                            <Text style={[fontWeights['bold'], fontSize['lg'], { color: colors.teal[500] }]}>
+                                            <Text style={[fontWeights['bold'], fontSize['lg'], { color: colors.blue[900] }]}>
                                                 Rotas
                                             </Text>
-                                            <Text style={[fontWeights['bold'], fontSize['sm'], { color: colors.teal[500] }]}>
+                                            <Text style={[fontWeights['bold'], fontSize['sm'], { color: colors.blue[900] }]}>
                                                 {user?.totalRotas}
                                             </Text>
                                         </View>
                                     </View>
-                                    <FontAwesome5 name="arrow-right" size={20} style={[{ color: colors.teal[500], marginRight: 8 }]} />
+                                    <FontAwesome5 name="arrow-right" size={20} style={[{ color: colors.blue[900], marginRight: 8 }]} />
                                 </TouchableOpacity>
+                            }
+                        />
+
+                        {/* Card de quadro de medalhas */}
+                        <Card
+                            borderBottomColor={colors.blue[900]}
+                            content={
+                                <>
+                                    <View style={[display.row, display.justifyContentBetween]}>
+                                        <View style={[display.row, display.alignItemsCenter, gap[5]]}>
+                                            <FontAwesome5 name="medal" size={20} style={[{ color: colors.blue[900], marginRight: 8 }]} />
+                                            <Text style={[fontWeights['bold'], fontSize['lg'], { color: colors.blue[900] }]}>
+                                                Quadro de Medalhas
+                                            </Text>
+                                        </View>
+                                        {/* <FontAwesome5 name="arrow-right" size={20} style={[{ color: colors.blue[900], marginRight: 8 }]} /> */}
+                                    </View>
+
+                                    {/* Listar Conquistas agrupadas por ano */}
+                                    {Object.entries(conquistas ?? {}).map(([ano, conquistasAno]) => (
+                                        <View key={ano} style={{ marginTop: 15 }}>
+                                            {/* Título do Ano */}
+                                            <Text style={[fontWeights['bold'], fontSize['md'], { color: colors.blue[900], marginBottom: 5 }]}>
+                                                {ano}
+                                            </Text>
+
+                                            {/* Ícones das Conquistas */}
+
+                                            <View style={[display.row, { flexWrap: 'wrap', gap: 10 }, display.justifyContentBetween]}>
+                                                {conquistasAno.map((item) => (
+                                                    item.conquista && item.conquista.icone ? ( // Verifica se o objeto e o ícone existem
+                                                        <View style={[display.alignItemsCenter]} key={item.id}>
+                                                            <Image
+                                                                key={item.id}
+                                                                source={{ uri: item.conquista.icone }}
+                                                                style={{ width: 30, height: 30 }}
+                                                            />
+
+                                                            <Text
+                                                                style={[
+                                                                    fontSize['3xs'],
+                                                                    {
+                                                                        color: colors.blue[900],
+                                                                        textAlign: 'center',
+                                                                        flexWrap: 'wrap',
+                                                                        maxWidth: 50,
+                                                                    }
+                                                                ]}
+                                                            >
+                                                                {item.conquista.nome}
+                                                            </Text>
+                                                        </View>
+                                                    ) : null
+                                                ))}
+                                            </View>
+                                        </View>
+                                    ))}
+                                </>
                             }
                         />
                     </ScrollView>

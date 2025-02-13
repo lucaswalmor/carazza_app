@@ -65,6 +65,10 @@ export default function PontoScreen({ route }) {
         }
     };
 
+    const redirectToGps = async () => {
+        navigation.navigate('GPSNavigatorByMarkerScreen', { destLatitude: ponto.latitude, destLongitude: ponto.longitude });
+    }
+
     const openMap = async () => {
         const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${ponto?.latitude},${ponto?.longitude}`;
         Linking.openURL(googleMapsUrl);
@@ -252,7 +256,23 @@ export default function PontoScreen({ route }) {
                             <TouchableOpacity
                                 style={[
                                     styles.button,
-                                    { flexDirection: 'row', marginBottom: 20 },
+                                    { flexDirection: 'row', },
+                                ]}
+                                onPress={redirectToGps}>
+                                <Ionicons
+                                    name="location-outline"
+                                    size={20}
+                                    color="#fff"
+                                    style={{ marginRight: 8 }}
+                                />
+                                <Text style={styles.buttonText}>Abrir GPS MotoStrada</Text>
+                            </TouchableOpacity>
+
+                            
+                            {/* <TouchableOpacity
+                                style={[
+                                    styles.button,
+                                    { flexDirection: 'row', marginBottom: 20,  backgroundColor: colors.gray[500] },
                                 ]}
                                 onPress={openMap}>
                                 <Ionicons
@@ -262,7 +282,7 @@ export default function PontoScreen({ route }) {
                                     style={{ marginRight: 8 }}
                                 />
                                 <Text style={styles.buttonText}>Abrir no Google Maps</Text>
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
                         </View>
 
                         {/* Card 6: Galeria de Imagens */}

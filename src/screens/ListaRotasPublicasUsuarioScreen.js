@@ -1,12 +1,13 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useState } from "react";
-import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import api from "../services/api";
 import Card from "../components/Card";
 import { borders, colors, display, fontSize, fontWeights, gap, margins, shadows } from "../assets/css/primeflex";
 import { FontAwesome5 } from '@expo/vector-icons';
 import MapView, { Marker, Polyline } from 'react-native-maps';
+import styles from "../assets/css/styles";
 
 export default function ListaRotasPublicasUsuarioScreen({ navigation, route }) {
     const { id } = route.params
@@ -60,7 +61,7 @@ export default function ListaRotasPublicasUsuarioScreen({ navigation, route }) {
     };
 
     return (
-        <View style={{ flex: 1  }}>
+        <View style={{ flex: 1 }}>
             {isLoading ? (
                 <>
                     <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
@@ -80,7 +81,13 @@ export default function ListaRotasPublicasUsuarioScreen({ navigation, route }) {
                                                 const region = calculateRegion(rotaItem.rota);
                                                 return (
                                                     <View key={index} style={[{ flex: 1, marginTop: 20 }, shadows['shadow2'], borders.borderRound]}>
-                                                        <View style={[display.row, gap[10], margins[5]]}>
+                                                        <View style={[display.row, gap[10], margins[5], display.alignItemsCenter] }>
+                                                            <View>
+                                                                <Image
+                                                                    source={require('../assets/img/logo.png')} // Caminho para sua logo
+                                                                    style={{ width: 40, height: 40}}
+                                                                />
+                                                            </View>
                                                             <View>
                                                                 <Text style={[fontSize['2xs']]}>
                                                                     Distância
@@ -90,7 +97,7 @@ export default function ListaRotasPublicasUsuarioScreen({ navigation, route }) {
                                                                 </Text>
                                                             </View>
 
-                                                            <View>
+                                                            {/* <View>
                                                                 <Text style={[fontSize['2xs']]}>
                                                                     Tempo
                                                                 </Text>
@@ -107,7 +114,7 @@ export default function ListaRotasPublicasUsuarioScreen({ navigation, route }) {
                                                                 <Text style={[fontSize['base'], fontWeights['bold']]}>
                                                                     {rotaItem.velocidade_media} km/h
                                                                 </Text>
-                                                            </View>
+                                                            </View> */}
                                                         </View>
 
                                                         <TouchableOpacity

@@ -40,13 +40,13 @@ export default function GPSNavigatorScreen() {
     }, []);
 
     useEffect(() => {
-        let locationSubscription = null; // Variável para armazenar a Subscription
+        let locationSubscription = null;
 
         const startWatchingPosition = async () => {
             locationSubscription = await Location.watchPositionAsync(
                 {
                     accuracy: Location.Accuracy.High,
-                    distanceInterval: 10, // Reduzi para testar melhor
+                    distanceInterval: 10,
                 },
                 (location) => {
                     const { latitude, longitude } = location.coords;
@@ -56,7 +56,7 @@ export default function GPSNavigatorScreen() {
                         mapRef.current.animateCamera({
                             center: location.coords,
                             pitch: 50,
-                            heading: location.coords.heading || 0,
+                            heading: location.coords.heading,
                         });
                     }
 
@@ -71,8 +71,7 @@ export default function GPSNavigatorScreen() {
                             setHasRecalculated(true);
                             calculateRoute();
 
-                            // Reseta a flag depois de um tempo para permitir um novo recálculo, se necessário
-                            setTimeout(() => setHasRecalculated(false), 5000); // Aguarda 5 segundos antes de permitir um novo recálculo
+                            setTimeout(() => setHasRecalculated(false), 5000);
                         }
                     }
                 }
@@ -236,8 +235,8 @@ export default function GPSNavigatorScreen() {
                 region={{
                     latitude: currentLocation.latitude,
                     longitude: currentLocation.longitude,
-                    latitudeDelta: 0.01,
-                    longitudeDelta: 0.01,
+                    latitudeDelta: 0.002,
+                    longitudeDelta: 0.002,
                 }}
                 showsUserLocation={true}
                 followUserLocation={true}

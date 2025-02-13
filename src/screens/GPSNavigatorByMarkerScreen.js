@@ -68,7 +68,7 @@ export default function GPSNavigatorByMarkerScreen({ route }) {
                     if (mapRef.current) {
                         mapRef.current.animateCamera({
                             center: location.coords,
-                            pitch: 50,
+                            pitch: 60,
                             heading: location.coords.heading || 0,
                         });
                     }

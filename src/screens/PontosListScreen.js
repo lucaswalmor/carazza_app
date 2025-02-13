@@ -7,7 +7,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { TextInput } from 'react-native-gesture-handler';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
-const PontosListScreen = ({  }) => {
+const PontosListScreen = ({ }) => {
     const [user, setUser] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
@@ -61,21 +61,33 @@ const PontosListScreen = ({  }) => {
     const filterPontosByCidade = (text) => {
         setCidade(text);
 
-        const textoSemAcento = removeAcentos(text); // Remove acentos da entrada do usuário
+        // Remove acentos da entrada do usuário
+        const textoSemAcento = removeAcentos(text);
 
         if (textoSemAcento === '') {
-            setPontos(allPontos);
+            setPontos(allPontos); // Se a busca estiver vazia, exibe todos os pontos
         } else {
             const filteredPontos = allPontos.map((estado) => {
                 // Filtra os pontos de cada estado
-                const filteredByCidade = estado.pontos.filter((ponto) => {
-                    const cidadeSemAcento = removeAcentos(ponto.cidade); // Remove acentos dos nomes das cidades
+                const filteredByCidadeOuId = estado.pontos.filter((ponto) => {
+                    const cidadeSemAcento = removeAcentos(ponto.cidade); // Remove acentos das cidades
                     const nomePontoSemAcento = removeAcentos(ponto.nome); // Remove acentos dos nomes dos pontos
-                    return cidadeSemAcento.toLowerCase().includes(textoSemAcento.toLowerCase()) || nomePontoSemAcento.toLowerCase().includes(textoSemAcento.toLowerCase());
+
+                    // Verifica se o texto de busca é um número (ID) ou uma cidade
+                    const isNumber = !isNaN(textoSemAcento);
+
+                    // Se for número, busca pelo ID, senão busca pela cidade ou nome do ponto
+                    if (isNumber) {
+                        return String(ponto.id).padStart(4, '0').includes(textoSemAcento); // Filtra pelo ID
+                    } else {
+                        // Filtra pela cidade ou nome do ponto
+                        return cidadeSemAcento.toLowerCase().includes(textoSemAcento.toLowerCase()) ||
+                            nomePontoSemAcento.toLowerCase().includes(textoSemAcento.toLowerCase());
+                    }
                 });
 
                 // Retorna o estado com os pontos filtrados
-                return { ...estado, pontos: filteredByCidade };
+                return { ...estado, pontos: filteredByCidadeOuId };
             }).filter((estado) => estado.pontos.length > 0); // Filtra estados sem pontos correspondentes
 
             setPontos(filteredPontos); // Atualiza a lista de pontos com os filtrados
@@ -124,8 +136,10 @@ const PontosListScreen = ({  }) => {
                 <TouchableOpacity
                     onPress={() => navigation.navigate('PontoScreen', { id: item.id })}
                 >
-                    <Text style={stylesPontoListScreen.textCardTitle}>{item.nome}</Text>
-                    <Text style={stylesPontoListScreen.textCard}>{item.cidade}, {item.estado}</Text>
+                    <Text style={stylesPontoListScreen.textCardTitle}>
+                        Ponto: {item.id}
+                    </Text>
+                    <Text style={stylesPontoListScreen.textCard}>{item.nome}</Text>
                     <Text style={stylesPontoListScreen.textInfoCard}>{item.descricao}</Text>
 
                     <View style={stylesPontoListScreen.actionsContainer}>
@@ -139,7 +153,6 @@ const PontosListScreen = ({  }) => {
                                 color="#007BFF"
                                 style={{ marginRight: 10 }}
                             />
-
                             <Text>{item.like_count}</Text>
                         </TouchableOpacity>
                     </View>
@@ -168,7 +181,7 @@ const PontosListScreen = ({  }) => {
                     </Text>
                     <TextInput
                         style={styles.inputComum}
-                        placeholder="Buscar por cidade..."
+                        placeholder="Buscar por cidade ou número"
                         value={cidade}
                         onChangeText={filterPontosByCidade}
                     />

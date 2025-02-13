@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from 'react';
-import { View, TouchableOpacity, Text, ActivityIndicator, Image, ScrollView } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, TouchableOpacity, Text, ActivityIndicator, Image, ScrollView, FlatList, Modal as RNModal } from 'react-native';
 import api from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../assets/css/styles';
@@ -11,6 +11,9 @@ import { useFocusEffect } from '@react-navigation/native';
 export default function PerfilScreen({ navigation }) {
     const [isLoading, setIsLoading] = useState(false);
     const [user, setUser] = useState(null);
+    const [conquistas, setConquistas] = useState(null);
+    const [seguindo, setSeguindo] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useFocusEffect(
         useCallback(() => {
@@ -30,12 +33,21 @@ export default function PerfilScreen({ navigation }) {
                 }
             });
 
+            setConquistas(response.data.data.conquistas)
             setUser(response.data.data)
         } catch (error) {
             console.log('Erro ao enviar o formulário:', error);
         } finally {
             setIsLoading(false)
         }
+    }
+
+    const navigateToListaDeSeguindo = () => {
+        navigation.navigate('ListaDeSeguindoScreen')
+    }
+
+    const navigateToListaDeSeguidores = () => {
+        navigation.navigate('ListaDeSeguidoresScreen')
     }
 
     const navigateMeusDesafios = () => {
@@ -48,6 +60,10 @@ export default function PerfilScreen({ navigation }) {
 
     const navigateRotasPublicas = () => {
         navigation.navigate('ListaRotasPublicasUsuarioScreen', { id: user.id })
+    }
+
+    const navigateToBuscarPerfil = () => {
+        navigation.navigate('BuscarPerfilScreen')
     }
 
     return (
@@ -71,37 +87,59 @@ export default function PerfilScreen({ navigation }) {
                                 />
 
                                 <View style={[]}>
-                                    <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
+                                    <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.blue[900] }}>
                                         {user?.nome}
                                     </Text>
                                 </View>
                             </View>
 
                             <View style={{ gap: 10, flexDirection: 'row', alignItems: 'center' }}>
-                                <View>
-                                    <Text
-                                        style={{ color: '#000', fontWeight: 'bold' }}
-                                    >
-                                        Seguidores
-                                    </Text>
-                                    <Text
-                                        style={[{ color: '#000', textAlign: 'center' }, fontWeights['bold'], fontSize['sm']]}
-                                    >
-                                        {user?.seguidores}
-                                    </Text>
-                                </View>
-                                <View>
-                                    <Text
-                                        style={{ color: '#000', fontWeight: 'bold' }}
-                                    >
-                                        Seguindo
-                                    </Text>
-                                    <Text
-                                        style={[{ color: '#000', textAlign: 'center' }, fontWeights['bold'], fontSize['sm']]}
-                                    >
-                                        {user?.seguindo}
-                                    </Text>
-                                </View>
+                                <TouchableOpacity
+                                    onPress={() => navigateToListaDeSeguidores()}
+                                >
+                                    <View>
+                                        <Text
+                                            style={{ color: colors.blue[900], fontWeight: 'bold' }}
+                                        >
+                                            Seguidores
+                                        </Text>
+                                        <Text
+                                            style={[{ color: colors.blue[900], textAlign: 'center' }, fontWeights['bold'], fontSize['sm']]}
+                                        >
+                                            {user?.seguidores}
+                                        </Text>
+                                    </View>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity
+                                    onPress={() => navigateToListaDeSeguindo()}
+                                >
+                                    <View>
+                                        <Text
+                                            style={{ color: colors.blue[900], fontWeight: 'bold' }}
+                                        >
+                                            Seguindo
+                                        </Text>
+                                        <Text
+                                            style={[{ color: colors.blue[900], textAlign: 'center' }, fontWeights['bold'], fontSize['sm']]}
+                                        >
+                                            {user?.seguindo}
+                                        </Text>
+                                    </View>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity
+                                    onPress={() => navigateToBuscarPerfil()}
+                                >
+                                    <View style={{alignItems: 'center'}}>
+                                        <Text
+                                            style={{ color: colors.blue[900], fontWeight: 'bold' }}
+                                        >
+                                            Buscar
+                                        </Text>
+                                        <FontAwesome5 name="search" size={16} style={[{ color: colors.blue[900], marginTop: 5 }]} />
+                                    </View>
+                                </TouchableOpacity>
                             </View>
                         </View>
 
@@ -110,9 +148,9 @@ export default function PerfilScreen({ navigation }) {
                             onPress={() => navigateToRankingGeral()}
                         >
                             <Card
-                                borderBottomColor={colors.pink[500]}
+                                borderBottomColor={colors.blue[500]}
                                 title={
-                                    <Text style={[{ padding: 4, color: colors.pink[500] }, fontWeights['bold'], fontSize['lg'], borders.borderRound3xl]}>
+                                    <Text style={[{ padding: 4, color: colors.blue[900] }, fontWeights['bold'], fontSize['lg'], borders.borderRound3xl]}>
                                         Ranking Geral
                                     </Text>
                                 }
@@ -133,7 +171,7 @@ export default function PerfilScreen({ navigation }) {
                                                 style={[
                                                     {
                                                         padding: 4,
-                                                        color: colors.pink[500],
+                                                        color: colors.blue[900],
                                                         letterSpacing: 1,
                                                     },
                                                     fontSize['2xl'],
@@ -147,7 +185,7 @@ export default function PerfilScreen({ navigation }) {
                                             <Text style={[
                                                 {
                                                     padding: 4,
-                                                    color: colors.pink[500],
+                                                    color: colors.blue[900],
                                                     letterSpacing: 1,
                                                 },
                                                 fontSize['lg'],
@@ -163,7 +201,7 @@ export default function PerfilScreen({ navigation }) {
 
                         {/* Card de quadro de meus desafios */}
                         <Card
-                            borderBottomColor={colors.indigo[400]}
+                            borderBottomColor={colors.blue[500]}
                             content={
                                 <View
                                     style={[display.row, display.justifyContentBetween]}
@@ -172,57 +210,93 @@ export default function PerfilScreen({ navigation }) {
                                         style={[display.flex, display.row, display.justifyContentBetween]}
                                         onPress={navigateMeusDesafios}
                                     >
-                                        <Text style={[{ color: colors.indigo[500], fontSize: 18, fontWeight: 'bold' }]}>
+                                        <Text style={[{ color: colors.blue[900], fontSize: 18, fontWeight: 'bold' }]}>
                                             Meus Desafios
                                         </Text>
-                                        <FontAwesome5 name="arrow-right" size={20} style={[{ color: colors.indigo[500], marginRight: 8 }]} />
+                                        <FontAwesome5 name="arrow-right" size={20} style={[{ color: colors.blue[900], marginRight: 8 }]} />
                                     </TouchableOpacity>
-                                </View>
-                            }
-                        />
-
-                        {/* Card de quadro de medalhas */}
-                        <Card
-                            borderBottomColor={colors.blueGray[500]}
-                            content={
-                                <View style={[display.row, display.justifyContentBetween]}>
-                                    <View style={[display.row, display.alignItemsCenter, gap[5]]}>
-                                        <FontAwesome5 name="medal" size={20} style={[{ color: colors.blueGray[500], marginRight: 8 }]} />
-                                        <View>
-                                            <Text style={[fontWeights['bold'], fontSize['lg'], { color: colors.blueGray[500] }]}>
-                                                Quadro de Medalhas
-                                            </Text>
-                                            {/* <Text style={[fontWeights['bold'], fontSize['sm'], { color: colors.blueGray[500] }]}>
-                                                {user.totalRotas}
-                                            </Text> */}
-                                        </View>
-                                    </View>
-                                    <FontAwesome5 name="arrow-right" size={20} style={[{ color: colors.blueGray[500], marginRight: 8 }]} />
                                 </View>
                             }
                         />
 
                         {/* Card de rotas */}
                         <Card
-                            borderBottomColor={colors.teal[500]}
+                            borderBottomColor={colors.blue[500]}
                             content={
                                 <TouchableOpacity
                                     onPress={navigateRotasPublicas}
                                     style={[display.row, display.justifyContentBetween]}
                                 >
                                     <View style={[display.row, display.alignItemsCenter, gap[5]]}>
-                                        <FontAwesome5 name="route" size={20} style={[{ color: colors.teal[500], marginRight: 8 }]} />
+                                        <FontAwesome5 name="route" size={20} style={[{ color: colors.blue[900], marginRight: 8 }]} />
                                         <View>
-                                            <Text style={[fontWeights['bold'], fontSize['lg'], { color: colors.teal[500] }]}>
+                                            <Text style={[fontWeights['bold'], fontSize['lg'], { color: colors.blue[900] }]}>
                                                 Rotas
                                             </Text>
-                                            <Text style={[fontWeights['bold'], fontSize['sm'], { color: colors.teal[500] }]}>
+                                            <Text style={[fontWeights['bold'], fontSize['sm'], { color: colors.blue[900] }]}>
                                                 {user?.totalRotas}
                                             </Text>
                                         </View>
                                     </View>
-                                    <FontAwesome5 name="arrow-right" size={20} style={[{ color: colors.teal[500], marginRight: 8 }]} />
+                                    <FontAwesome5 name="arrow-right" size={20} style={[{ color: colors.blue[900], marginRight: 8 }]} />
                                 </TouchableOpacity>
+                            }
+                        />
+
+                        {/* Card de quadro de medalhas */}
+                        <Card
+                            borderBottomColor={colors.blue[500]}
+                            content={
+                                <>
+                                    <View style={[display.row, display.justifyContentBetween]}>
+                                        <View style={[display.row, display.alignItemsCenter, gap[5]]}>
+                                            <FontAwesome5 name="medal" size={20} style={[{ color: colors.blue[900], marginRight: 8 }]} />
+                                            <Text style={[fontWeights['bold'], fontSize['lg'], { color: colors.blue[900] }]}>
+                                                Quadro de Medalhas
+                                            </Text>
+                                        </View>
+                                        {/* <FontAwesome5 name="arrow-right" size={20} style={[{ color: colors.blue[900], marginRight: 8 }]} /> */}
+                                    </View>
+
+                                    {/* Listar Conquistas agrupadas por ano */}
+                                    {Object.entries(conquistas ?? {}).map(([ano, conquistasAno]) => (
+                                        <View key={ano} style={{ marginTop: 15 }}>
+                                            {/* Título do Ano */}
+                                            <Text style={[fontWeights['bold'], fontSize['md'], { color: colors.blue[900], marginBottom: 5 }]}>
+                                                {ano}
+                                            </Text>
+
+                                            {/* Ícones das Conquistas */}
+                                            <View style={[display.row, { flexWrap: 'wrap', gap: 10 }, display.justifyContentBetween]}>
+                                                {conquistasAno.map((item) => (
+                                                    item.conquista && item.conquista.icone ? ( // Verifica se o objeto e o ícone existem
+                                                        <View style={[display.alignItemsCenter]} key={item.id}>
+                                                            <Image
+                                                                key={item.id}
+                                                                source={{ uri: item.conquista.icone }}
+                                                                style={{ width: 30, height: 30 }}
+                                                            />
+
+                                                            <Text
+                                                                style={[
+                                                                    fontSize['3xs'],
+                                                                    {
+                                                                        color: colors.blue[900],
+                                                                        textAlign: 'center',
+                                                                        flexWrap: 'wrap',
+                                                                        maxWidth: 50,
+                                                                    }
+                                                                ]}
+                                                            >
+                                                                {item.conquista.nome}
+                                                            </Text>
+                                                        </View>
+                                                    ) : null
+                                                ))}
+                                            </View>
+                                        </View>
+                                    ))}
+                                </>
                             }
                         />
                     </ScrollView>

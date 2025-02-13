@@ -11,6 +11,7 @@ import AdminScreen from '../src/screens/AdminScreen';
 import MapMarkersPontos from '../src/screens/MapMarkersPontos';
 import DesafiosScreen from '../src/screens/DesafiosScreen';
 import TodosComponentes from '../src/components/TodosComponentes';
+import CartaoScreen from '../src/screens/CartaoScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -118,6 +119,16 @@ export default function DrawerRoutes() {
                     }}
                 />
             )}
+            <Drawer.Screen
+                name="Cartão"
+                component={CartaoScreen}
+                options={{
+                    drawerIcon: ({ color, size }) => (
+                        <FontAwesome6 name="id-card" color={color} size={size} />
+                    ),
+                    drawerLabel: 'Cartão'
+                }}
+            />
             <Drawer.Screen
                 name="configuracoes"
                 component={ConfiguracoesScreen}

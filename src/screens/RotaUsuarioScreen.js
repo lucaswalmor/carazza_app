@@ -6,12 +6,14 @@ import * as Sharing from "expo-sharing";
 import { captureRef } from "react-native-view-shot";
 import { colors, display, fontSize, fontWeights, gap, margins } from "../assets/css/primeflex";
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function RotaUsuarioScreen({ route }) {
     const { id } = route.params;
     const [rota, setRota] = useState([]);
     const [distancia, setDistancia] = useState([]);
     const [velocidadeMedia, setVelocidadeMedia] = useState([]);
+    const [usuarioRota, setUsuarioRota] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const mapViewRef = useRef(null); // Ref para o mapa
     const mapContainerRef = useRef(null); // Ref para o contêiner do mapa
@@ -21,9 +23,18 @@ export default function RotaUsuarioScreen({ route }) {
     }, []);
 
     const getRoute = async () => {
+        const token = await AsyncStorage.getItem('token');
+        
         try {
-            const response = await api.get(`rota/${id}`);
+            const response = await api.get(`rota/${id}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
             setRota(response.data.rota);
+            setUsuarioRota(response.data.usuario)
             setDistancia(response.data.distancia_total_km);
             setVelocidadeMedia(response.data.velocidade_media_ms);
         } catch (error) {
@@ -151,12 +162,21 @@ export default function RotaUsuarioScreen({ route }) {
 
                             <View>
                                 <Text style={[fontSize['2xs']]}>
+                                    Rota feita por
+                                </Text>
+                                <Text style={[fontSize['lg'], fontWeights['bold']]}>
+                                    {usuarioRota}
+                                </Text>
+                            </View>
+
+                            {/* <View>
+                                <Text style={[fontSize['2xs']]}>
                                     Velocidade Média
                                 </Text>
                                 <Text style={[fontSize['lg'], fontWeights['bold']]}>
                                     {velocidadeMedia} km/h
                                 </Text>
-                            </View>
+                            </View> */}
                         </View>
                     </View>
                 </>
@@ -177,7 +197,7 @@ const styles = StyleSheet.create({
     },
     map: {
         width: "100%",
-        height: "83%",
+        height: "90%",
     },
     logo: {
         zIndex: 999,
