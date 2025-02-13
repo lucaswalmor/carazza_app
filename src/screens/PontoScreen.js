@@ -267,7 +267,6 @@ export default function PontoScreen({ route }) {
                                 />
                                 <Text style={styles.buttonText}>Abrir GPS MotoStrada</Text>
                             </TouchableOpacity>
-
                             
                             {/* <TouchableOpacity
                                 style={[
