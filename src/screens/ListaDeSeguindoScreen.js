@@ -52,7 +52,7 @@ export default function ListaDeSeguindoScreen({ navigation }) {
                     content={
                         <View>
                             {seguidores.map((seguidor, index) => (
-                                <TouchableOpacity onPress={() => navigateToPerfil(seguidor)} key={index} style={[display.row, display.alignItemsCenter, { marginBottom: 15 }]}>
+                                <TouchableOpacity onPress={() => navigateToPerfil(seguidor)} key={index} style={[display.row, display.alignItemsCenter, { padding: 10, borderBottomWidth: 1, borderBottomColor: colors.blueGray[200] }]}>
                                     <Image
                                         source={{ uri: seguidor.img_perfil }}
                                         style={{ width: 35, height: 35, borderRadius: 25, marginRight: 10 }}

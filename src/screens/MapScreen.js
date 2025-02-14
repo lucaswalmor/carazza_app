@@ -83,7 +83,7 @@ export default function MapScreen() {
                 mapRef.current.animateCamera({
                     center: response.coords,
                     pitch: 50,
-                    heading: response.coords.heading || 0,
+                    heading: response.coords?.heading || 0,
                 });
             }
 

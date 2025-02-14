@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, ScrollView, ActivityIndicator } from "react-native";
+import { View, Text, Image, ScrollView, ActivityIndicator, TouchableOpacity } from "react-native";
 import Card from "../components/Card";
 import api from "../services/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { colors, display } from "../assets/css/primeflex";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function RankingGeralScreen() {
+export default function RankingGeralScreen({ navigation }) {
     const [ranking, setRanking] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -29,6 +29,10 @@ export default function RankingGeralScreen() {
 
         fetchRanking();
     }, []);
+
+    const navigateToPerfil = async (item) => {
+        navigation.navigate('PerfilPublicoScreen', { id: item.user_id });
+    }
 
     // Preencher a lista com dados vazios para completar 50 participantes
     const rankingList = [...ranking, ...Array(50 - ranking.length).fill({ nome: '---', pontos_totais: 0 })];
@@ -58,32 +62,37 @@ export default function RankingGeralScreen() {
                         content={
                             <View>
                                 {rankingList.map((item, index) => (
-                                    <View key={index} style={[display.row, display.alignItemsCenter, { marginBottom: 10 }]}>
-                                        {/* Medalhas para os 3 primeiros */}
-                                        {index < 3 ? (
-                                            <Image
-                                                source={
-                                                    index === 0
-                                                        ? require('../assets/icons/gold-medal8.png')
-                                                        : index === 1
-                                                            ? require('../assets/icons/silver-medal8.png')
-                                                            : require('../assets/icons/bronze-medal8.png')
-                                                }
-                                                style={{ width: 40, height: 40, marginRight: 10 }}
-                                            />
-                                        ) : (
-                                            <Text style={{ fontWeight: "bold", width: 40, textAlign: "center" }}>
-                                                {index + 1}º
+                                    <View key={index} style={{ flex: 1, padding: 10 }}>
+                                        <TouchableOpacity
+                                            style={[display.row, display.alignItemsCenter, { padding: 10, borderBottomWidth: 1, borderBottomColor: colors.blueGray[200] }]}
+                                            onPress={() => navigateToPerfil(item)}
+                                        >
+                                            {/* Medalhas para os 3 primeiros */}
+                                            {index < 3 ? (
+                                                <Image
+                                                    source={
+                                                        index === 0
+                                                            ? require('../assets/icons/gold-medal8.png')
+                                                            : index === 1
+                                                                ? require('../assets/icons/silver-medal8.png')
+                                                                : require('../assets/icons/bronze-medal8.png')
+                                                    }
+                                                    style={{ width: 40, height: 40, marginRight: 10 }}
+                                                />
+                                            ) : (
+                                                <Text style={{ fontWeight: "bold", width: 40, textAlign: "center" }}>
+                                                    {index + 1}º
+                                                </Text>
+                                            )}
+
+                                            {/* Nome do jogador */}
+                                            <Text style={{ fontSize: 18, flex: 1 }}>{item.nome}</Text>
+
+                                            {/* Pontos totais */}
+                                            <Text style={{ fontSize: 16, color: colors.blue[500] }}>
+                                                {item.pontos_totais} pts
                                             </Text>
-                                        )}
-
-                                        {/* Nome do jogador */}
-                                        <Text style={{ fontSize: 18, flex: 1 }}>{item.nome}</Text>
-
-                                        {/* Pontos totais */}
-                                        <Text style={{ fontSize: 16, color: colors.blue[500] }}>
-                                            {item.pontos_totais} pts
-                                        </Text>
+                                        </TouchableOpacity>
                                     </View>
                                 ))}
                             </View>

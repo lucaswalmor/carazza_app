@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, Button, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, Button, ActivityIndicator, TouchableOpacity } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
 import axios from 'axios';
@@ -47,8 +47,9 @@ export default function GPSNavigatorScreen() {
         const startWatchingPosition = async () => {
             locationSubscription = await Location.watchPositionAsync(
                 {
-                    accuracy: Location.Accuracy.High,
-                    distanceInterval: 10,
+                    accuracy: Location.Accuracy.BestForNavigation,
+                    timeInterval: 1000,
+                    distanceInterval: 1,
                 },
                 (location) => {
                     const { latitude, longitude } = location.coords;

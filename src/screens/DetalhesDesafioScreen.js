@@ -120,6 +120,10 @@ export default function DetalhesDesafioScreen({ navigation, route }) {
         }
     }
 
+    const navigateToPerfil = async (item) => {
+        navigation.navigate('PerfilPublicoScreen', { id: item.user_id });
+    }
+
     if (isLoading && !isRefreshing) {
         return (
             <View style={styles.loadingContainer}>
@@ -211,7 +215,11 @@ export default function DetalhesDesafioScreen({ navigation, route }) {
                                             const posicaoVazia = !participante;
 
                                             return (
-                                                <View key={index} style={{ flexDirection: 'row', alignItems: 'center', padding: 10 }}>
+                                                <TouchableOpacity
+                                                    key={index}
+                                                    style={{ flexDirection: 'row', alignItems: 'center', padding: 10, borderBottomWidth: 1, borderBottomColor: colors.blueGray[200] }}
+                                                    onPress={() => navigateToPerfil(participante)}
+                                                >
                                                     {/* Posição */}
                                                     <Text style={{ fontWeight: 'bold', marginRight: 10 }}>
                                                         {index + 1}º
@@ -249,7 +257,7 @@ export default function DetalhesDesafioScreen({ navigation, route }) {
                                                     <Text>
                                                         {posicaoVazia ? '0 km' : `${participante.km_percorrido} km`}
                                                     </Text>
-                                                </View>
+                                                </TouchableOpacity>
                                             );
                                         })}
                                     </ScrollView>

@@ -43,6 +43,11 @@ export default function ListaRotasPublicasUsuarioScreen({ navigation, route }) {
         navigation.navigate('RotaUsuarioScreen', { id });
     }
 
+    const navigateToGps = async (item) => {
+        const ultimaPosicao = item[item.length - 1];
+        navigation.navigate('GPSNavigatorByMarkerScreen', { destLatitude: ultimaPosicao.latitude, destLongitude: ultimaPosicao.longitude });
+    }
+
     const calculateRegion = (coordinates) => {
         let minLat = Math.min(...coordinates.map((coord) => coord.latitude));
         let maxLat = Math.max(...coordinates.map((coord) => coord.latitude));
@@ -97,24 +102,22 @@ export default function ListaRotasPublicasUsuarioScreen({ navigation, route }) {
                                                                 </Text>
                                                             </View>
 
-                                                            {/* <View>
-                                                                <Text style={[fontSize['2xs']]}>
-                                                                    Tempo
-                                                                </Text>
-                                                                <Text style={[fontSize['base'], fontWeights['bold']]}>
-                                                                    {rotaItem.tempo_total} h
-                                                                </Text>
-
-                                                            </View>
-
                                                             <View>
                                                                 <Text style={[fontSize['2xs']]}>
                                                                     Velocidade Média
                                                                 </Text>
                                                                 <Text style={[fontSize['base'], fontWeights['bold']]}>
-                                                                    {rotaItem.velocidade_media} km/h
+                                                                    {rotaItem.velocidade_media_kmh} km/h
                                                                 </Text>
-                                                            </View> */}
+                                                            </View>
+
+                                                            <View>
+                                                                   <TouchableOpacity
+                                                                    onPress={() => navigateToGps(rotaItem.rota)}
+                                                                   >
+                                                                        <FontAwesome5 name="location-arrow" size={16} color={colors.blue[500]} />
+                                                                   </TouchableOpacity>
+                                                            </View>
                                                         </View>
 
                                                         <TouchableOpacity

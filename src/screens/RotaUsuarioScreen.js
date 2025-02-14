@@ -24,7 +24,7 @@ export default function RotaUsuarioScreen({ route }) {
 
     const getRoute = async () => {
         const token = await AsyncStorage.getItem('token');
-        
+
         try {
             const response = await api.get(`rota/${id}`, {
                 headers: {
@@ -36,7 +36,7 @@ export default function RotaUsuarioScreen({ route }) {
             setRota(response.data.rota);
             setUsuarioRota(response.data.usuario)
             setDistancia(response.data.distancia_total_km);
-            setVelocidadeMedia(response.data.velocidade_media_ms);
+            setVelocidadeMedia(response.data.velocidade_media_kmh);
         } catch (error) {
             console.log(error.response?.data?.error || "Erro ao carregar a rota");
         }
@@ -151,32 +151,33 @@ export default function RotaUsuarioScreen({ route }) {
                                     style={styles.logo}
                                 />
                             </View>
+
+                            <View>
+                                <Text style={[fontSize['2xs']]}>
+                                    Rota feita por
+                                </Text>
+                                <Text style={[fontSize['xs'], fontWeights['bold'], {maxWidth: 100, textAlign: 'center',}]}>
+                                    {usuarioRota}
+                                </Text>
+                            </View>
+
                             <View>
                                 <Text style={[fontSize['2xs']]}>
                                     Distância
                                 </Text>
-                                <Text style={[fontSize['lg'], fontWeights['bold']]}>
+                                <Text style={[fontSize['xs'], fontWeights['bold']]}>
                                     {distancia} km
                                 </Text>
                             </View>
 
                             <View>
                                 <Text style={[fontSize['2xs']]}>
-                                    Rota feita por
-                                </Text>
-                                <Text style={[fontSize['lg'], fontWeights['bold']]}>
-                                    {usuarioRota}
-                                </Text>
-                            </View>
-
-                            {/* <View>
-                                <Text style={[fontSize['2xs']]}>
                                     Velocidade Média
                                 </Text>
-                                <Text style={[fontSize['lg'], fontWeights['bold']]}>
+                                <Text style={[fontSize['xs'], fontWeights['bold']]}>
                                     {velocidadeMedia} km/h
                                 </Text>
-                            </View> */}
+                            </View>
                         </View>
                     </View>
                 </>
@@ -197,7 +198,7 @@ const styles = StyleSheet.create({
     },
     map: {
         width: "100%",
-        height: "90%",
+        height: "84%",
     },
     logo: {
         zIndex: 999,

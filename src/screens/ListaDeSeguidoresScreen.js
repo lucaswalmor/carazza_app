@@ -3,7 +3,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useState } from "react";
 import { ActivityIndicator, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import api from "../services/api";
-import { colors, display } from "../assets/css/primeflex";
+import { borders, colors, display } from "../assets/css/primeflex";
 import Card from "../components/Card";
 import styles from "../assets/css/styles";
 
@@ -52,7 +52,7 @@ export default function ListaDeSeguidoresScreen({ navigation }) {
                     content={
                         <View>
                             {seguidores.map((seguidor, index) => (
-                                <TouchableOpacity onPress={() => navigateToPerfil(seguidor)} key={index} style={[display.row, display.alignItemsCenter, { marginBottom: 15 }]}>
+                                <TouchableOpacity onPress={() => navigateToPerfil(seguidor)} key={index} style={[display.row, display.alignItemsCenter, { padding: 10, borderBottomWidth: 1, borderBottomColor: colors.blueGray[200] }]}>
                                     <Image
                                         source={{ uri: seguidor.img_perfil }}
                                         style={{ width: 35, height: 35, borderRadius: 25, marginRight: 10 }}
