@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, FlatList, ActivityIndicator, Image, TouchableOpacity } from 'react-native';
 import api from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -46,7 +46,7 @@ export default function NotificacoesScreen({ navigation }) {
     }, []);
 
     const lookPerfil = async (item) => {
-        navigation.navigate('PerfilPublicoScreen', { id: item.user_id });
+        navigation.navigate('PerfilPublicoScreen', { id: item.from_user_id });
     }
 
     const renderItem = ({ item }) => (

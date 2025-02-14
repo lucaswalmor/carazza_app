@@ -23,6 +23,7 @@ export default function GPSNavigatorByMarkerScreen({ route }) {
     const [hasRecalculated, setHasRecalculated] = useState(false);
     const { destLatitude, destLongitude } = route.params || {};
     const [modalVisible, setModalVisible] = useState(false);
+    const pitch = useRef(60)
 
     useEffect(() => {
         (async () => {
@@ -68,7 +69,7 @@ export default function GPSNavigatorByMarkerScreen({ route }) {
                     if (mapRef.current) {
                         mapRef.current.animateCamera({
                             center: location.coords,
-                            pitch: 60,
+                            pitch: pitch,
                             heading: location.coords.heading || 0,
                         });
                     }
@@ -99,7 +100,7 @@ export default function GPSNavigatorByMarkerScreen({ route }) {
                 locationSubscription.remove(); // Garante que o watchPositionAsync será cancelado ao desmontar
             }
         };
-    }, [destinationCoords, hasRecalculated]);
+    }, [destinationCoords, hasRecalculated, pitch]);
 
     // Função para calcular a distância entre dois pontos (Haversine)
     const getDistance = (lat1, lon1, lat2, lon2) => {

@@ -35,7 +35,7 @@ export default function PontoScreen({ route }) {
 
     const player = useVideoPlayer(videoSource, player => {
         player.loop = true;
-        player.play();
+        // player.play();
     });
 
     const { isPlaying } = useEvent(player, 'playingChange', { isPlaying: player.playing });

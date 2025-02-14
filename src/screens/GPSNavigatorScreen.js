@@ -7,6 +7,7 @@ import Accordion from '../components/Accordion';
 import styles from '../assets/css/styles';
 import Botao from '../components/Botao';
 import { colors } from '../assets/css/primeflex';
+import Toast from '../components/Toast';
 
 const GOOGLE_MAPS_API_KEY = 'AIzaSyAu4BOiZIT9Y4eHn81U5Uf98ZTBt8jUjyU';
 const LOCATIONIQ_API_KEY = 'pk.7179dc15856b3b310d544e4c66101b1b';
@@ -21,6 +22,7 @@ export default function GPSNavigatorScreen() {
     const [activeIndex, setActiveIndex] = useState(null);
     const mapRef = useRef(null);
     const [hasRecalculated, setHasRecalculated] = useState(false);
+    const [toast, setToast] = useState({ visible: false, message: '', position: 'bottom', severity: '' });
 
     useEffect(() => {
         (async () => {
@@ -105,21 +107,23 @@ export default function GPSNavigatorScreen() {
     const pesquisacep = async (valor) => {
         const cep = valor.replace(/\D/g, '');
         try {
-            if (cep.length !== 8) return;
+            if (cep.length !== 8) {
+                showToast('CEP inválido', 'top', 'danger')
+            }
             const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
             const data = await response.json();
             return data;
         } catch (error) {
-            console.error('Erro ao buscar o CEP:', error);
+            showToast('CEP inválido', 'top', 'danger')
         }
     };
 
     // Função para calcular a rota
     const calculateRoute = async () => {
         setIsLoading(true);
-
         try {
             const getDestinationCepAddress = await pesquisacep(destinationCep);
+
             const destinationAddress = `${getDestinationCepAddress.logradouro}, ${destinationNumber}, ${getDestinationCepAddress.bairro}, ${getDestinationCepAddress.localidade}, ${getDestinationCepAddress.estado}`;
 
             const destinationCoords = await getCoordinatesFromAddress(destinationAddress);
@@ -226,6 +230,13 @@ export default function GPSNavigatorScreen() {
         setHasRota(false)
     }
 
+    const showToast = (message, position, severity) => {
+        setToast({ visible: true, message, position, severity });
+
+        // Esconde o toast após 3 segundos
+        setTimeout(() => setToast({ ...toast, visible: false }), 3000);
+    };
+
     if (!currentLocation) return <Text>Carregando mapa...</Text>;
 
     return (
@@ -316,6 +327,15 @@ export default function GPSNavigatorScreen() {
                     </Accordion>
                 </View>
             </View>
+
+            {toast.visible && (
+                <Toast
+                    message={toast.message}
+                    position={toast.position}
+                    onClose={() => setToast({ ...toast, visible: false })}
+                    severity={toast.severity}
+                />
+            )}
         </View>
     );
 }
