@@ -2,7 +2,9 @@ const pesquisacep = async (valor) => {
     const cep = valor.replace(/\D/g, '');
 
     try {
-        if (cep.length != 8) return;
+        if (cep.length != 8) {
+            return {message: 'CEP inválido'}
+        }
 
         const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
         const data = await response.json();

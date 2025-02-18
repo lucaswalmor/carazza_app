@@ -39,13 +39,24 @@ export default function ListaRotasPublicasUsuarioScreen({ navigation, route }) {
             setIsLoading(false)
         }
     }
+
     const rotaUsuario = async (id) => {
         navigation.navigate('RotaUsuarioScreen', { id });
     }
 
     const navigateToGps = async (item) => {
         const ultimaPosicao = item[item.length - 1];
-        navigation.navigate('GPSNavigatorByMarkerScreen', { destLatitude: ultimaPosicao.latitude, destLongitude: ultimaPosicao.longitude });
+        // navigation.navigate('GPSNavigatorByMarkerScreen', { destLatitude: ultimaPosicao.latitude, destLongitude: ultimaPosicao.longitude });
+        navigation.navigate('Main', {
+          screen: 'Home',
+          params: {
+            screen: 'GPS',
+            params: {
+                destLatitude: ultimaPosicao.latitude,
+                destLongitude: ultimaPosicao.longitude
+            }
+          }
+        });
     }
 
     const calculateRegion = (coordinates) => {
@@ -74,7 +85,7 @@ export default function ListaRotasPublicasUsuarioScreen({ navigation, route }) {
                     </View>
                 </>
             ) : (
-                <View style={{ flex: 1, padding: 10 }}>
+                <View style={{ flex: 1, padding: 10, paddingBottom: 50 }}>
                     <ScrollView style={{ flex: 1 }}>
                         <Card
                             borderBottomColor={colors.teal[500]}
@@ -86,11 +97,18 @@ export default function ListaRotasPublicasUsuarioScreen({ navigation, route }) {
                                                 const region = calculateRegion(rotaItem.rota);
                                                 return (
                                                     <View key={index} style={[{ flex: 1, marginTop: 20 }, shadows['shadow2'], borders.borderRound]}>
-                                                        <View style={[display.row, gap[10], margins[5], display.alignItemsCenter] }>
+                                                        {rotaItem.titulo && (
+                                                            <View style={[display.row, display.alignItemsCenter, display.justifyContentCenter, { backgroundColor: colors.alpha[1000], paddingTop: 10 }]}>
+                                                                <Text style={[fontWeights['bold']]}>{rotaItem?.titulo}</Text>
+                                                            </View>
+                                                        )}
+
+
+                                                        <View style={[display.row, gap[10], margins[2], display.alignItemsCenter]}>
                                                             <View>
                                                                 <Image
                                                                     source={require('../assets/img/logo.png')} // Caminho para sua logo
-                                                                    style={{ width: 40, height: 40}}
+                                                                    style={{ width: 40, height: 40 }}
                                                                 />
                                                             </View>
                                                             <View>
@@ -112,11 +130,11 @@ export default function ListaRotasPublicasUsuarioScreen({ navigation, route }) {
                                                             </View>
 
                                                             <View>
-                                                                   <TouchableOpacity
+                                                                <TouchableOpacity
                                                                     onPress={() => navigateToGps(rotaItem.rota)}
-                                                                   >
-                                                                        <FontAwesome5 name="location-arrow" size={16} color={colors.blue[500]} />
-                                                                   </TouchableOpacity>
+                                                                >
+                                                                    <FontAwesome5 name="location-arrow" size={16} color={colors.blue[500]} />
+                                                                </TouchableOpacity>
                                                             </View>
                                                         </View>
 

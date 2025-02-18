@@ -1,234 +1,212 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, Button, ActivityIndicator, TouchableOpacity } from 'react-native';
-import MapView, { Marker, Polyline } from 'react-native-maps';
-import * as Location from 'expo-location';
-import axios from 'axios';
-import Accordion from '../components/Accordion';
-import styles from '../assets/css/styles';
-import Botao from '../components/Botao';
-import { colors } from '../assets/css/primeflex';
-import Toast from '../components/Toast';
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import {
+    View,
+    StyleSheet,
+    TextInput,
+    Modal,
+    TouchableOpacity,
+    Text,
+    ActivityIndicator,
+    Switch,
+    Platform,
+    KeyboardAvoidingView,
+    Keyboard,
+    TouchableWithoutFeedback
+} from "react-native";
+import MapView, { Marker, Polyline } from "react-native-maps";
+import * as Location from "expo-location";
+import styles from "../assets/css/styles";
+import { borders, colors, display, fontSize, gap, paddings } from "../assets/css/primeflex";
+import { FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
+import api from "../services/api";
+import decodePolyline from "../services/decodePolyline";
+import pesquisacep from "../services/viacep";
+import Toast from "../components/Toast";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
 
-const GOOGLE_MAPS_API_KEY = 'AIzaSyAu4BOiZIT9Y4eHn81U5Uf98ZTBt8jUjyU';
-const LOCATIONIQ_API_KEY = 'pk.7179dc15856b3b310d544e4c66101b1b';
+const LOCATIONIQ_API_KEY = 'pk.0fc5b34da0f6795efb98e3076f9d3c83';
 
-export default function GPSNavigatorScreen() {
-    const [currentLocation, setCurrentLocation] = useState(null);
-    const [destinationCoords, setDestinationCoords] = useState([]);
-    const [destinationCep, setDestinationCep] = useState('');
-    const [destinationNumber, setDestinationNumber] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const [hasRota, setHasRota] = useState(false);
-    const [activeIndex, setActiveIndex] = useState(null);
+const GPSNavigatorScreen = ({ route }) => {
     const mapRef = useRef(null);
-    const [hasRecalculated, setHasRecalculated] = useState(false);
+    const [cep, setCep] = useState("");
+    const [nomeRota, setNomeRota] = useState("");
+    const [routes, setRoutes] = useState([]);
+    const [numero, setNumero] = useState("");
+    const [distance, setDistance] = useState(0);
+    const [location, setLocation] = useState(null);
+    const [tracking, setTracking] = useState(false);
+    const [hasRoute, setHasRoute] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [finishRoute, setFinishRoute] = useState(false);
+    const [inputVisible, setInputVisible] = useState(true);
+    const [modalVisible, setModalVisible] = useState(false);
+    const { destLatitude, destLongitude } = route.params || {};
+    const [modalSalvarRota, setModalSalvarRota] = useState(false);
+    const [destinationCoords, setDestinationCoords] = useState([]);
+    const [bolDisponivelPerfil, setBolDisponivelPerfil] = useState(false);
     const [toast, setToast] = useState({ visible: false, message: '', position: 'bottom', severity: '' });
 
     useEffect(() => {
-        (async () => {
-            let { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                Alert.alert('Permissão de localização negada');
-                return;
-            }
+        const requestLocationPermission = async () => {
+            const { status } = await Location.requestForegroundPermissionsAsync();
 
             let location = await Location.getCurrentPositionAsync({});
 
-            setCurrentLocation({
+            setLocation({
                 latitude: location.coords.latitude,
                 longitude: location.coords.longitude,
             });
-        })();
+
+            if (destLatitude && destLongitude) {
+                setModalVisible(true)
+            }
+        };
+
+        requestLocationPermission();
     }, []);
 
+    useFocusEffect(
+        useCallback(() => {
+            if (location) {
+                setModalVisible(true)
+            }
+        }, [])
+    );
+
+    // Fica vendo a posicao atual do usuario
     useEffect(() => {
-        let locationSubscription = null;
+        Location.watchPositionAsync(
+            {
+                accuracy: Location.LocationAccuracy.BestForNavigation,
+                timeInterval: 1000,
+                distanceInterval: 1,
+            },
+            (response) => {
+                const newLocation = {
+                    latitude: response.coords.latitude,
+                    longitude: response.coords.longitude,
+                };
 
-        const startWatchingPosition = async () => {
-            locationSubscription = await Location.watchPositionAsync(
-                {
-                    accuracy: Location.Accuracy.BestForNavigation,
-                    timeInterval: 1000,
-                    distanceInterval: 1,
-                },
-                (location) => {
-                    const { latitude, longitude } = location.coords;
-                    setCurrentLocation({ latitude, longitude });
+                // Salva a nova localizacao atual do usuario conforme ele se move
+                setLocation(newLocation);
 
-                    if (mapRef.current) {
-                        mapRef.current.animateCamera({
-                            center: location.coords,
-                            pitch: 50,
-                            heading: location.coords.heading,
-                        });
-                    }
-
-
-                    if (destinationCoords.length > 0) {
-                        const isOnRoute = destinationCoords.some(({ latitude: lat, longitude: lon }) => {
-                            const distance = getDistance(latitude, longitude, lat, lon);
-                            return distance <= 150;
-                        });
-
-                        if (!isOnRoute && !hasRecalculated) {
-                            setHasRecalculated(true);
-                            calculateRoute();
-
-                            setTimeout(() => setHasRecalculated(false), 5000);
-                        }
-                    }
+                // Atualiza a visualizacao do mapa conforme o usuario se move
+                if (mapRef.current) {
+                    mapRef.current.animateCamera({
+                        center: newLocation,
+                        pitch: 60,
+                        heading: response.coords.heading || 0,
+                    });
                 }
-            );
-        };
 
-        startWatchingPosition();
+                // Adiciona ao array de rotas a rota que o usuario esta fazendo neste momento,
+                // e também calcula a distancia percorrida se o usuario estiver gravando a rota
+                if (tracking) {
+                    setRoutes((prevRoute) => {
+                        if (prevRoute.length > 0) {
+                            const lastPoint = prevRoute[prevRoute.length - 1];
+                            const newDistance = calculateDistance(lastPoint, response.coords);
+                            setDistance((prevDistance) => prevDistance + newDistance);
+                        }
 
-        return () => {
-            if (locationSubscription) {
-                locationSubscription.remove(); // Garante que o watchPositionAsync será cancelado ao desmontar
+                        return [...prevRoute, response.coords];
+                    });
+                }
             }
-        };
-    }, [destinationCoords, hasRecalculated]);
+        );
+    }, [destinationCoords, tracking]);
 
-    // Função para calcular a distância entre dois pontos (Haversine)
-    const getDistance = (lat1, lon1, lat2, lon2) => {
-        const R = 6371e3; // Raio da Terra em metros
-        const toRad = (angle) => (angle * Math.PI) / 180;
-        const dLat = toRad(lat2 - lat1);
-        const dLon = toRad(lon2 - lon1);
+    const calculateDistance = (pointA, pointB) => {
+        const R = 6371;
+        const dLat = ((pointB.latitude - pointA.latitude) * Math.PI) / 180;
+        const dLon = ((pointB.longitude - pointA.longitude) * Math.PI) / 180;
         const a =
-            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            Math.sin(dLat / 2) ** 2 +
+            Math.cos((pointA.latitude * Math.PI) / 180) *
+            Math.cos((pointB.latitude * Math.PI) / 180) *
+            Math.sin(dLon / 2) ** 2;
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c; // Retorna a distância em metros
+        return R * c;
     };
 
-    // Função para buscar o endereço completo a partir do cep
-    const pesquisacep = async (valor) => {
-        const cep = valor.replace(/\D/g, '');
-        try {
-            if (cep.length !== 8) {
-                showToast('CEP inválido', 'top', 'danger')
-            }
-            const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            showToast('CEP inválido', 'top', 'danger')
-        }
-    };
+    const consultarCep = async () => {
+        const response = await pesquisacep(cep);
 
-    // Função para calcular a rota
-    const calculateRoute = async () => {
-        setIsLoading(true);
-        try {
-            const getDestinationCepAddress = await pesquisacep(destinationCep);
-
-            const destinationAddress = `${getDestinationCepAddress.logradouro}, ${destinationNumber}, ${getDestinationCepAddress.bairro}, ${getDestinationCepAddress.localidade}, ${getDestinationCepAddress.estado}`;
-
-            const destinationCoords = await getCoordinatesFromAddress(destinationAddress);
-
-            if (!destinationCoords) {
-                Alert.alert('Erro ao obter coordenadas do destino');
-                return;
-            }
-
-            const routeData = await getRouteFromLocationIQ(currentLocation, destinationCoords);
-            if (routeData) {
-                setHasRota(true);
-                setDestinationCoords(routeData);
-            }
-        } catch (error) {
-            console.error('Erro ao calcular a rota:', error.response.data);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    // Função para buscar o array de polyline
-    const getRouteFromLocationIQ = async (origin, destination) => {
-        try {
-            const response = await axios.get(
-                `https://us1.locationiq.com/v1/directions/driving/${origin.longitude},${origin.latitude};${destination.lng},${destination.lat}?key=${LOCATIONIQ_API_KEY}&steps=true&alternatives=true&geometries=polyline&overview=full`
-            );
-
-            if (response.data.routes.length > 0 && response.data.routes[0].geometry) {
-                return decodePolyline(response.data.routes[0].geometry);
-            } else {
-                throw new Error('Nenhuma rota encontrada');
-            }
-        } catch (error) {
-            console.error('Erro ao calcular a rota:', error);
-            return null;
-        }
-    };
-
-    // Função parade codificar o array de polyline
-    const decodePolyline = (encoded) => {
-        let index = 0;
-        const coordinates = [];
-        let lat = 0, lng = 0;
-
-        while (index < encoded.length) {
-            let shift = 0, result = 0;
-            let byte;
-
-            // Decodifica latitude
-            do {
-                byte = encoded.charCodeAt(index++) - 63;
-                result |= (byte & 0x1F) << shift;
-                shift += 5;
-            } while (byte >= 0x20);
-
-            let deltaLat = (result & 1) ? ~(result >> 1) : (result >> 1);
-            lat += deltaLat;
-
-            // Decodifica longitude
-            shift = 0;
-            result = 0;
-
-            do {
-                byte = encoded.charCodeAt(index++) - 63;
-                result |= (byte & 0x1F) << shift;
-                shift += 5;
-            } while (byte >= 0x20);
-
-            let deltaLng = (result & 1) ? ~(result >> 1) : (result >> 1);
-            lng += deltaLng;
-
-            coordinates.push({ latitude: lat / 1e5, longitude: lng / 1e5 });
+        if (response.message) {
+            showToast(response.message, 'top', 'danger')
+            return;
         }
 
-        return coordinates;
-    };
+        const destinationAddress = `${response.logradouro}, ${numero}, ${response.bairro}, ${response.localidade}, ${response.estado}`;
 
-    // Função para obter coordenadas a partir do endereço
-    const getCoordinatesFromAddress = async (address) => {
         try {
-            const response = await axios.get(
-                `https://us1.locationiq.com/v1/search.php?key=${LOCATIONIQ_API_KEY}&q=${encodeURIComponent(address)}&format=json`
-            );
+            const response = await api.get(`https://us1.locationiq.com/v1/search.php?key=${LOCATIONIQ_API_KEY}&q=${encodeURIComponent(destinationAddress)}&format=json`);
 
             if (response.data.length > 0) {
                 return {
-                    lat: parseFloat(response.data[0].lat),
-                    lng: parseFloat(response.data[0].lon),
+                    latitude: parseFloat(response.data[0].lat),
+                    longitude: parseFloat(response.data[0].lon),
                 };
             } else {
                 throw new Error('Endereço não encontrado');
             }
         } catch (error) {
-            console.error('Erro ao obter coordenadas:', error.response.data);
-            return null;
-        }
-    };
+            if (error) {
 
-    const limparRota = async () => {
+            }
+        }
+    }
+
+    const calculateRoute = async () => {
+        setIsLoading(true);
+
+        const destino = {
+            latitude: 0,
+            longitude: 0
+        }
+
+        if (cep && numero) {
+            const destinationCoords = await consultarCep();
+
+            destino.latitude = destinationCoords.latitude
+            destino.longitude = destinationCoords.longitude
+        } else {
+            destino.latitude = destLatitude
+            destino.longitude = destLongitude
+        }
+
+        try {
+            const url = `https://us1.locationiq.com/v1/directions/driving/${location.longitude},${location.latitude};${destino.longitude},${destino.latitude}?key=${LOCATIONIQ_API_KEY}&steps=true&geometries=polyline&overview=full`
+
+            const response = await api.get(url)
+
+            if (response.data.routes.length > 0 && response.data.routes[0].geometry) {
+                const polyline = decodePolyline(response.data.routes[0].geometry);
+
+                setDestinationCoords(polyline)
+                setInputVisible(false)
+                setHasRoute(true)
+                setModalVisible(false)
+            } else {
+                throw new Error('Nenhuma rota encontrada');
+            }
+        } catch (error) {
+            showToast('Estamos recebendo muitas solicitações no momento, por favor tente novamente em alguns instantes', 'top', 'danger')
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const clearRoute = async () => {
         setDestinationCoords([])
-        setDestinationCep("")
-        setDestinationNumber("")
-        setHasRota(false)
+        setCep("")
+        setNumero("")
+        setHasRoute(false)
+    }
+
+    const changeInputVisible = () => {
+        setInputVisible(!inputVisible)
     }
 
     const showToast = (message, position, severity) => {
@@ -238,105 +216,372 @@ export default function GPSNavigatorScreen() {
         setTimeout(() => setToast({ ...toast, visible: false }), 3000);
     };
 
-    if (!currentLocation) return <Text>Carregando mapa...</Text>;
+    const saveRoute = async () => {
+        const token = await AsyncStorage.getItem('token');
+
+        const data = {
+            route: routes,
+            distance: distance,
+            bolDisponivelPerfil: bolDisponivelPerfil,
+            titulo: nomeRota
+        }
+
+        try {
+            setIsLoading(true)
+            const response = await api.post('/user/store/rotas', data, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                }
+            })
+            setDestinationCoords([])
+            setCep("")
+            setNumero("")
+            setHasRoute(false)
+            setFinishRoute(false)
+            setDistance(0)
+            setRoutes([])
+            setModalSalvarRota(false)
+
+            showToast(response.data.message, 'top', 'success')
+        } catch (error) {
+            showToast(error.response.data.error, 'top', 'danger')
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const startTracking = async () => {
+        setTracking(true);
+        setDistance(0)
+        setRoutes([])
+    }
+
+    const stopTracking = async () => {
+        setTracking(false);
+
+        setFinishRoute(true)
+    }
 
     return (
-        <View style={{ flex: 1, position: 'relative' }}>
-            <MapView
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : ''}
                 style={{ flex: 1 }}
-                region={{
-                    latitude: currentLocation.latitude,
-                    longitude: currentLocation.longitude,
-                    latitudeDelta: 0.002,
-                    longitudeDelta: 0.002,
-                }}
-                showsUserLocation={true}
-                followUserLocation={true}
-                ref={mapRef}
             >
-                {destinationCoords.length > 0 && (
-                    <Marker
-                        coordinate={{
-                            latitude: destinationCoords[destinationCoords.length - 1].latitude,
-                            longitude: destinationCoords[destinationCoords.length - 1].longitude,
-                        }}
-                    />
-                )}
-                {/* Desenhando a rota manualmente */}
-                {destinationCoords.length > 0 && (
-                    <Polyline
-                        coordinates={destinationCoords}
-                        strokeWidth={4}
-                        strokeColor={colors.blue[500]}
-                    />
-                )}
-            </MapView>
+                <View style={{ flex: 1, position: 'relative', width: '100%' }}>
+                    {location && (
+                        <MapView
+                            ref={mapRef}
+                            style={{ width: '100%', height: '100%' }}
+                            initialRegion={{
+                                latitude: location.latitude,
+                                longitude: location.longitude,
+                                latitudeDelta: 0.002,
+                                longitudeDelta: 0.002,
+                            }}
+                            showsUserLocation={true}
+                            followUserLocation={true}
+                        >
+                            {destinationCoords.length > 0 && (
+                                <Marker
+                                    coordinate={{
+                                        latitude: destinationCoords[destinationCoords.length - 1].latitude,
+                                        longitude: destinationCoords[destinationCoords.length - 1].longitude,
+                                    }}
+                                />
+                            )}
 
-            {/* Inputs para Destino */}
-            <View style={{ position: 'absolute', top: 0, width: '85%', padding: 10 }}>
-                <View style={{ flex: 1 }}>
-                    <Accordion title="Rota" index={0} activeIndex={activeIndex} setActiveIndex={setActiveIndex}>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="CEP de Destino"
-                            value={destinationCep}
-                            onChangeText={setDestinationCep}
-                            keyboardType="numeric"
-                        />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Número de Destino"
-                            value={destinationNumber}
-                            onChangeText={setDestinationNumber}
-                            keyboardType="numeric"
-                        />
+                            {/* Desenhando a rota manualmente */}
+                            {destinationCoords.length > 0 && (
+                                <Polyline
+                                    coordinates={destinationCoords}
+                                    strokeWidth={4}
+                                    strokeColor={colors.blue[500]}
+                                />
+                            )}
 
-                        <Botao onPress={calculateRoute}>
-                            <View style={styles.buttonContent}>
-                                {isLoading ? (
-                                    <>
-                                        <ActivityIndicator
-                                            style={styles.loadingIndicator}
-                                            size="small"
-                                            color="#fff"
-                                        />
-                                        <Text style={styles.buttonText}>Trançando a rota...</Text>
-                                    </>
-                                ) : (
-                                    <Text style={styles.buttonText}>Traçar Rota</Text>
-                                )}
-                            </View>
-                        </Botao>
-                        {hasRota && (
-                            <Botao onPress={limparRota} severity="error">
-                                <View style={styles.buttonContent}>
-                                    {isLoading ? (
-                                        <>
-                                            <ActivityIndicator
-                                                style={styles.loadingIndicator}
-                                                size="small"
-                                                color="#fff"
-                                            />
-                                            <Text style={styles.buttonText}>Limpando a rota...</Text>
-                                        </>
+                            {/* Desenhando a rota manualmente */}
+                            {tracking && routes.length > 0 && (
+                                <Polyline
+                                    coordinates={routes}
+                                    strokeWidth={4}
+                                    strokeColor={colors.blue[900]}
+                                />
+                            )}
+                        </MapView>
+                    )}
+
+                    {/* Container que mostra a distancia percorrida */}
+                    {tracking && (
+                        <View style={[styles2.distanceContainer, display.row, display.justifyContentBetween]}>
+                            <Text style={styles2.distanceText}>
+                                Distância: {!tracking ? '0.00' : distance.toFixed(2)} km
+                            </Text>
+                        </View>
+                    )}
+
+                    {/* Container de botoes da parte de baixo da tela */}
+                    <View style={{ position: 'absolute', bottom: 15, width: '100%', paddingLeft: 20, paddingRight: 20 }}>
+                        <View style={[display.row, display.justifyContentBetween]}>
+                            <TouchableOpacity
+                                onPress={() => changeInputVisible()}
+                                style={[
+                                    {
+                                        backgroundColor: colors.blue[500],
+                                        padding: 10,
+                                        alignItems: 'center'
+                                    },
+                                    display.row,
+                                    gap[2],
+                                    borders.borderCircle
+                                ]}
+                            >
+                                <FontAwesome5 name={!inputVisible ? 'arrow-up' : 'arrow-down'} size={16} color='#FFF' />
+                                <Text style={{ color: colors.alpha[1000] }}>
+                                    Traçar
+                                </Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                onPress={tracking ? stopTracking : startTracking}
+                                style={[
+                                    {
+                                        backgroundColor: !tracking ? colors.blue[900] : colors.red[500],
+                                        padding: 10,
+                                        justifyContent: 'center',
+                                        alignItems: 'center'
+                                    },
+                                    display.row,
+                                    gap[2],
+                                    borders.borderCircle
+                                ]}
+                            >
+                                <FontAwesome5 name={tracking ? 'stop-circle' : 'play-circle'} size={16} color='#FFF' />
+                                <Text style={{ color: colors.alpha[1000] }}>
+                                    {tracking ? 'Parar' : 'Gravar'}
+                                </Text>
+                            </TouchableOpacity>
+
+                            {finishRoute && (
+                                <TouchableOpacity
+                                    onPress={() => setModalSalvarRota(true)}
+                                    style={[
+                                        {
+                                            backgroundColor: colors.indigo['600'],
+                                            padding: 10,
+                                            justifyContent: 'center',
+                                            alignItems: 'center'
+                                        },
+                                        display.row,
+                                        gap[2],
+                                        borders.borderCircle
+                                    ]}
+                                >
+                                    <FontAwesome5 name="cloud-upload-alt" size={16} color='#FFF' />
+                                    <Text style={[{ color: colors.alpha[1000] }]}>
+                                        Salvar
+                                    </Text>
+                                </TouchableOpacity>
+                            )}
+                        </View>
+                    </View>
+
+                    {/* Container de inputs de traçar rotas */}
+                    {!inputVisible && (
+                        <View style={{ position: 'absolute', bottom: 60, width: '100%', padding: 10 }}>
+                            <View style={[display.row, display.alignItemsCenter, display.justifyContentBetween]}>
+                                <View style={{ width: '50%' }}>
+                                    <TextInput
+                                        style={[{ width: '100%', backgroundColor: colors.blue[200], height: 40, paddingLeft: 10, paddingRight: 10 }, borders.borderCircle]}
+                                        value={cep}
+                                        onChangeText={(text) => setCep(text)}
+                                        keyboardType="numeric"
+                                        placeholder="CEP"
+                                    />
+                                </View>
+                                <View style={{ width: '25%' }}>
+                                    <TextInput
+                                        style={[{ width: '100%', backgroundColor: colors.blue[200], height: 40, paddingLeft: 10, paddingRight: 10 }, borders.borderCircle]}
+                                        value={numero}
+                                        onChangeText={(text) => setNumero(text)}
+                                        keyboardType="numeric"
+                                        placeholder="Número"
+                                    />
+                                </View>
+
+                                <View style={{ width: '20%', flexDirection: 'row', justifyContent: 'center' }}>
+                                    {!hasRoute ? (
+                                        <TouchableOpacity
+                                            onPress={() => calculateRoute()}
+                                            style={[{ backgroundColor: colors.blue[500], padding: 12 }, borders.borderCircle]}
+                                        >
+                                            {!isLoading ? (
+                                                <FontAwesome5 name='search' size={12} color='#FFF' />
+                                            ) : (
+                                                <ActivityIndicator size={12} color="#fff" />
+                                            )}
+                                        </TouchableOpacity>
                                     ) : (
-                                        <Text style={styles.buttonText}>Limpar Rota</Text>
+                                        <View style={[display.row, gap[1]]}>
+                                            <TouchableOpacity
+                                                onPress={() => clearRoute()}
+                                                style={[{ backgroundColor: colors.red[500], padding: 12 }, borders.borderCircle]}
+                                            >
+                                                {!isLoading ? (
+                                                    <FontAwesome6 name='xmark' size={12} color='#FFF' />
+                                                ) : (
+                                                    <ActivityIndicator size={12} color="#fff" />
+                                                )}
+                                            </TouchableOpacity>
+
+                                            <TouchableOpacity
+                                                onPress={() => calculateRoute()}
+                                                style={[{ backgroundColor: colors.orange[500], padding: 12 }, borders.borderCircle]}
+                                            >
+                                                {!isLoading ? (
+                                                    <FontAwesome6 name='arrows-rotate' size={12} color='#FFF' />
+                                                ) : (
+                                                    <ActivityIndicator size={12} color="#fff" />
+                                                )}
+                                            </TouchableOpacity>
+                                        </View>
                                     )}
                                 </View>
-                            </Botao>
-                        )}
-                    </Accordion>
-                </View>
-            </View>
+                            </View>
+                        </View>
+                    )}
 
-            {toast.visible && (
-                <Toast
-                    message={toast.message}
-                    position={toast.position}
-                    onClose={() => setToast({ ...toast, visible: false })}
-                    severity={toast.severity}
-                />
-            )}
-        </View>
+                    {toast.visible && (
+                        <Toast
+                            message={toast.message}
+                            position={toast.position}
+                            onClose={() => setToast({ ...toast, visible: false })}
+                            severity={toast.severity}
+                        />
+                    )}
+
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={modalSalvarRota}
+                        onRequestClose={() => setModalSalvarRota(false)}
+                    >
+                        <View style={styles.modalCenteredView}>
+                            <View style={styles.modalView}>
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="Nome da rota"
+                                    value={nomeRota}
+                                    onChangeText={setNomeRota}
+                                />
+
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 15 }}>
+                                    <Switch
+                                        trackColor={{ false: '#767577', true: '#81b0ff' }}
+                                        thumbColor={bolDisponivelPerfil ? '#007BFF' : '#f4f3f4'}
+                                        ios_backgroundColor="#3e3e3e"
+                                        onValueChange={() => setBolDisponivelPerfil(previousState => !previousState)}
+                                        value={bolDisponivelPerfil}
+                                    />
+
+
+                                    <Text
+                                        style={[
+                                            fontSize['base'],
+                                            {
+                                                color: colors.blue[900],
+                                                textAlign: 'center',
+                                                flexWrap: 'wrap',
+                                                maxWidth: 250,
+                                            }
+                                        ]}
+                                    >
+                                        Disponibilizar esta rota no seu perfil ?
+                                    </Text>
+                                </View>
+
+                                <View style={[display.row, display.justifyContentBetween]}>
+                                    <TouchableOpacity onPress={saveRoute} style={styles.button}>
+                                        <Text style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Salvar Rota</Text>
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity onPress={() => setModalSalvarRota(false)} style={styles.buttonDanger}>
+                                        <Text style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Cancelar</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+                    </Modal>
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={modalVisible}
+                        onRequestClose={() => setModalVisible(false)}
+                    >
+                        <View style={styles.modalCenteredView}>
+                            <View style={styles.modalView}>
+                                <Text style={{ marginBottom: 20 }}>
+                                    Identificamos uma nova rota, o que gostaria de fazer?
+                                </Text>
+
+                                <TouchableOpacity onPress={() => calculateRoute()} style={{ marginBottom: 20, flexDirection: 'row' }}>
+                                    <Text style={{ fontSize: 14, color: colors.blue[500] }}>Traçar rota? </Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity onPress={() => setModalVisible(false)} style={{ marginBottom: 20, flexDirection: 'row' }}>
+                                    <Text style={{ fontSize: 14 }}>Fechar Janela </Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </Modal>
+                </View>
+            </KeyboardAvoidingView>
+        </TouchableWithoutFeedback>
     );
-}
+};
+
+const styles2 = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+    map: {
+        flex: 1
+    },
+    marker: {
+        padding: 2,
+        backgroundColor: 'white',
+        borderRadius: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 2,
+        elevation: 4,
+    },
+    buttonContainer: {
+        position: 'absolute',
+        bottom: 20,
+        left: 20,
+        right: 20,
+        alignItems: 'center',
+    },
+    distanceContainer: {
+        position: 'absolute',
+        top: 60,
+        left: 20,
+        right: 20,
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        padding: 10,
+        borderRadius: 8,
+        alignItems: 'center',
+        zIndex: 999,
+    },
+    distanceText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#2c3e50',
+    },
+});
+
+
+export default GPSNavigatorScreen;

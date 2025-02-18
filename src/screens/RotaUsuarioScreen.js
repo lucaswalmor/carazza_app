@@ -14,6 +14,7 @@ export default function RotaUsuarioScreen({ route }) {
     const [distancia, setDistancia] = useState([]);
     const [velocidadeMedia, setVelocidadeMedia] = useState([]);
     const [usuarioRota, setUsuarioRota] = useState("");
+    const [titulo, setTitulo] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const mapViewRef = useRef(null); // Ref para o mapa
     const mapContainerRef = useRef(null); // Ref para o contêiner do mapa
@@ -33,6 +34,7 @@ export default function RotaUsuarioScreen({ route }) {
                 },
             });
 
+            setTitulo(response.data.titulo)
             setRota(response.data.rota);
             setUsuarioRota(response.data.usuario)
             setDistancia(response.data.distancia_total_km);
@@ -143,6 +145,12 @@ export default function RotaUsuarioScreen({ route }) {
                                 strokeWidth={4} // Espessura da linha
                             />
                         </MapView>
+
+                        {titulo && (
+                            <View style={[display.row, display.alignItemsCenter, display.justifyContentCenter, { backgroundColor: colors.alpha[1000], paddingTop: 10 }]}>
+                                <Text style={[fontWeights['bold']]}>{titulo}</Text>
+                            </View>
+                        )}
 
                         <View style={[display.row, gap[10], display.alignItemsCenter, { backgroundColor: colors.alpha[1000], padding: 10 }]}>
                             <View>

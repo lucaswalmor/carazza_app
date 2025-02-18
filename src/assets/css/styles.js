@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
         color: '#cce5ff'
     },
     patrocinadorContainer: {
-      marginBottom: 20,
+        marginBottom: 20,
     },
     loadingContainer: {
         flex: 1,
@@ -349,21 +349,32 @@ const styles = StyleSheet.create({
         fontWeight: 'medium'
     },
     video: {
-      width: '100%',
-      height: 600,
-      marginBottom: 20,
-      borderRadius: 10,
-      overflow: 'hidden'
+        width: '100%',
+        height: 600,
+        marginBottom: 20,
+        borderRadius: 10,
+        overflow: 'hidden'
     },
     registerLink: {
-      fontSize: 14,
-      fontWeight: 'bold',
-      color: '#007BFF',
-      marginLeft: 5,
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: '#007BFF',
+        marginLeft: 5,
     },
     map: {
         flex: 1
-    }
+    },
+    suggestionsList: {
+        marginTop: 5,
+        maxHeight: 150,
+        backgroundColor: "#fff",
+        borderRadius: 5,
+    },
+    suggestionItem: {
+        padding: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: "#ddd",
+    },
 })
 
 export default styles
