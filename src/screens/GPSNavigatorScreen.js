@@ -24,29 +24,34 @@ import pesquisacep from "../services/viacep";
 import Toast from "../components/Toast";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
+import { setupDatabase, saveRouteToDB, loadRouteFromDB, clearRouteDB } from "../database/database";
 
 const LOCATIONIQ_API_KEY = 'pk.0fc5b34da0f6795efb98e3076f9d3c83';
 
 const GPSNavigatorScreen = ({ route }) => {
     const mapRef = useRef(null);
-    const [cep, setCep] = useState("");
-    const [nomeRota, setNomeRota] = useState("");
     const [routes, setRoutes] = useState([]);
-    const [numero, setNumero] = useState("");
-    const [distance, setDistance] = useState(0);
     const [location, setLocation] = useState(null);
-    const [tracking, setTracking] = useState(false);
-    const [hasRoute, setHasRoute] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [finishRoute, setFinishRoute] = useState(false);
+    const [isLoadingSaveRoute, setIsLoadingSaveRoute] = useState(false);
     const [inputVisible, setInputVisible] = useState(true);
     const [modalVisible, setModalVisible] = useState(false);
     const { destLatitude, destLongitude } = route.params || {};
     const [modalSalvarRota, setModalSalvarRota] = useState(false);
     const [destinationCoords, setDestinationCoords] = useState([]);
-    const [bolDisponivelPerfil, setBolDisponivelPerfil] = useState(false);
     const [toast, setToast] = useState({ visible: false, message: '', position: 'bottom', severity: '' });
+    const [routeState, setRouteState] = useState({
+        cep: "",
+        numero: "",
+        nomeRota: "",
+        distance: 0,
+        hasRoute: false,
+        finishRoute: false,
+        tracking: false,
+        bolDisponivelPerfil: true
+    });
 
+    // pede permissoes de localizacao ao usuari
     useEffect(() => {
         const requestLocationPermission = async () => {
             const { status } = await Location.requestForegroundPermissionsAsync();
@@ -66,13 +71,24 @@ const GPSNavigatorScreen = ({ route }) => {
         requestLocationPermission();
     }, []);
 
-    useFocusEffect(
-        useCallback(() => {
-            if (location) {
-                setModalVisible(true)
+    // inicia o banco de dados e carrega as rotas salvas caso exista
+    useEffect(() => {
+        const initDB = async () => {
+            await setupDatabase();
+            const savedRoute = await loadRouteFromDB();
+            console.log('savedRoute: ', savedRoute)
+            if (Array.isArray(savedRoute) && savedRoute.length > 0) {
+                setRoutes(savedRoute);
+                setLocation(savedRoute[savedRoute.length - 1]);
+                setRouteState((prevState) => ({
+                    ...prevState,
+                    tracking: true,
+                }));
             }
-        }, [])
-    );
+        };
+
+        initDB();
+    }, []);
 
     // Fica vendo a posicao atual do usuario
     useEffect(() => {
@@ -100,22 +116,69 @@ const GPSNavigatorScreen = ({ route }) => {
                     });
                 }
 
-                // Adiciona ao array de rotas a rota que o usuario esta fazendo neste momento,
-                // e também calcula a distancia percorrida se o usuario estiver gravando a rota
-                if (tracking) {
+                if (routeState.tracking) {
                     setRoutes((prevRoute) => {
                         if (prevRoute.length > 0) {
                             const lastPoint = prevRoute[prevRoute.length - 1];
                             const newDistance = calculateDistance(lastPoint, response.coords);
-                            setDistance((prevDistance) => prevDistance + newDistance);
+                            setRouteState((prevState) => ({
+                                ...prevState,
+                                distance: prevState.distance + newDistance,
+                            }));
                         }
 
                         return [...prevRoute, response.coords];
                     });
+                    saveRouteToDB(response.coords.latitude, response.coords.longitude);
                 }
             }
         );
-    }, [destinationCoords, tracking]);
+    }, [destinationCoords, routeState.tracking]);
+
+    const saveRoute = async () => {
+        setIsLoadingSaveRoute(true)
+        const token = await AsyncStorage.getItem('token');
+
+        const data = {
+            route: routes,
+            distance: routeState.distance,
+            bolDisponivelPerfil: routeState.bolDisponivelPerfil,
+            titulo: routeState.nomeRota
+        }
+
+        try {
+            setIsLoading(true)
+            const response = await api.post('/user/store/rotas', data, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                }
+            })
+            resetRouteState();
+
+            showToast(response.data.message, 'top', 'success')
+        } catch (error) {
+            const errorMessage = error?.response?.data?.error || 'Erro desconhecido';
+            showToast(errorMessage, 'top', 'danger');
+        } finally {
+            setIsLoadingSaveRoute(false)
+        }
+    }
+
+    const resetRouteState = async () => {
+        await clearRouteDB();
+        setDestinationCoords([]);
+        setRouteState(prevState => ({
+            ...prevState,
+            cep: "",
+            numero: "",
+            distance: 0,
+            hasRoute: false,
+            finishRoute: false,
+        }));
+        setRoutes([]);
+        setModalSalvarRota(false);
+    };
 
     const calculateDistance = (pointA, pointB) => {
         const R = 6371;
@@ -131,14 +194,14 @@ const GPSNavigatorScreen = ({ route }) => {
     };
 
     const consultarCep = async () => {
-        const response = await pesquisacep(cep);
+        const response = await pesquisacep(routeState.cep);
 
         if (response.message) {
             showToast(response.message, 'top', 'danger')
             return;
         }
 
-        const destinationAddress = `${response.logradouro}, ${numero}, ${response.bairro}, ${response.localidade}, ${response.estado}`;
+        const destinationAddress = `${response.logradouro}, ${routeState.numero}, ${response.bairro}, ${response.localidade}, ${response.estado}`;
 
         try {
             const response = await api.get(`https://us1.locationiq.com/v1/search.php?key=${LOCATIONIQ_API_KEY}&q=${encodeURIComponent(destinationAddress)}&format=json`);
@@ -166,7 +229,7 @@ const GPSNavigatorScreen = ({ route }) => {
             longitude: 0
         }
 
-        if (cep && numero) {
+        if (routeState.cep && routeState.numero) {
             const destinationCoords = await consultarCep();
 
             destino.latitude = destinationCoords.latitude
@@ -186,7 +249,7 @@ const GPSNavigatorScreen = ({ route }) => {
 
                 setDestinationCoords(polyline)
                 setInputVisible(false)
-                setHasRoute(true)
+                setRouteState(prevState => ({ ...prevState, hasRoute: true }))
                 setModalVisible(false)
             } else {
                 throw new Error('Nenhuma rota encontrada');
@@ -200,9 +263,7 @@ const GPSNavigatorScreen = ({ route }) => {
 
     const clearRoute = async () => {
         setDestinationCoords([])
-        setCep("")
-        setNumero("")
-        setHasRoute(false)
+        setRouteState(prevState => ({ ...prevState, cep: "", numero: "", hasRoute: false }))
     }
 
     const changeInputVisible = () => {
@@ -216,51 +277,21 @@ const GPSNavigatorScreen = ({ route }) => {
         setTimeout(() => setToast({ ...toast, visible: false }), 3000);
     };
 
-    const saveRoute = async () => {
-        const token = await AsyncStorage.getItem('token');
-
-        const data = {
-            route: routes,
-            distance: distance,
-            bolDisponivelPerfil: bolDisponivelPerfil,
-            titulo: nomeRota
-        }
-
-        try {
-            setIsLoading(true)
-            const response = await api.post('/user/store/rotas', data, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                }
-            })
-            setDestinationCoords([])
-            setCep("")
-            setNumero("")
-            setHasRoute(false)
-            setFinishRoute(false)
-            setDistance(0)
-            setRoutes([])
-            setModalSalvarRota(false)
-
-            showToast(response.data.message, 'top', 'success')
-        } catch (error) {
-            showToast(error.response.data.error, 'top', 'danger')
-        } finally {
-            setIsLoading(false)
-        }
-    }
-
     const startTracking = async () => {
-        setTracking(true);
-        setDistance(0)
+        setRouteState(prevState => ({
+            ...prevState,
+            distance: 0,
+            tracking: true,
+        }))
         setRoutes([])
     }
 
     const stopTracking = async () => {
-        setTracking(false);
-
-        setFinishRoute(true)
+        setRouteState(prevState => ({
+            ...prevState,
+            finishRoute: true,
+            tracking: false,
+        }))
     }
 
     return (
@@ -302,7 +333,7 @@ const GPSNavigatorScreen = ({ route }) => {
                             )}
 
                             {/* Desenhando a rota manualmente */}
-                            {tracking && routes.length > 0 && (
+                            {routeState.tracking && routes.length > 0 && (
                                 <Polyline
                                     coordinates={routes}
                                     strokeWidth={4}
@@ -313,10 +344,10 @@ const GPSNavigatorScreen = ({ route }) => {
                     )}
 
                     {/* Container que mostra a distancia percorrida */}
-                    {tracking && (
+                    {routeState.tracking && (
                         <View style={[styles2.distanceContainer, display.row, display.justifyContentBetween]}>
                             <Text style={styles2.distanceText}>
-                                Distância: {!tracking ? '0.00' : distance.toFixed(2)} km
+                                Distância: {!routeState.tracking ? '0.00' : routeState.distance.toFixed(2)} km
                             </Text>
                         </View>
                     )}
@@ -344,10 +375,10 @@ const GPSNavigatorScreen = ({ route }) => {
                             </TouchableOpacity>
 
                             <TouchableOpacity
-                                onPress={tracking ? stopTracking : startTracking}
+                                onPress={routeState.tracking ? stopTracking : startTracking}
                                 style={[
                                     {
-                                        backgroundColor: !tracking ? colors.blue[900] : colors.red[500],
+                                        backgroundColor: !routeState.tracking ? colors.blue[900] : colors.red[500],
                                         padding: 10,
                                         justifyContent: 'center',
                                         alignItems: 'center'
@@ -357,13 +388,13 @@ const GPSNavigatorScreen = ({ route }) => {
                                     borders.borderCircle
                                 ]}
                             >
-                                <FontAwesome5 name={tracking ? 'stop-circle' : 'play-circle'} size={16} color='#FFF' />
+                                <FontAwesome5 name={routeState.tracking ? 'stop-circle' : 'play-circle'} size={16} color='#FFF' />
                                 <Text style={{ color: colors.alpha[1000] }}>
-                                    {tracking ? 'Parar' : 'Gravar'}
+                                    {routeState.tracking ? 'Parar' : 'Gravar'}
                                 </Text>
                             </TouchableOpacity>
 
-                            {finishRoute && (
+                            {routeState.finishRoute && (
                                 <TouchableOpacity
                                     onPress={() => setModalSalvarRota(true)}
                                     style={[
@@ -394,8 +425,8 @@ const GPSNavigatorScreen = ({ route }) => {
                                 <View style={{ width: '50%' }}>
                                     <TextInput
                                         style={[{ width: '100%', backgroundColor: colors.blue[200], height: 40, paddingLeft: 10, paddingRight: 10 }, borders.borderCircle]}
-                                        value={cep}
-                                        onChangeText={(text) => setCep(text)}
+                                        value={routeState.cep}
+                                        onChangeText={(text) => setRouteState(prevState => ({ ...prevState, cep: text }))}
                                         keyboardType="numeric"
                                         placeholder="CEP"
                                     />
@@ -403,15 +434,15 @@ const GPSNavigatorScreen = ({ route }) => {
                                 <View style={{ width: '25%' }}>
                                     <TextInput
                                         style={[{ width: '100%', backgroundColor: colors.blue[200], height: 40, paddingLeft: 10, paddingRight: 10 }, borders.borderCircle]}
-                                        value={numero}
-                                        onChangeText={(text) => setNumero(text)}
+                                        value={routeState.numero}
+                                        onChangeText={(text) => setRouteState(prevState => ({ ...prevState, numero: text }))}
                                         keyboardType="numeric"
                                         placeholder="Número"
                                     />
                                 </View>
 
                                 <View style={{ width: '20%', flexDirection: 'row', justifyContent: 'center' }}>
-                                    {!hasRoute ? (
+                                    {!routeState.hasRoute ? (
                                         <TouchableOpacity
                                             onPress={() => calculateRoute()}
                                             style={[{ backgroundColor: colors.blue[500], padding: 12 }, borders.borderCircle]}
@@ -472,17 +503,17 @@ const GPSNavigatorScreen = ({ route }) => {
                                 <TextInput
                                     style={styles.input}
                                     placeholder="Nome da rota"
-                                    value={nomeRota}
-                                    onChangeText={setNomeRota}
+                                    value={routeState.nomeRota}
+                                    onChangeText={(text) => setRouteState(prevState => ({ ...prevState, nomeRota: text }))}
                                 />
 
                                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 15 }}>
                                     <Switch
                                         trackColor={{ false: '#767577', true: '#81b0ff' }}
-                                        thumbColor={bolDisponivelPerfil ? '#007BFF' : '#f4f3f4'}
+                                        thumbColor={routeState.bolDisponivelPerfil ? '#007BFF' : '#f4f3f4'}
                                         ios_backgroundColor="#3e3e3e"
-                                        onValueChange={() => setBolDisponivelPerfil(previousState => !previousState)}
-                                        value={bolDisponivelPerfil}
+                                        onValueChange={() => setRouteState(prevState => ({ ...prevState, bolDisponivelPerfil: !prevState.bolDisponivelPerfil }))}
+                                        value={routeState.bolDisponivelPerfil}
                                     />
 
 
@@ -502,8 +533,19 @@ const GPSNavigatorScreen = ({ route }) => {
                                 </View>
 
                                 <View style={[display.row, display.justifyContentBetween]}>
-                                    <TouchableOpacity onPress={saveRoute} style={styles.button}>
-                                        <Text style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Salvar Rota</Text>
+                                    <TouchableOpacity onPress={saveRoute} style={styles.button} disabled={isLoadingSaveRoute}>
+                                        {isLoadingSaveRoute ? (
+                                            <>
+                                                <ActivityIndicator
+                                                    style={styles.loadingIndicator}
+                                                    size="small"
+                                                    color="#fff"
+                                                />
+                                                <Text style={styles.buttonText}>Salvando...</Text>
+                                            </>
+                                        ) : (
+                                            <Text style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Salvar Rota</Text>
+                                        )}
                                     </TouchableOpacity>
 
                                     <TouchableOpacity onPress={() => setModalSalvarRota(false)} style={styles.buttonDanger}>
@@ -513,6 +555,7 @@ const GPSNavigatorScreen = ({ route }) => {
                             </View>
                         </View>
                     </Modal>
+
                     <Modal
                         animationType="slide"
                         transparent={true}

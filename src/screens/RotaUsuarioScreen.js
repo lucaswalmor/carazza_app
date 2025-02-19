@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from "react-native"; // Importe o componente Image
-import MapView, { Marker, Polyline } from "react-native-maps";
+import MapView, { Marker, Overlay, Polyline } from "react-native-maps";
 import api from "../services/api";
 import * as Sharing from "expo-sharing";
 import { captureRef } from "react-native-view-shot";
@@ -113,6 +113,11 @@ export default function RotaUsuarioScreen({ route }) {
                             style={styles.map}
                             initialRegion={region}
                             ref={mapViewRef}
+                            scrollEnabled={false} // Impede rolagem
+                            zoomEnabled={false} // Impede zoom
+                            rotateEnabled={false} // Impede rotação
+                            pitchEnabled={false} // Impede alteração do ângulo da câmera
+                            pointerEvents="none"
                         >
                             {/* Marcador do ponto inicial */}
                             {rota.length > 0 && (
@@ -124,6 +129,7 @@ export default function RotaUsuarioScreen({ route }) {
                                     title="Início"
                                     description="Ponto inicial da rota"
                                     pinColor="green"
+                                    tappable={false}
                                 />
                             )}
                             {/* Marcador do ponto final */}
@@ -136,6 +142,7 @@ export default function RotaUsuarioScreen({ route }) {
                                     title="Fim"
                                     description="Ponto final da rota"
                                     pinColor="red" // Define a cor do marcador
+                                    tappable={false}
                                 />
                             )}
                             {/* Desenha a rota */}
@@ -164,7 +171,7 @@ export default function RotaUsuarioScreen({ route }) {
                                 <Text style={[fontSize['2xs']]}>
                                     Rota feita por
                                 </Text>
-                                <Text style={[fontSize['xs'], fontWeights['bold'], {maxWidth: 100, textAlign: 'center',}]}>
+                                <Text style={[fontSize['xs'], fontWeights['bold'], { maxWidth: 100, textAlign: 'center', }]}>
                                     {usuarioRota}
                                 </Text>
                             </View>

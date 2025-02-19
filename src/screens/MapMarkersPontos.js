@@ -99,9 +99,8 @@ export default function MapMarkersPontos({ navigation }) {
                             <Marker
                                 key={marker.id}
                                 coordinate={{ latitude: parseFloat(marker?.latitude), longitude: parseFloat(marker?.longitude) }}
-                                image={marker.bol_parceiro === 1 ? require("../assets/icons/pin-green.png") : require("../assets/icons/pin-red.png")}
                                 title={marker?.nome}
-                                pinColor={marker.bol_parceiro === 1 ? colors.green[500] : colors.red[500]}
+                                pinColor={marker.bol_parceiro === 1 ? colors.green[700] : colors.red[500]}
                                 onPress={e => addCoordinates(e.nativeEvent)}
                             />
                         ))}

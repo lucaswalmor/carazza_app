@@ -57,15 +57,22 @@ export default function LoginScreen({ navigation, route }) {
     }
   };
 
-  // useEffect(() => {
-  //   registerForPushNotifications();
-  // }, []);
-
   ////////////////////////////////////////////////////////////////////////////////////////
 
-  useEffect(() => {
-    checkBiometricAuth();
-  }, []);
+   useEffect(() => {
+        const getToken = async () => {
+            const token = await AsyncStorage.getItem('token');
+
+           console.log(token)
+           if (token) {
+                navigation.replace('Main');
+           } else {
+                checkBiometricAuth();
+           }
+        }
+
+        getToken();
+   }, []);
 
   useEffect(() => {
     if (route.params?.message) {
