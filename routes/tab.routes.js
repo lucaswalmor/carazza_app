@@ -15,8 +15,8 @@ export default function TabRoutes() {
                     let iconName;
                     if (route.name === 'GPS') {
                         iconName = 'route';
-                    } else if (route.name === 'Gravar') {
-                        iconName = 'record-vinyl';
+                    } else if (route.name === 'Feed') {
+                        iconName = 'newspaper';
                     } else if (route.name === 'Perfil') {
                         iconName = 'user-alt';
                     } else if (route.name === 'Geral') {
@@ -42,7 +42,7 @@ export default function TabRoutes() {
         >
             <Tab.Screen name="Perfil" component={PerfilScreen} options={{ headerShown: false }} />
             <Tab.Screen name="GPS" component={GPSNavigatorScreen} options={{ headerShown: false }} />
-            <Tab.Screen name="Gravar" component={MapScreen} options={{ headerShown: false }} />
+            {/* <Tab.Screen name="Feed" component={MapScreen} options={{ headerShown: false }} /> */}
             <Tab.Screen name="Geral" component={EventosEncontros} options={{ headerShown: false }} />
         </Tab.Navigator>
     );

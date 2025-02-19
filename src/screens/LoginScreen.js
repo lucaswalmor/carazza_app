@@ -138,7 +138,6 @@ export default function LoginScreen({ navigation, route }) {
       }
 
       if (data.token) {
-        console.log(data.token)
         await AsyncStorage.setItem('token', data.token);
       } else {
         await AsyncStorage.removeItem('token');
