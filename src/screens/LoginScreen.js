@@ -185,7 +185,7 @@ export default function LoginScreen({ navigation, route }) {
   return (
     <View style={stylesLogin.container}>
       <View style={stylesLogin.logoView}>
-        <Image source={require('../assets/img/logo.png')} style={stylesLogin.logo} />
+        <Image source={require('../assets/img/logo_colorida.png')} style={stylesLogin.logo} />
       </View>
 
       <TextInput

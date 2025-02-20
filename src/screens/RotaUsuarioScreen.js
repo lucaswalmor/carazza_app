@@ -4,7 +4,7 @@ import MapView, { Marker, Overlay, Polyline } from "react-native-maps";
 import api from "../services/api";
 import * as Sharing from "expo-sharing";
 import { captureRef } from "react-native-view-shot";
-import { colors, display, fontSize, fontWeights, gap, margins } from "../assets/css/primeflex";
+import { borders, colors, display, fontSize, fontWeights, gap, margins } from "../assets/css/primeflex";
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -162,8 +162,8 @@ export default function RotaUsuarioScreen({ route }) {
                         <View style={[display.row, gap[10], display.alignItemsCenter, { backgroundColor: colors.alpha[1000], padding: 10 }]}>
                             <View>
                                 <Image
-                                    source={require('../assets/img/logo.png')} // Caminho para sua logo
-                                    style={styles.logo}
+                                    source={require('../assets/img/logo_colorida.png')} // Caminho para sua logo
+                                    style={[styles.logo, borders.borderCircle]}
                                 />
                             </View>
 

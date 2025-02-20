@@ -107,8 +107,8 @@ export default function ListaRotasPublicasUsuarioScreen({ navigation, route }) {
                                                         <View style={[display.row, gap[10], margins[2], display.alignItemsCenter]}>
                                                             <View>
                                                                 <Image
-                                                                    source={require('../assets/img/logo.png')} // Caminho para sua logo
-                                                                    style={{ width: 40, height: 40 }}
+                                                                    source={require('../assets/img/logo_colorida.png')} // Caminho para sua logo
+                                                                    style={[{ width: 40, height: 40 }, borders.borderCircle]}
                                                                 />
                                                             </View>
                                                             <View>
