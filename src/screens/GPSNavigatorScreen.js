@@ -76,7 +76,6 @@ const GPSNavigatorScreen = ({ route }) => {
         const initDB = async () => {
             await setupDatabase();
             const savedRoute = await loadRouteFromDB();
-            console.log('savedRoute: ', savedRoute)
             if (Array.isArray(savedRoute) && savedRoute.length > 0) {
                 setRoutes(savedRoute);
                 setLocation(savedRoute[savedRoute.length - 1]);
@@ -166,18 +165,22 @@ const GPSNavigatorScreen = ({ route }) => {
     }
 
     const resetRouteState = async () => {
-        await clearRouteDB();
-        setDestinationCoords([]);
-        setRouteState(prevState => ({
-            ...prevState,
-            cep: "",
-            numero: "",
-            distance: 0,
-            hasRoute: false,
-            finishRoute: false,
-        }));
-        setRoutes([]);
-        setModalSalvarRota(false);
+        const response = await clearRouteDB();
+
+        if (response === 'ok') {
+            setDestinationCoords([]);
+            setRouteState(prevState => ({
+                ...prevState,
+                cep: "",
+                numero: "",
+                distance: 0,
+                hasRoute: false,
+                finishRoute: false,
+                nomeRota: false,
+            }));
+            setRoutes([]);
+            setModalSalvarRota(false);
+        }
     };
 
     const calculateDistance = (pointA, pointB) => {
@@ -292,6 +295,10 @@ const GPSNavigatorScreen = ({ route }) => {
             finishRoute: true,
             tracking: false,
         }))
+    }
+
+    if (!location) {
+        return <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}><ActivityIndicator size="large" color="#0000ff" /></View>;
     }
 
     return (
@@ -535,14 +542,14 @@ const GPSNavigatorScreen = ({ route }) => {
                                 <View style={[display.row, display.justifyContentBetween]}>
                                     <TouchableOpacity onPress={saveRoute} style={styles.button} disabled={isLoadingSaveRoute}>
                                         {isLoadingSaveRoute ? (
-                                            <>
+                                            <View style={[display.row, gap[2]]}>
                                                 <ActivityIndicator
                                                     style={styles.loadingIndicator}
                                                     size="small"
                                                     color="#fff"
                                                 />
-                                                <Text style={styles.buttonText}>Salvando...</Text>
-                                            </>
+                                                <Text style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Salvando...</Text>
+                                            </View>
                                         ) : (
                                             <Text style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Salvar Rota</Text>
                                         )}

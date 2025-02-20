@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, TouchableOpacity, Text, ActivityIndicator, Image, Alert } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import api from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../assets/css/styles';
@@ -92,6 +93,11 @@ export default function ConfiguracoesScreen({ navigation }) {
         }
     }
 
+    const copyToClipboard = async (text) => {
+        await Clipboard.setStringAsync(text);
+        // Alert.alert("Copiado!", "O link foi copiado para a área de transferência.");
+    };
+
     return (
         <View style={{ flex: 1, padding: 10, paddingTop: 20 }}>
             {isLoading ? (
@@ -115,7 +121,26 @@ export default function ConfiguracoesScreen({ navigation }) {
                         </Text>
                     </View>
 
-                    {/* Card 2: Logout */}
+                    {/* Card 2: Codigo referencia */}
+                    {user && user.tipo_usuario === 3 && (
+                        <Card
+                            borderBottomColor={colors.blue[500]}
+                            title={<View><Text style={{ color: colors.blue[500], fontSize: 18, fontWeight: 'bold' }}>Código de referência</Text></View>}
+                            content={
+                                <View style={[display.row, display.justifyContentBetween]}>
+                                    <Text style={{ color: colors.blue[500], fontSize: 14, maxWidth: 250, textAlign: 'center', }}>
+                                        https://www.motostrada.com.br/cadastro?inf=0&ref={user?.refferal_code}
+                                    </Text>
+                    
+                                    <TouchableOpacity onPress={() => copyToClipboard(`https://www.motostrada.com.br/cadastro?inf=0&ref=${user?.refferal_code}`)}>
+                                        <Ionicons name="copy-outline" size={24} color={colors.blue[500]} />
+                                    </TouchableOpacity>
+                                </View>
+                            }
+                        />
+                    )}
+
+                    {/* Card 3: Pausar assinatura */}
                     <View style={[styles.cardDanger, { gap: 10, flexDirection: 'row', alignItems: 'center' }]}>
                         <TouchableOpacity
                             style={{ flex: 1, alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}
@@ -129,6 +154,7 @@ export default function ConfiguracoesScreen({ navigation }) {
                         </TouchableOpacity>
                     </View>
 
+                    {/* Card 4: Logout */}
                     <Card
                         borderBottomColor={colors.gray[400]}
                         content={
@@ -136,7 +162,7 @@ export default function ConfiguracoesScreen({ navigation }) {
                                 style={[display.row, display.justifyContentBetween]}
                             >
                                 <TouchableOpacity
-                                    style={[ display.flex , display.row, display.justifyContentBetween]}
+                                    style={[display.flex, display.row, display.justifyContentBetween]}
                                     onPress={handleLogout}
                                 >
                                     <Text style={[{ color: colors.gray[400], fontSize: 18, fontWeight: 'bold' }]}>

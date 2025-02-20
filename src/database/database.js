@@ -34,4 +34,5 @@ export const loadRouteFromDB = async () => {
 export const clearRouteDB = async () => {
     if (!db) return;
     await db.runAsync('DELETE FROM routes');
+    return 'ok'
 };

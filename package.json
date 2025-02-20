@@ -45,7 +45,8 @@
     "expo-screen-capture": "~7.0.1",
     "expo-sharing": "~13.0.1",
     "react-native-view-shot": "~4.0.3",
-    "expo-sqlite": "~15.1.2"
+    "expo-sqlite": "~15.1.2",
+    "expo-clipboard": "~7.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

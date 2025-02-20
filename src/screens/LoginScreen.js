@@ -62,8 +62,7 @@ export default function LoginScreen({ navigation, route }) {
    useEffect(() => {
         const getToken = async () => {
             const token = await AsyncStorage.getItem('token');
-
-           console.log(token)
+            
            if (token) {
                 navigation.replace('Main');
            } else {
@@ -185,7 +184,7 @@ export default function LoginScreen({ navigation, route }) {
   return (
     <View style={stylesLogin.container}>
       <View style={stylesLogin.logoView}>
-        <Image source={require('../assets/img/logo_colorida.png')} style={stylesLogin.logo} />
+        <Image source={require('../assets/img/logo1.png')} style={stylesLogin.logo} resizeMode="contain" />
       </View>
 
       <TextInput
@@ -352,6 +351,8 @@ const stylesLogin = StyleSheet.create({
     width: 150,
     height: 150,
     marginBottom: 40,
+    alignSelf: 'center', 
+    flexShrink: 1,  
   },
   registerContainer: {
     flexDirection: 'row',
