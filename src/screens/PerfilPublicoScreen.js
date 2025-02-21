@@ -107,8 +107,8 @@ export default function PerfilPublicoScreen({ navigation, route }) {
                 <View style={{ flex: 1 }}>
                     <ScrollView style={{ flex: 1 }}>
                         {/* Card 1: Avatar */}
-                        <View style={{ flex: 1, height: 160, backgroundColor: colors.primary[400], padding: 20, gap: 20 }}>
-                            <View style={{ gap: 10, flexDirection: 'row', alignItems: 'center' }}>
+                        <View style={{ flex: 1, height: 160, backgroundColor: colors.primary[400], padding: 20, gap: 10 }}>
+                            <View style={{ gap: 10, flexDirection: 'row', alignItems: 'center', justifyContent: user && user.bol_pioneiro ? 'space-between' : 'flex-start' }}>
                                 <Image
                                     source={{ uri: user?.img_perfil || 'https://i.ibb.co/5kkRBSS/default-Avatar.png' }}
                                     style={styles.avatar}
@@ -150,6 +150,18 @@ export default function PerfilPublicoScreen({ navigation, route }) {
                                         )}
                                     </View>
                                 </View>
+
+                                {user && user.bol_pioneiro && (
+                                    <View style={[display.alignItemsCenter, display.justifyContentCenter, gap[2]]}>
+                                        <Image
+                                            source={require('../assets/img/medalha-pioneiro2.png')}
+                                            style={[{ width: 50, height: 50, borderRadius: 50 }]}
+                                            onError={() => console.log('Erro ao carregar a imagem.')}
+                                        />
+
+                                        <Text style={[{ color: colors.primary[500], backgroundColor: colors.primary[50], padding: 3, letterSpacing: 1 }, borders.borderCircle, fontSize['3xs'], fontWeights['bold']]}>Pioneiro</Text>
+                                    </View>
+                                )}
                             </View>
 
                             <View style={{ gap: 10, flexDirection: 'row', alignItems: 'center' }}>
@@ -209,7 +221,7 @@ export default function PerfilPublicoScreen({ navigation, route }) {
                                         </View>
 
                                         {/* Listar Conquistas agrupadas por ano */}
-                                        {conquistas.length > 0 ? (
+                                        {conquistas && conquistas.length > 0 ? (
                                             Object.entries(conquistas ?? {}).map(([ano, conquistasAno]) => (
                                                 <View key={ano} style={{ marginTop: 15 }}>
                                                     {/* Título do Ano */}

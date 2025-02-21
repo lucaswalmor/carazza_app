@@ -12,8 +12,6 @@ export default function PerfilScreen({ navigation }) {
     const [isLoading, setIsLoading] = useState(false);
     const [user, setUser] = useState(null);
     const [conquistas, setConquistas] = useState(null);
-    const [seguindo, setSeguindo] = useState([]);
-    const [loading, setLoading] = useState(true);
 
     useFocusEffect(
         useCallback(() => {
@@ -77,8 +75,8 @@ export default function PerfilScreen({ navigation }) {
             ) : (
                 <View style={{ flex: 1 }}>
                     <ScrollView style={{ flex: 1 }}>
-                        <View style={{ flex: 1, height: 160, backgroundColor: colors.primary[400], padding: 20, gap: 20 }}>
-                            <View style={{ gap: 10, flexDirection: 'row', alignItems: 'center' }}>
+                        <View style={{ flex: 1, height: 170, backgroundColor: colors.primary[400], padding: 20, gap: 20 }}>
+                            <View style={{ gap: 10, flexDirection: 'row', alignItems: 'center', justifyContent: user && user.bol_pioneiro ? 'space-between' : 'flex-start' }}>
                                 <Image
                                     source={{ uri: user?.img_perfil || 'https://i.ibb.co/5kkRBSS/default-Avatar.png' }}
                                     style={styles.avatar}
@@ -139,6 +137,18 @@ export default function PerfilScreen({ navigation }) {
                                         </TouchableOpacity>
                                     </View>
                                 </View>
+
+                                {user && user.bol_pioneiro && (
+                                    <View style={[display.alignItemsCenter, display.justifyContentCenter, gap[2]]}>
+                                        <Image
+                                            source={require('../assets/img/medalha-pioneiro2.png')}
+                                            style={[{ width: 50, height: 50, borderRadius: 50 }]}
+                                            onError={() => console.log('Erro ao carregar a imagem.')}
+                                        />
+
+                                        <Text style={[{ color: colors.primary[500], backgroundColor: colors.primary[50], padding: 3, letterSpacing: 1 }, borders.borderCircle, fontSize['3xs'], fontWeights['bold']]}>Pioneiro</Text>
+                                    </View>
+                                )}
                             </View>
 
                             <View style={[{ backgroundColor: colors.primary[100], padding: 3 }, borders.borderCircle]}>
@@ -261,7 +271,7 @@ export default function PerfilScreen({ navigation }) {
                                 </>
                             }
                         />
-                        
+
                         {/* Card de quadro de meus desafios */}
                         <Card
                             borderBottomColor={colors.blue[500]}
