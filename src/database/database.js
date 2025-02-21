@@ -10,17 +10,20 @@ export const setupDatabase = async () => {
         CREATE TABLE IF NOT EXISTS routes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             latitude REAL NOT NULL,
-            longitude REAL NOT NULL
+            longitude REAL NOT NULL,
+            distancia REAL NOT NULL
         );
     `);
+
+    console.log('banco de dados novo criado')
 };
 
 // Função para salvar a coordenada
-export const saveRouteToDB = async (latitude, longitude) => {
+export const saveRouteToDB = async (latitude, longitude, distancia) => {
     if (!db) return;
     await db.runAsync(
-        'INSERT INTO routes (latitude, longitude) VALUES (?, ?)',
-        latitude, longitude
+        'INSERT INTO routes (latitude, longitude, distancia) VALUES (?, ?, ?)',
+        latitude, longitude, distancia
     );
 };
 

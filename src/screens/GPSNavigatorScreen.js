@@ -76,12 +76,15 @@ const GPSNavigatorScreen = ({ route }) => {
         const initDB = async () => {
             await setupDatabase();
             const savedRoute = await loadRouteFromDB();
+            console.log('savedRoute: ', savedRoute)
+
             if (Array.isArray(savedRoute) && savedRoute.length > 0) {
                 setRoutes(savedRoute);
                 setLocation(savedRoute[savedRoute.length - 1]);
                 setRouteState((prevState) => ({
                     ...prevState,
                     tracking: true,
+                    distance: savedRoute[savedRoute.length - 1].distancia
                 }));
             }
         };
@@ -117,18 +120,24 @@ const GPSNavigatorScreen = ({ route }) => {
 
                 if (routeState.tracking) {
                     setRoutes((prevRoute) => {
+                        let newDistance = 0;
+
                         if (prevRoute.length > 0) {
                             const lastPoint = prevRoute[prevRoute.length - 1];
-                            const newDistance = calculateDistance(lastPoint, response.coords);
-                            setRouteState((prevState) => ({
-                                ...prevState,
-                                distance: prevState.distance + newDistance,
-                            }));
+                            newDistance = calculateDistance(lastPoint, response.coords);
                         }
+
+                        setRouteState((prevState) => {
+                            const updatedDistance = prevState.distance + newDistance;
+
+                            // Salva a distância correta no banco
+                            saveRouteToDB(response.coords.latitude, response.coords.longitude, updatedDistance);
+
+                            return { ...prevState, distance: updatedDistance };
+                        });
 
                         return [...prevRoute, response.coords];
                     });
-                    saveRouteToDB(response.coords.latitude, response.coords.longitude);
                 }
             }
         );
@@ -298,7 +307,7 @@ const GPSNavigatorScreen = ({ route }) => {
     }
 
     if (!location) {
-        return <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}><ActivityIndicator size="large" color="#0000ff" /></View>;
+        return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><ActivityIndicator size="large" color="#0000ff" /></View>;
     }
 
     return (

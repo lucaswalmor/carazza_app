@@ -131,6 +131,7 @@ export default function ListaRotasPublicasUsuarioScreen({ navigation, route }) {
 
                                                             <View>
                                                                 <TouchableOpacity
+                                                                    style={[{borderWidth: 1, borderColor: colors.blue[500], padding: 10}, borders.borderCircle]}
                                                                     onPress={() => navigateToGps(rotaItem.rota)}
                                                                 >
                                                                     <FontAwesome5 name="location-arrow" size={16} color={colors.blue[500]} />
@@ -145,10 +146,10 @@ export default function ListaRotasPublicasUsuarioScreen({ navigation, route }) {
                                                                 style={styles2.map}
                                                                 initialRegion={region}
                                                                 scrollEnabled={false} // Desativa o movimento de arrastar
-                                                                zoomEnabled={false}   // Desativa o zoom
-                                                                pitchEnabled={false}  // Desativa a inclinação
-                                                                rotateEnabled={false} // Desativa a rotação
-                                                                toolbarEnabled={false} // Remove a barra de ferramentas (Android)
+                                                                zoomEnabled={false}
+                                                                pitchEnabled={false}
+                                                                rotateEnabled={false}
+                                                                toolbarEnabled={false}
                                                             >
                                                                 <Polyline
                                                                     coordinates={rotaItem.rota}
