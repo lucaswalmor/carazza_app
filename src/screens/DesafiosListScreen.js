@@ -67,7 +67,7 @@ export default function DesafioListScreen({ navigation, route }) {
   if (isLoading && !isRefreshing) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007BFF" />
+        <ActivityIndicator size="large" color="#1d1e22" />
       </View>
     );
   }

@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
         top: 10,
         right: 10,
         zIndex: 1,
-        backgroundColor: "#007BFF",
+        backgroundColor: "#1d1e22",
         padding: 10,
         borderRadius: 8,
         elevation: 5, // Sombras no Android

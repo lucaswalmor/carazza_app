@@ -14,8 +14,6 @@ export const setupDatabase = async () => {
             distancia REAL NOT NULL
         );
     `);
-
-    console.log('banco de dados novo criado')
 };
 
 // Função para salvar a coordenada

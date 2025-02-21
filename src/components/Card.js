@@ -2,9 +2,9 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import PropTypes from 'prop-types';
 
-const Card = ({ title, content, footer, borderBottomColor = '#007BFF', backgroundColor = '#fff' }) => {
+const Card = ({ title, content, footer, borderRadius = 10, marginBottom = 10, borderBottomWidth = 5, borderBottomColor = '#1d1e22', backgroundColor = '#fff' }) => {
     return (
-        <View style={[styles.card, { borderBottomColor, backgroundColor }]}>
+        <View style={[styles.card, { borderBottomColor, backgroundColor, borderRadius, marginBottom, borderBottomWidth }]}>
             {title && <View style={styles.cardTitle}>{title}</View>}
 
             {/* Verificar se content foi passado */}
@@ -18,15 +18,13 @@ const Card = ({ title, content, footer, borderBottomColor = '#007BFF', backgroun
 
 const styles = StyleSheet.create({
     card: {
-        borderRadius: 10,
         padding: 15,
-        marginBottom: 10,
         elevation: 3,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.2,
         shadowRadius: 1,
-        borderBottomWidth: 5,
+        
     },
     cardTitle: {
         fontSize: 18,

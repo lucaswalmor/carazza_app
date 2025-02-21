@@ -365,7 +365,7 @@ const stylesLogin = StyleSheet.create({
   registerLink: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#007BFF',
+    color: '#1d1e22',
     marginLeft: 5,
   },
 });

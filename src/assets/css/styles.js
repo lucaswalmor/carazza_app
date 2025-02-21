@@ -19,19 +19,19 @@ const styles = StyleSheet.create({
     },
     input: {
         height: 50,
-        borderColor: '#007BFF',
+        borderColor: '#1d1e22',
         borderRadius: 5,
         marginBottom: 15,
         paddingHorizontal: 10,
         fontSize: 16,
         backgroundColor: '#f9f9f9',
         borderBottomWidth: 2,
-        borderBottomColor: '#007BFF',
+        borderBottomColor: '#1d1e22',
         borderWidth: 0,
     },
     inputComum: {
         height: 50,
-        borderColor: '#007BFF',
+        borderColor: '#1d1e22',
         borderRadius: 5,
         fontSize: 16,
         backgroundColor: '#f9f9f9',
@@ -44,8 +44,8 @@ const styles = StyleSheet.create({
     textArea: {
         height: 80,
         borderBottomWidth: 2,
-        borderBottomColor: '#007BFF',
-        borderColor: '#007BFF',
+        borderBottomColor: '#1d1e22',
+        borderColor: '#1d1e22',
         borderRadius: 5,
         marginBottom: 15,
         paddingHorizontal: 10,
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     },
     button: {
         height: 50,
-        backgroundColor: '#007BFF',
+        backgroundColor: '#1d1e22',
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 5,
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     },
     buttonSend: {
         height: 30,
-        backgroundColor: '#007BFF',
+        backgroundColor: '#1d1e22',
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 25,
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 1,
         borderBottomWidth: 5,
-        borderBottomColor: '#007BFF',
+        borderBottomColor: '#1d1e22',
     },
     cardDanger: {
         backgroundColor: '#fff',
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
         color: '#FFCA00'
     },
     textPrimary: {
-        color: '#007BFF'
+        color: '#1d1e22'
     },
     avatar: {
         width: 60,
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     },
     infoTitle: {
         fontSize: 16,
-        color: '#007BFF',
+        color: '#1d1e22',
         fontWeight: 'bold'
     },
     modalCenteredView: {
@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
     },
     textCardTitleEncontros: {
         fontWeight: 'bold',
-        color: '#007BFF',
+        color: '#1d1e22',
         fontSize: 18,
     },
     textCardEncontros: {
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
     registerLink: {
         fontSize: 14,
         fontWeight: 'bold',
-        color: '#007BFF',
+        color: '#1d1e22',
         marginLeft: 5,
     },
     map: {

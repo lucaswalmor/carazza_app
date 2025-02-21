@@ -29,11 +29,11 @@ export default function StackRoutes() {
             tabBarActiveTintColor: '#fff', // Cor dos ícones ativos
             tabBarInactiveTintColor: '#000c19', // Cor dos ícones inativos
             tabBarStyle: {
-                backgroundColor: '#007bff', // Cor de fundo da aba
+                backgroundColor: '#1d1e22', // Cor de fundo da aba
                 borderTopWidth: 0,         // Remove a borda superior
             },
             headerStyle: {
-                backgroundColor: '#007bff', // Cor de fundo do cabeçalho
+                backgroundColor: '#1d1e22', // Cor de fundo do cabeçalho
             },
             headerTintColor: '#FFFFFF', // Cor do texto no cabeçalho
             headerTitleStyle: {

@@ -26,7 +26,7 @@ const Tab = ({
     children,
     isActive,
     onPress,
-    activeBackgroundColor = '#007BFF',
+    activeBackgroundColor = '#1d1e22',
     inactiveBackgroundColor = '#e9ecef',
     activeTextColor = '#fff',
     inactiveTextColor = '#000',
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     activeTab: {
-        backgroundColor: '#007BFF',
+        backgroundColor: '#1d1e22',
     },
     tabText: {
         color: '#000',

@@ -103,7 +103,7 @@ export default function ConfiguracoesScreen({ navigation }) {
             {isLoading ? (
                 <>
                     <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                        <ActivityIndicator size="large" color="#007BFF" />
+                        <ActivityIndicator size="large" color="#1d1e22" />
                     </View>
                 </>
             ) : (

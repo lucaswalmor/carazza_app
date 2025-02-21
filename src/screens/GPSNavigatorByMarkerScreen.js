@@ -460,7 +460,7 @@ const GPSNavigatorScreen = ({ route }) => {
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 15 }}>
                             <Switch
                                 trackColor={{ false: '#767577', true: '#81b0ff' }}
-                                thumbColor={bolDisponivelPerfil ? '#007BFF' : '#f4f3f4'}
+                                thumbColor={bolDisponivelPerfil ? '#1d1e22' : '#f4f3f4'}
                                 ios_backgroundColor="#3e3e3e"
                                 onValueChange={() => setBolDisponivelPerfil(previousState => !previousState)}
                                 value={bolDisponivelPerfil}

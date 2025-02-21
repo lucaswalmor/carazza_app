@@ -49,7 +49,7 @@ export default function RankingGeralScreen({ navigation }) {
                                 alignItems: 'center',
                                 justifyContent: 'center',
                             }}>
-                            <ActivityIndicator size="large" color="#007BFF" />
+                            <ActivityIndicator size="large" color="#1d1e22" />
                         </View>
                     </>
                 ) : (

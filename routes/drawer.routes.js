@@ -53,7 +53,7 @@ export default function DrawerRoutes() {
     return (
         <Drawer.Navigator
             screenOptions={({ route }) => ({
-                headerStyle: { backgroundColor: '#007bff' },
+                headerStyle: { backgroundColor: '#1d1e22' },
                 headerTintColor: '#fff',
                 headerTitleStyle: { fontWeight: 'bold' },
                 drawerStyle: { backgroundColor: '#f4f4f4' },

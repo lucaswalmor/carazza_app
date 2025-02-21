@@ -42,7 +42,7 @@ export default function MeusDesafiosScreen({ navigation }) {
   if (isLoading && !isRefreshing) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007BFF" />
+        <ActivityIndicator size="large" color="#1d1e22" />
       </View>
     );
   }

@@ -76,7 +76,6 @@ const GPSNavigatorScreen = ({ route }) => {
         const initDB = async () => {
             await setupDatabase();
             const savedRoute = await loadRouteFromDB();
-            console.log('savedRoute: ', savedRoute)
 
             if (Array.isArray(savedRoute) && savedRoute.length > 0) {
                 setRoutes(savedRoute);
@@ -526,7 +525,7 @@ const GPSNavigatorScreen = ({ route }) => {
                                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 15 }}>
                                     <Switch
                                         trackColor={{ false: '#767577', true: '#81b0ff' }}
-                                        thumbColor={routeState.bolDisponivelPerfil ? '#007BFF' : '#f4f3f4'}
+                                        thumbColor={routeState.bolDisponivelPerfil ? '#1d1e22' : '#f4f3f4'}
                                         ios_backgroundColor="#3e3e3e"
                                         onValueChange={() => setRouteState(prevState => ({ ...prevState, bolDisponivelPerfil: !prevState.bolDisponivelPerfil }))}
                                         value={routeState.bolDisponivelPerfil}

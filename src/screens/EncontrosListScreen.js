@@ -188,7 +188,7 @@ export default function EncontrosListScreen({  }) {
     if (isLoading && !isRefreshing) {
         return (
             <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#007BFF" />
+                <ActivityIndicator size="large" color="#1d1e22" />
             </View>
         );
     }
@@ -196,7 +196,7 @@ export default function EncontrosListScreen({  }) {
     return (
         <SafeAreaView style={{ flex: 1 }}>
             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                <View style={{ backgroundColor: '#007BFF', height: 120, padding: 20, justifyContent: 'space-evenly', gap: 5, position: 'relative' }}>
+                <View style={{ backgroundColor: '#1d1e22', height: 120, padding: 20, justifyContent: 'space-evenly', gap: 5, position: 'relative' }}>
                     <Text style={{ textAlign: 'center', color: '#fff', fontSize: 20, fontWeight: 'bold', marginBottom: 10 }}>
                         Lista de Encontros
                     </Text>
@@ -209,7 +209,7 @@ export default function EncontrosListScreen({  }) {
                     />
                     {cidade.length > 0 && (
                         <TouchableOpacity onPress={clearInput} style={styles.clearButton}>
-                            <Ionicons name="close-circle" size={24} color="#007BFF" />
+                            <Ionicons name="close-circle" size={24} color="#1d1e22" />
                         </TouchableOpacity>
                     )}
                 </View>
@@ -243,7 +243,7 @@ export default function EncontrosListScreen({  }) {
                             <RefreshControl
                                 refreshing={isRefreshing}
                                 onRefresh={refreshEncontros}
-                                colors={['#007BFF']}
+                                colors={['#1d1e22']}
                             />
                         }
                         scrollEnabled={false}
@@ -266,7 +266,7 @@ export default function EncontrosListScreen({  }) {
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                     <Switch
                                         trackColor={{ false: '#767577', true: '#81b0ff' }}
-                                        thumbColor={denuncia.bol_spam_ou_propaganda ? '#007BFF' : '#f4f3f4'}
+                                        thumbColor={denuncia.bol_spam_ou_propaganda ? '#1d1e22' : '#f4f3f4'}
                                         ios_backgroundColor="#3e3e3e"
                                         onValueChange={() => toggleSwitch('bol_spam_ou_propaganda')}
                                         value={denuncia.bol_spam_ou_propaganda}
@@ -286,7 +286,7 @@ export default function EncontrosListScreen({  }) {
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                     <Switch
                                         trackColor={{ false: '#767577', true: '#81b0ff' }}
-                                        thumbColor={denuncia.bol_motivo_suspeito ? '#007BFF' : '#f4f3f4'}
+                                        thumbColor={denuncia.bol_motivo_suspeito ? '#1d1e22' : '#f4f3f4'}
                                         ios_backgroundColor="#3e3e3e"
                                         onValueChange={() => toggleSwitch('bol_motivo_suspeito')}
                                         value={denuncia.bol_motivo_suspeito}
@@ -306,7 +306,7 @@ export default function EncontrosListScreen({  }) {
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                     <Switch
                                         trackColor={{ false: '#767577', true: '#81b0ff' }}
-                                        thumbColor={denuncia.bol_encontro_ficticio ? '#007BFF' : '#f4f3f4'}
+                                        thumbColor={denuncia.bol_encontro_ficticio ? '#1d1e22' : '#f4f3f4'}
                                         ios_backgroundColor="#3e3e3e"
                                         onValueChange={() => toggleSwitch('bol_encontro_ficticio')}
                                         value={denuncia.bol_encontro_ficticio}
@@ -326,7 +326,7 @@ export default function EncontrosListScreen({  }) {
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                     <Switch
                                         trackColor={{ false: '#767577', true: '#81b0ff' }}
-                                        thumbColor={denuncia.bol_risco_seguranca ? '#007BFF' : '#f4f3f4'}
+                                        thumbColor={denuncia.bol_risco_seguranca ? '#1d1e22' : '#f4f3f4'}
                                         ios_backgroundColor="#3e3e3e"
                                         onValueChange={() => toggleSwitch('bol_risco_seguranca')}
                                         value={denuncia.bol_risco_seguranca}
@@ -346,7 +346,7 @@ export default function EncontrosListScreen({  }) {
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                     <Switch
                                         trackColor={{ false: '#767577', true: '#81b0ff' }}
-                                        thumbColor={denuncia.bol_fora_tema ? '#007BFF' : '#f4f3f4'}
+                                        thumbColor={denuncia.bol_fora_tema ? '#1d1e22' : '#f4f3f4'}
                                         ios_backgroundColor="#3e3e3e"
                                         onValueChange={() => toggleSwitch('bol_fora_tema')}
                                         value={denuncia.bol_fora_tema}
@@ -366,7 +366,7 @@ export default function EncontrosListScreen({  }) {
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                     <Switch
                                         trackColor={{ false: '#767577', true: '#81b0ff' }}
-                                        thumbColor={denuncia.bol_informacoes_falsas ? '#007BFF' : '#f4f3f4'}
+                                        thumbColor={denuncia.bol_informacoes_falsas ? '#1d1e22' : '#f4f3f4'}
                                         ios_backgroundColor="#3e3e3e"
                                         onValueChange={() => toggleSwitch('bol_informacoes_falsas')}
                                         value={denuncia.bol_informacoes_falsas}

@@ -150,7 +150,7 @@ const PontosListScreen = ({ }) => {
                             <Ionicons
                                 name={item.like ? "thumbs-up" : "thumbs-up-outline"}
                                 size={24}
-                                color="#007BFF"
+                                color="#1d1e22"
                                 style={{ marginRight: 10 }}
                             />
                             <Text>{item.like_count}</Text>
@@ -164,7 +164,7 @@ const PontosListScreen = ({ }) => {
     if (isLoading && !isRefreshing) {
         return (
             <View style={stylesPontoListScreen.loadingContainer}>
-                <ActivityIndicator size="large" color="#007BFF" />
+                <ActivityIndicator size="large" color="#1d1e22" />
             </View>
         );
     }
@@ -175,7 +175,7 @@ const PontosListScreen = ({ }) => {
                 style={{ flex: 1 }}
                 keyboardShouldPersistTaps="handled"
             >
-                <View style={{ backgroundColor: '#007BFF', height: 120, padding: 20, justifyContent: 'space-evenly', gap: 5, position: 'relative' }}>
+                <View style={{ backgroundColor: '#1d1e22', height: 120, padding: 20, justifyContent: 'space-evenly', gap: 5, position: 'relative' }}>
                     <Text style={{ textAlign: 'center', color: '#fff', fontSize: 20, fontWeight: 'bold', marginBottom: 10 }}>
                         Lista de Pontos
                     </Text>
@@ -187,7 +187,7 @@ const PontosListScreen = ({ }) => {
                     />
                     {cidade.length > 0 && (
                         <TouchableOpacity onPress={clearInput} style={styles.clearButton}>
-                            <Ionicons name="close-circle" size={24} color="#007BFF" />
+                            <Ionicons name="close-circle" size={24} color="#1d1e22" />
                         </TouchableOpacity>
                     )}
                 </View>
@@ -221,7 +221,7 @@ const PontosListScreen = ({ }) => {
                             <RefreshControl
                                 refreshing={isRefreshing}
                                 onRefresh={refreshPontos}
-                                colors={['#007BFF']}
+                                colors={['#1d1e22']}
                             />
                         }
                         scrollEnabled={false}

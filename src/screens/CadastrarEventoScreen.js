@@ -591,7 +591,7 @@ const CadastrarEventoScreen = ({ navigation }) => {
                                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                                         <Switch
                                             trackColor={{ false: '#767577', true: '#81b0ff' }}
-                                            thumbColor={bolShowsMusicais ? '#007BFF' : '#f4f3f4'}
+                                            thumbColor={bolShowsMusicais ? '#1d1e22' : '#f4f3f4'}
                                             ios_backgroundColor="#3e3e3e"
                                             onValueChange={() => setBolShowsMusicais(previousState => !previousState)}
                                             value={bolShowsMusicais}
@@ -605,7 +605,7 @@ const CadastrarEventoScreen = ({ navigation }) => {
                                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                                         <Switch
                                             trackColor={{ false: '#767577', true: '#81b0ff' }}
-                                            thumbColor={bolFoodTruck ? '#007BFF' : '#f4f3f4'}
+                                            thumbColor={bolFoodTruck ? '#1d1e22' : '#f4f3f4'}
                                             ios_backgroundColor="#3e3e3e"
                                             onValueChange={() => setBolFoodTruck(previousState => !previousState)}
                                             value={bolFoodTruck}
@@ -619,7 +619,7 @@ const CadastrarEventoScreen = ({ navigation }) => {
                                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                                         <Switch
                                             trackColor={{ false: '#767577', true: '#81b0ff' }}
-                                            thumbColor={bolEntradaPaga ? '#007BFF' : '#f4f3f4'}
+                                            thumbColor={bolEntradaPaga ? '#1d1e22' : '#f4f3f4'}
                                             ios_backgroundColor="#3e3e3e"
                                             onValueChange={() => setBolEntradaPaga(previousState => !previousState)}
                                             value={bolEntradaPaga}
@@ -667,7 +667,7 @@ const CadastrarEventoScreen = ({ navigation }) => {
                                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                                         <Switch
                                             trackColor={{ false: '#767577', true: '#81b0ff' }}
-                                            thumbColor={bolRotaPasseio ? '#007BFF' : '#f4f3f4'}
+                                            thumbColor={bolRotaPasseio ? '#1d1e22' : '#f4f3f4'}
                                             ios_backgroundColor="#3e3e3e"
                                             onValueChange={() => setBolRotaPasseio(previousState => !previousState)}
                                             value={bolRotaPasseio}
@@ -702,7 +702,7 @@ const CadastrarEventoScreen = ({ navigation }) => {
                                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                                         <Switch
                                             trackColor={{ false: '#767577', true: '#81b0ff' }}
-                                            thumbColor={bolEstacionamento ? '#007BFF' : '#f4f3f4'}
+                                            thumbColor={bolEstacionamento ? '#1d1e22' : '#f4f3f4'}
                                             ios_backgroundColor="#3e3e3e"
                                             onValueChange={() => setBolEstacionamento(previousState => !previousState)}
                                             value={bolEstacionamento}
@@ -719,7 +719,7 @@ const CadastrarEventoScreen = ({ navigation }) => {
                                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                                                 <Switch
                                                     trackColor={{ false: '#767577', true: '#81b0ff' }}
-                                                    thumbColor={bolEstacionamentoPago ? '#007BFF' : '#f4f3f4'}
+                                                    thumbColor={bolEstacionamentoPago ? '#1d1e22' : '#f4f3f4'}
                                                     ios_backgroundColor="#3e3e3e"
                                                     onValueChange={() => setBolEstacionamentoPago(previousState => !previousState)}
                                                     value={bolEstacionamentoPago}

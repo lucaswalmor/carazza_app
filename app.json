@@ -25,15 +25,24 @@
             "CFBundleURLSchemes": [
               "myapp"
             ]
+          },
+          {
+            "CFBundleURLName": "myapp",
+            "CFBundleURLSchemes": [
+              "myapp"
+            ]
           }
         ],
         "UIBackgroundModes": [
+          "remote-notification",
+          "location",
           "remote-notification",
           "location"
         ],
         "NSLocationWhenInUseUsageDescription": "Nós precisamos da sua localização para mostrar e gravar a rota.",
         "NSLocationAlwaysUsageDescription": "Nós precisamos da sua localização mesmo quando o aplicativo está em segundo plano.",
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "Precisamos da sua localização para fornecer atualizações contínuas, mesmo com o app em segundo plano."
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Precisamos da sua localização para fornecer atualizações contínuas, mesmo com o app em segundo plano.",
+        "ITSAppUsesNonExemptEncryption": false
       },
       "bundleIdentifier": "com.lucassteinbach.Carazza"
     },
@@ -48,7 +57,9 @@
         "ACCESS_COARSE_LOCATION",
         "ACCESS_BACKGROUND_LOCATION",
         "FOREGROUND_SERVICE",
-        "RECEIVE_BOOT_COMPLETED"
+        "RECEIVE_BOOT_COMPLETED",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
       ],
       "useNextNotificationsApi": true,
       "adaptiveIcon": {

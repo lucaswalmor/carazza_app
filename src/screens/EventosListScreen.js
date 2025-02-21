@@ -119,7 +119,7 @@ export default function EventosListScreen({ }) {
     if (isLoading && !isRefreshing) {
         return (
             <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#007BFF" />
+                <ActivityIndicator size="large" color="#1d1e22" />
             </View>
         );
     }
@@ -131,7 +131,7 @@ export default function EventosListScreen({ }) {
                 contentContainerStyle={{ paddingBottom: 200 }}
                 keyboardShouldPersistTaps="handled"
             >
-                <View style={{ backgroundColor: '#007BFF', height: 120, padding: 20, justifyContent: 'space-evenly', gap: 5, position: 'relative' }}>
+                <View style={{ backgroundColor: '#1d1e22', height: 120, padding: 20, justifyContent: 'space-evenly', gap: 5, position: 'relative' }}>
                     <Text style={{ textAlign: 'center', color: '#fff', fontSize: 20, fontWeight: 'bold', marginBottom: 10 }}>
                         Lista de Eventos
                     </Text>
@@ -143,7 +143,7 @@ export default function EventosListScreen({ }) {
                     />
                     {cidade.length > 0 && (
                         <TouchableOpacity onPress={clearInput} style={styles.clearButton}>
-                            <Ionicons name="close-circle" size={24} color="#007BFF" />
+                            <Ionicons name="close-circle" size={24} color="#1d1e22" />
                         </TouchableOpacity>
                     )}
                 </View>
@@ -177,7 +177,7 @@ export default function EventosListScreen({ }) {
                             <RefreshControl
                                 refreshing={isRefreshing}
                                 onRefresh={refreshEventos}
-                                colors={['#007BFF']}
+                                colors={['#1d1e22']}
                             />
                         }
                         scrollEnabled={false}

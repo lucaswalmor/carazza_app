@@ -83,7 +83,7 @@ export default function NotificacoesScreen({ navigation }) {
         <View style={{ flex: 1, padding: 10, paddingTop: 20 }}>
             {isLoading ? (
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                    <ActivityIndicator size="large" color="#007BFF" />
+                    <ActivityIndicator size="large" color="#1d1e22" />
                 </View>
             ) : (
                 notificacoes.length > 0 ? (

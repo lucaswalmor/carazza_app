@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, Animated, StyleSheet } from 'react-native
 import { borders } from '../assets/css/primeflex';
 import { FontAwesome5 } from '@expo/vector-icons';
 
-const Accordion = ({ title, children, index, activeIndex, setActiveIndex, backgroundColor = '#007BFF', textColor = '#fff' }) => {
+const Accordion = ({ title, children, index, activeIndex, setActiveIndex, backgroundColor = '#1d1e22', textColor = '#fff' }) => {
     const toggleAccordion = () => {
         if (activeIndex === index) {
             setActiveIndex(null);
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
         elevation: 2,
     },
     accordionHeader: {
-        backgroundColor: '#007BFF',  // Azul do Bootstrap
+        backgroundColor: '#1d1e22',  // Azul do Bootstrap
         paddingVertical: 15,
         paddingHorizontal: 20,
         shadowColor: '#000',

@@ -160,7 +160,7 @@ export default function PontoScreen({ route }) {
                                 alignItems: 'center',
                                 justifyContent: 'center',
                             }}>
-                            <ActivityIndicator size="large" color="#007BFF" />
+                            <ActivityIndicator size="large" color="#1d1e22" />
                         </View>
                     </>
                 ) : (
@@ -380,7 +380,7 @@ export default function PontoScreen({ route }) {
                                                         {comentarioItem.usuario.apelido}
                                                     </Text>
                                                 </View>
-                                                <FontAwesome5 name="eye" size={18} color="#007BFF" style={{ marginRight: 8 }} />
+                                                <FontAwesome5 name="eye" size={18} color="#1d1e22" style={{ marginRight: 8 }} />
                                             </View>
                                             <Text style={{ marginTop: 15, marginLeft: 10 }}>
                                                 {comentarioItem.comentario}
