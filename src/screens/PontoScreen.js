@@ -66,7 +66,16 @@ export default function PontoScreen({ route }) {
     };
 
     const redirectToGps = async () => {
-        navigation.navigate('GPSNavigatorByMarkerScreen', { destLatitude: ponto.latitude, destLongitude: ponto.longitude });
+        navigation.navigate('Main', {
+            screen: 'Home',
+            params: {
+              screen: 'GPS',
+              params: {
+                  destLatitude: ponto.latitude,
+                  destLongitude: ponto.longitude
+              }
+            }
+          });
     }
 
     const openMap = async () => {

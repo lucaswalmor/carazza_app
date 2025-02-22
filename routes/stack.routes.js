@@ -16,7 +16,6 @@ import DesafiosListScreen from '../src/screens/DesafiosListScreen';
 import DetalhesDesafioScreen from '../src/screens/DetalhesDesafioScreen';
 import RankingGeralScreen from '../src/screens/RankingGeralScreen';
 import CadastrarDesafioScreen from '../src/screens/CadastrarDesafioScreen';
-import GPSNavigatorByMarkerScreen from '../src/screens/GPSNavigatorByMarkerScreen';
 import ListaDeSeguidoresScreen from '../src/screens/ListaDeSeguidoresScreen';
 import ListaDeSeguindoScreen from '../src/screens/ListaDeSeguindoScreen';
 import BuscarPerfilScreen from '../src/screens/BuscarPerfilScreen';
@@ -56,7 +55,6 @@ export default function StackRoutes() {
             <Stack.Screen name="DetalhesDesafioScreen" component={DetalhesDesafioScreen} options={{ headerShown: true, headerTitle: 'Detalhes do Desafio' }} />
             <Stack.Screen name="MeusDesafiosScreen" component={MeusDesafiosScreen} options={{ headerShown: true, headerTitle: 'Meus Desafios' }} />
             <Stack.Screen name="RankingGeralScreen" component={RankingGeralScreen} options={{ headerShown: true, headerTitle: 'Maiores Pontuadores' }} />
-            <Stack.Screen name="GPSNavigatorByMarkerScreen" component={GPSNavigatorByMarkerScreen} options={{ headerShown: true, headerTitle: 'GPS' }} />
             <Stack.Screen name="ListaDeSeguidoresScreen" component={ListaDeSeguidoresScreen} options={{ headerShown: true, headerTitle: 'Meus Seguidores' }} />
             <Stack.Screen name="ListaDeSeguindoScreen" component={ListaDeSeguindoScreen} options={{ headerShown: true, headerTitle: 'Seguindo' }} />
             <Stack.Screen name="BuscarPerfilScreen" component={BuscarPerfilScreen} options={{ headerShown: true, headerTitle: 'Pesquisar Usuário' }} />

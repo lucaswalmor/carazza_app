@@ -17,13 +17,12 @@ import MapView, { Marker, Polyline } from "react-native-maps";
 import * as Location from "expo-location";
 import styles from "../assets/css/styles";
 import { borders, colors, display, fontSize, gap, paddings } from "../assets/css/primeflex";
-import { FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
+import { FontAwesome5, FontAwesome6, Ionicons } from '@expo/vector-icons';
 import api from "../services/api";
 import decodePolyline from "../services/decodePolyline";
 import pesquisacep from "../services/viacep";
 import Toast from "../components/Toast";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useFocusEffect } from "@react-navigation/native";
 import { setupDatabase, saveRouteToDB, loadRouteFromDB, clearRouteDB } from "../database/database";
 
 const LOCATIONIQ_API_KEY = 'pk.0fc5b34da0f6795efb98e3076f9d3c83';
@@ -36,6 +35,7 @@ const GPSNavigatorScreen = ({ route }) => {
     const [isLoadingSaveRoute, setIsLoadingSaveRoute] = useState(false);
     const [inputVisible, setInputVisible] = useState(true);
     const [modalVisible, setModalVisible] = useState(false);
+    const [modalMensagem, setModalMensagem] = useState(false);
     const { destLatitude, destLongitude } = route.params || {};
     const [modalSalvarRota, setModalSalvarRota] = useState(false);
     const [destinationCoords, setDestinationCoords] = useState([]);
@@ -51,25 +51,26 @@ const GPSNavigatorScreen = ({ route }) => {
         bolDisponivelPerfil: true
     });
 
-    // pede permissoes de localizacao ao usuari
     useEffect(() => {
-        const requestLocationPermission = async () => {
-            const { status } = await Location.requestForegroundPermissionsAsync();
+        setModalMensagem(true)
+    }, [])
 
-            let location = await Location.getCurrentPositionAsync({});
-
-            setLocation({
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude,
-            });
-
-            if (destLatitude && destLongitude) {
-                setModalVisible(true)
-            }
-        };
-
-        requestLocationPermission();
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            const requestLocationPermission = async () => {
+                const { status } = await Location.requestForegroundPermissionsAsync();
+    
+                let location = await Location.getCurrentPositionAsync({});
+    
+                setLocation({
+                    latitude: location.coords.latitude,
+                    longitude: location.coords.longitude,
+                });
+            };
+    
+            requestLocationPermission();
+        }, [])
+    );
 
     // inicia o banco de dados e carrega as rotas salvas caso exista
     useEffect(() => {
@@ -305,6 +306,14 @@ const GPSNavigatorScreen = ({ route }) => {
         }))
     }
 
+    const confirmCloseModalMessage = async () => {
+        setModalMensagem(false)
+
+        if (destLatitude && destLongitude) {
+            setModalVisible(true)
+        }
+    }
+
     if (!location) {
         return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><ActivityIndicator size="large" color="#0000ff" /></View>;
     }
@@ -352,7 +361,7 @@ const GPSNavigatorScreen = ({ route }) => {
                                 <Polyline
                                     coordinates={routes}
                                     strokeWidth={4}
-                                    strokeColor={colors.blue[900]}
+                                    strokeColor={colors.primary[500]}
                                 />
                             )}
                         </MapView>
@@ -589,6 +598,44 @@ const GPSNavigatorScreen = ({ route }) => {
 
                                 <TouchableOpacity onPress={() => setModalVisible(false)} style={{ marginBottom: 20, flexDirection: 'row' }}>
                                     <Text style={{ fontSize: 14 }}>Fechar Janela </Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </Modal>
+
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={modalMensagem}
+                        onRequestClose={() => setModalMensagem(false)}
+                    >
+                        <View style={styles.modalCenteredView}>
+                            <View style={styles.modalView}>
+                                <View style={[{ marginBottom: 20 }, display.row, gap[2], display.alignItemsCenter]}>
+                                    <Ionicons name="warning" color={colors.red[500] } size={20} />
+                                    <Text style={{ fontSize: 20, color: colors.red[500], fontWeight: 'bold' }}>
+                                        Atenção!
+                                    </Text>
+                                </View>
+
+                                <Text style={{ marginBottom: 20 }}>
+                                    Para gravações de rotas você precisa manter o GPS sempre aberto, isso irá garatir que sua rota seja traçada corretamente!
+                                </Text>
+
+                                <Text style={{ marginBottom: 20 }}>
+                                    Ao fechar o aplicativo, falta de rede, internet ou qualquer intereferência que possa vir a acontecer, não se preocupe, sua rota ainda permanecerá lá ate que a salve!
+                                </Text>
+
+                                <Text style={{ marginBottom: 20, backgroundColor: colors.gray[100], padding: 10, fontStyle: 'italic' }}>
+                                    Dirija com atenção, sempre respeitando as leis de trânsito e o limite de velocidade.
+                                </Text>
+
+                                <Text style={{ marginBottom: 20 }}>
+                                    Equipe <Text style={{ fontWeight: 'bold' }}>MotoStrada</Text> lhe deseja uma boa viagem e se divirta!
+                                </Text>
+
+                                <TouchableOpacity onPress={() => confirmCloseModalMessage()} style={{ marginBottom: 20, flexDirection: 'row' }}>
+                                    <Text style={{ fontSize: 14, color: colors.blue[500] }}>Fechar Janela </Text>
                                 </TouchableOpacity>
                             </View>
                         </View>

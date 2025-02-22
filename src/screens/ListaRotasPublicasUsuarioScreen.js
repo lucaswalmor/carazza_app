@@ -46,7 +46,6 @@ export default function ListaRotasPublicasUsuarioScreen({ navigation, route }) {
 
     const navigateToGps = async (item) => {
         const ultimaPosicao = item[item.length - 1];
-        // navigation.navigate('GPSNavigatorByMarkerScreen', { destLatitude: ultimaPosicao.latitude, destLongitude: ultimaPosicao.longitude });
         navigation.navigate('Main', {
           screen: 'Home',
           params: {

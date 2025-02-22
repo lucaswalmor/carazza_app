@@ -84,7 +84,7 @@ export default function PerfilScreen({ navigation }) {
                                 />
 
                                 <View style={[]}>
-                                    <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.primary[50] }}>
+                                    <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.alpha[1000] }}>
                                         Olá, {user?.nome}
                                     </Text>
 
@@ -94,12 +94,12 @@ export default function PerfilScreen({ navigation }) {
                                         >
                                             <View>
                                                 <Text
-                                                    style={[{ color: colors.primary[50], fontWeight: 'bold' }, fontSize['2xs']]}
+                                                    style={[{ color: colors.alpha[1000], fontWeight: 'bold' }, fontSize['2xs']]}
                                                 >
                                                     Seguidores
                                                 </Text>
                                                 <Text
-                                                    style={[{ color: colors.primary[50], textAlign: 'center' }, fontWeights['bold'], fontSize['sm']]}
+                                                    style={[{ color: colors.alpha[1000], textAlign: 'center' }, fontWeights['bold'], fontSize['sm']]}
                                                 >
                                                     {user?.seguidores}
                                                 </Text>
@@ -111,12 +111,12 @@ export default function PerfilScreen({ navigation }) {
                                         >
                                             <View>
                                                 <Text
-                                                    style={[{ color: colors.primary[50], fontWeight: 'bold' }, fontSize['2xs']]}
+                                                    style={[{ color: colors.alpha[1000], fontWeight: 'bold' }, fontSize['2xs']]}
                                                 >
                                                     Seguindo
                                                 </Text>
                                                 <Text
-                                                    style={[{ color: colors.primary[50], textAlign: 'center' }, fontWeights['bold'], fontSize['sm']]}
+                                                    style={[{ color: colors.alpha[1000], textAlign: 'center' }, fontWeights['bold'], fontSize['sm']]}
                                                 >
                                                     {user?.seguindo}
                                                 </Text>
@@ -128,11 +128,11 @@ export default function PerfilScreen({ navigation }) {
                                         >
                                             <View style={{ alignItems: 'center' }}>
                                                 <Text
-                                                    style={[{ color: colors.primary[50], fontWeight: 'bold' }, fontSize['2xs']]}
+                                                    style={[{ color: colors.alpha[1000], fontWeight: 'bold' }, fontSize['2xs']]}
                                                 >
                                                     Buscar
                                                 </Text>
-                                                <FontAwesome5 name="search" size={16} style={[{ color: colors.primary[50], marginTop: 5 }]} />
+                                                <FontAwesome5 name="search" size={16} style={[{ color: colors.alpha[1000], marginTop: 5 }]} />
                                             </View>
                                         </TouchableOpacity>
                                     </View>
@@ -146,7 +146,7 @@ export default function PerfilScreen({ navigation }) {
                                             onError={() => console.log('Erro ao carregar a imagem.')}
                                         />
 
-                                        <Text style={[{ color: colors.primary[500], backgroundColor: colors.primary[50], padding: 3, letterSpacing: 1 }, borders.borderCircle, fontSize['3xs'], fontWeights['bold']]}>Pioneiro</Text>
+                                        <Text style={[{ color: colors.primary[500], backgroundColor: colors.alpha[1000], padding: 3, letterSpacing: 1 }, borders.borderCircle, fontSize['3xs'], fontWeights['bold']]}>Pioneiro</Text>
                                     </View>
                                 )}
                             </View>
@@ -172,7 +172,7 @@ export default function PerfilScreen({ navigation }) {
                                                     style={[
                                                         {
                                                             padding: 4,
-                                                            color: colors.primary[500],
+                                                            color: colors.alpha[1000],
                                                             letterSpacing: 1,
                                                         },
                                                         fontSize['2xl'],
@@ -186,7 +186,7 @@ export default function PerfilScreen({ navigation }) {
                                                 <Text style={[
                                                     {
                                                         padding: 4,
-                                                        color: colors.primary[500],
+                                                        color: colors.alpha[1000],
                                                         letterSpacing: 1,
                                                     },
                                                     fontSize['lg'],
@@ -198,7 +198,7 @@ export default function PerfilScreen({ navigation }) {
                                         </View>
 
                                         <View>
-                                            <FontAwesome5 name="arrow-right" size={22} style={[{ color: colors.primary[500], marginTop: 5 }]} />
+                                            <FontAwesome5 name="arrow-right" size={22} style={[{ color: colors.alpha[1000], marginTop: 5 }]} />
                                         </View>
                                     </View>
                                 </TouchableOpacity>

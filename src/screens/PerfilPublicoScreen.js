@@ -116,19 +116,19 @@ export default function PerfilPublicoScreen({ navigation, route }) {
                                 />
 
                                 <View style={[]}>
-                                    <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.primary[50] }}>
+                                    <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.alpha[1000] }}>
                                         Olá, {user?.nome}
                                     </Text>
 
                                     <View style={{ gap: 10, flexDirection: 'row', alignItems: 'center' }}>
                                         <View>
                                             <Text
-                                                style={[{ color: colors.primary[50], fontWeight: 'bold' }, fontSize['2xs']]}
+                                                style={[{ color: colors.alpha[1000], fontWeight: 'bold' }, fontSize['2xs']]}
                                             >
                                                 Seguidores
                                             </Text>
                                             <Text
-                                                style={[{ color: colors.primary[50], textAlign: 'center' }, fontWeights['bold'], fontSize['sm']]}
+                                                style={[{ color: colors.alpha[1000], textAlign: 'center' }, fontWeights['bold'], fontSize['sm']]}
                                             >
                                                 {user?.seguidores}
                                             </Text>
@@ -137,12 +137,12 @@ export default function PerfilPublicoScreen({ navigation, route }) {
                                         {user?.isMyPerfil && (
                                             <View>
                                                 <Text
-                                                    style={{ color: colors.primary[50], fontWeight: 'bold' }}
+                                                    style={{ color: colors.alpha[1000], fontWeight: 'bold' }}
                                                 >
                                                     Seguindo
                                                 </Text>
                                                 <Text
-                                                    style={[{ color: colors.primary[50], textAlign: 'center' }, fontWeights['bold'], fontSize['sm']]}
+                                                    style={[{ color: colors.alpha[1000], textAlign: 'center' }, fontWeights['bold'], fontSize['sm']]}
                                                 >
                                                     {user?.seguindo}
                                                 </Text>
@@ -159,7 +159,7 @@ export default function PerfilPublicoScreen({ navigation, route }) {
                                             onError={() => console.log('Erro ao carregar a imagem.')}
                                         />
 
-                                        <Text style={[{ color: colors.primary[500], backgroundColor: colors.primary[50], padding: 3, letterSpacing: 1 }, borders.borderCircle, fontSize['3xs'], fontWeights['bold']]}>Pioneiro</Text>
+                                        <Text style={[{ color: colors.primary[500], backgroundColor: colors.alpha[1000], padding: 3, letterSpacing: 1 }, borders.borderCircle, fontSize['3xs'], fontWeights['bold']]}>Pioneiro</Text>
                                     </View>
                                 )}
                             </View>
@@ -169,7 +169,7 @@ export default function PerfilPublicoScreen({ navigation, route }) {
                                     <>
                                         {!user?.isFollowing ? (
                                             <TouchableOpacity
-                                                style={[{ backgroundColor: colors.primary[50] }, paddings[2], borders.borderRound, widths[4]]}
+                                                style={[{ backgroundColor: colors.alpha[1000] }, paddings[2], borders.borderRound, widths[4]]}
                                                 onPress={seguir}
                                             >
                                                 <Text
@@ -184,7 +184,7 @@ export default function PerfilPublicoScreen({ navigation, route }) {
                                                 onPress={pararSeguir}
                                             >
                                                 <Text
-                                                    style={[{ color: colors.primary[50], textAlign: 'center', borderWidth: 2, borderColor: colors.primary[50] }, borders.borderRound, paddings[1]]}
+                                                    style={[{ color: colors.alpha[1000], textAlign: 'center', borderWidth: 2, borderColor: colors.alpha[1000] }, borders.borderRound, paddings[1]]}
                                                 >
                                                     Parar de Seguir
                                                 </Text>
@@ -217,7 +217,6 @@ export default function PerfilPublicoScreen({ navigation, route }) {
                                                     Quadro de Medalhas
                                                 </Text>
                                             </View>
-                                            {/* <FontAwesome5 name="arrow-right" size={20} style={[{ color: colors.primary[500], marginRight: 8 }]} /> */}
                                         </View>
 
                                         {/* Listar Conquistas agrupadas por ano */}

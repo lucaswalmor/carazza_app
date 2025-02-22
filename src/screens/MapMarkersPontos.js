@@ -58,7 +58,16 @@ export default function MapMarkersPontos({ navigation }) {
     }
 
     const redirectToGps = async () => {
-        navigation.navigate('GPSNavigatorByMarkerScreen', { destLatitude: coordinates.latitude, destLongitude: coordinates.longitude, hasRouteParam: true });
+        navigation.navigate('Main', {
+          screen: 'Home',
+          params: {
+            screen: 'GPS',
+            params: {
+                destLatitude: coordinates.latitude,
+                destLongitude: coordinates.longitude
+            }
+          }
+        });
     }
 
     return (
