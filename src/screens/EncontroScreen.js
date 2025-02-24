@@ -136,17 +136,9 @@ export default function EncontroScreen({ route }) {
     <View style={{ flex: 1 }}>
       <ScrollView style={styles.container}>
         {isLoading ? (
-          <>
-            <View
-              style={{
-                flex: 1,
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}>
-              <ActivityIndicator size="large" color="#1d1e22" />
-            </View>
-          </>
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Loader />
+          </View>
         ) : (
           <>
             {/* Card 1: Nome do encontro */}

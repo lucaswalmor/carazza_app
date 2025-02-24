@@ -5,6 +5,7 @@ import styles from '../assets/css/styles';
 import api from '../services/api';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import Loader from '../components/Loader';
 
 export default function EventosListScreen({ }) {
     const [user, setUser] = useState({});
@@ -118,8 +119,8 @@ export default function EventosListScreen({ }) {
 
     if (isLoading && !isRefreshing) {
         return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#1d1e22" />
+            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                <Loader />
             </View>
         );
     }
@@ -148,7 +149,7 @@ export default function EventosListScreen({ }) {
                     )}
                 </View>
 
-                {(user.tipo_usuario === 1 || user.tipo_usuario === 4) && (
+                {[1, 3, 4, 5, 6].includes(user.tipo_usuario) && (
                     <View style={{ padding: 10 }}>
                         <View style={{ width: '100%' }}>
                             <TouchableOpacity style={styles.button} onPress={CadastrarEventoScreen}>

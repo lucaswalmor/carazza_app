@@ -21,6 +21,7 @@ import { useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
 import Botao from '../components/Botao';
 import { colors, fontSize, shadows } from '../assets/css/primeflex';
+import Loader from '../components/Loader';
 
 export default function PontoScreen({ route }) {
     const { id } = route.params;
@@ -69,13 +70,13 @@ export default function PontoScreen({ route }) {
         navigation.navigate('Main', {
             screen: 'Home',
             params: {
-              screen: 'GPS',
-              params: {
-                  destLatitude: ponto.latitude,
-                  destLongitude: ponto.longitude
-              }
+                screen: 'GPS',
+                params: {
+                    destLatitude: ponto.latitude,
+                    destLongitude: ponto.longitude
+                }
             }
-          });
+        });
     }
 
     const openMap = async () => {
@@ -161,17 +162,9 @@ export default function PontoScreen({ route }) {
         <View style={{ flex: 1 }}>
             <ScrollView style={styles.container}>
                 {isLoading ? (
-                    <>
-                        <View
-                            style={{
-                                flex: 1,
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}>
-                            <ActivityIndicator size="large" color="#1d1e22" />
-                        </View>
-                    </>
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                        <Loader />
+                    </View>
                 ) : (
                     <>
                         <View style={{}}>
@@ -185,7 +178,7 @@ export default function PontoScreen({ route }) {
                         </View>
 
                         {/* Botao de checkin */}
-                        <View>
+                        {/* <View>
                             <Botao severity="help" style={[shadows['shadow5']]} onPress={() => handleCheckin()}>
                                 <View style={styles.buttonContent}>
                                     {isLoadingCheckin ? (
@@ -202,7 +195,7 @@ export default function PontoScreen({ route }) {
                                     )}
                                 </View>
                             </Botao>
-                        </View>
+                        </View> */}
 
                         {/* Card 2: Informações */}
                         <View style={styles.card}>
@@ -276,7 +269,7 @@ export default function PontoScreen({ route }) {
                                 />
                                 <Text style={styles.buttonText}>Abrir GPS MotoStrada</Text>
                             </TouchableOpacity>
-                            
+
                             {/* <TouchableOpacity
                                 style={[
                                     styles.button,

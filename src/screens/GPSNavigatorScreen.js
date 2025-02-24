@@ -24,6 +24,8 @@ import pesquisacep from "../services/viacep";
 import Toast from "../components/Toast";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { setupDatabase, saveRouteToDB, loadRouteFromDB, clearRouteDB } from "../database/database";
+import { useFocusEffect } from "@react-navigation/native";
+import Loader from "../components/Loader";
 
 const LOCATIONIQ_API_KEY = 'pk.0fc5b34da0f6795efb98e3076f9d3c83';
 
@@ -59,15 +61,15 @@ const GPSNavigatorScreen = ({ route }) => {
         useCallback(() => {
             const requestLocationPermission = async () => {
                 const { status } = await Location.requestForegroundPermissionsAsync();
-    
+
                 let location = await Location.getCurrentPositionAsync({});
-    
+
                 setLocation({
                     latitude: location.coords.latitude,
                     longitude: location.coords.longitude,
                 });
             };
-    
+
             requestLocationPermission();
         }, [])
     );
@@ -315,7 +317,12 @@ const GPSNavigatorScreen = ({ route }) => {
     }
 
     if (!location) {
-        return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><ActivityIndicator size="large" color="#0000ff" /></View>;
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                {/* <ActivityIndicator size="large" color="#0000ff" /> */}
+                <Loader />
+            </View>
+        );
     }
 
     return (
@@ -612,7 +619,7 @@ const GPSNavigatorScreen = ({ route }) => {
                         <View style={styles.modalCenteredView}>
                             <View style={styles.modalView}>
                                 <View style={[{ marginBottom: 20 }, display.row, gap[2], display.alignItemsCenter]}>
-                                    <Ionicons name="warning" color={colors.red[500] } size={20} />
+                                    <Ionicons name="warning" color={colors.red[500]} size={20} />
                                     <Text style={{ fontSize: 20, color: colors.red[500], fontWeight: 'bold' }}>
                                         Atenção!
                                     </Text>

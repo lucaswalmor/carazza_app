@@ -19,6 +19,7 @@ import { useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
 import Botao from '../components/Botao';
 import { colors, fontSize, shadows } from '../assets/css/primeflex';
+import Loader from '../components/Loader';
 
 export default function EventoScreen({ route }) {
     const { id } = route.params;
@@ -138,23 +139,21 @@ export default function EventoScreen({ route }) {
         navigation.navigate('PerfilPublicoScreen', { id: item.user_id });
     }
 
-    if (!evento) return <Text>Carregando evento...</Text>;
+    if (!evento) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Loader />
+            </View>
+        )
+    }
 
     return (
         <View style={{ flex: 1 }}>
             <ScrollView style={styles.container}>
                 {isLoading ? (
-                    <>
-                        <View
-                            style={{
-                                flex: 1,
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}>
-                            <ActivityIndicator size="large" color="#1d1e22" />
-                        </View>
-                    </>
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                        <Loader />
+                    </View>
                 ) : (
                     <>
                         {/* Card 1: Logo e Nome do evento */}

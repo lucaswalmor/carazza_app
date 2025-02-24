@@ -9,6 +9,7 @@ import { borders, colors, display, fontSize, fontWeights, gap, margins, paddings
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import { useFocusEffect } from '@react-navigation/native';
 import Toast from '../components/Toast';
+import Loader from '../components/Loader';
 
 export default function PerfilPublicoScreen({ navigation, route }) {
     const { id } = route.params;
@@ -98,11 +99,9 @@ export default function PerfilPublicoScreen({ navigation, route }) {
     return (
         <View style={{ flex: 1 }}>
             {isLoading ? (
-                <>
-                    <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                        <ActivityIndicator size="large" color="#1d1e22" />
-                    </View>
-                </>
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <Loader />
+                </View>
             ) : (
                 <View style={{ flex: 1 }}>
                     <ScrollView style={{ flex: 1 }}>

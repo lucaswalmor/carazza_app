@@ -116,8 +116,8 @@ export default function MapMarkersPontos({ navigation }) {
                     </MapView>
                 </>
             ) : (
-                <View style={styles.loading}>
-                    <Text>Carregando mapa...</Text>
+                <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                    <Loader />
                 </View>
             )}
         </View>

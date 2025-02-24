@@ -7,6 +7,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import Card from '../components/Card';
 import { borders, colors, display, fontSize, fontWeights, gap } from '../assets/css/primeflex';
 import { useFocusEffect } from '@react-navigation/native';
+import Loader from '../components/Loader';
 
 export default function PerfilScreen({ navigation }) {
     const [isLoading, setIsLoading] = useState(false);
@@ -67,11 +68,9 @@ export default function PerfilScreen({ navigation }) {
     return (
         <View style={{ flex: 1 }}>
             {isLoading ? (
-                <>
-                    <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                        <ActivityIndicator size="large" color="#1d1e22" />
-                    </View>
-                </>
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <Loader />
+                </View>
             ) : (
                 <View style={{ flex: 1 }}>
                     <ScrollView style={{ flex: 1 }}>

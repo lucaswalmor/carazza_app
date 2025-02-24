@@ -6,6 +6,7 @@ import styles from '../assets/css/styles';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { TextInput } from 'react-native-gesture-handler';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import Loader from '../components/Loader'
 
 const PontosListScreen = ({ }) => {
     const [user, setUser] = useState({});
@@ -163,8 +164,8 @@ const PontosListScreen = ({ }) => {
 
     if (isLoading && !isRefreshing) {
         return (
-            <View style={stylesPontoListScreen.loadingContainer}>
-                <ActivityIndicator size="large" color="#1d1e22" />
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Loader />
             </View>
         );
     }

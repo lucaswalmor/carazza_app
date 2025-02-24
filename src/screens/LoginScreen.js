@@ -18,7 +18,6 @@ export default function LoginScreen({ navigation, route }) {
   const [msgConfirmResumeSubscription, setMsgConfirmResumeSubscription] = useState(false);
   const [modalConfirmResumeSubscriptionVisible, setModalConfirmResumeSubscriptionVisible] = useState(false);
   const [modalResumeSubscription, setModalResumeSubscription] = useState(false);
-  const [expoPushToken, setExpoPushToken] = useState('');
 
   ///////////////////////////// EXPO PUSH NOTIFICATION /////////////////////////////////
 
@@ -59,19 +58,19 @@ export default function LoginScreen({ navigation, route }) {
 
   ////////////////////////////////////////////////////////////////////////////////////////
 
-   useEffect(() => {
-        const getToken = async () => {
-            const token = await AsyncStorage.getItem('token');
-            
-           if (token) {
-                navigation.replace('Main');
-           } else {
-                checkBiometricAuth();
-           }
-        }
+  useEffect(() => {
+    const getToken = async () => {
+      const token = await AsyncStorage.getItem('token');
 
-        getToken();
-   }, []);
+      if (token) {
+        navigation.replace('Main');
+      } else {
+        checkBiometricAuth();
+      }
+    }
+
+    getToken();
+  }, []);
 
   useEffect(() => {
     if (route.params?.message) {
@@ -110,14 +109,14 @@ export default function LoginScreen({ navigation, route }) {
   };
 
   const handleRegisterNavigation = async () => {
-      const baseUrl = 'https://carazzapayment.vercel.app/cadastro?ref=&inf=&';
-      const supported = await Linking.canOpenURL(baseUrl);
-      if (supported) {
-          await Linking.openURL(baseUrl);
-          navigation.replace('Login', { message: 'Cadastro realizado com sucesso!' });
-      } else {
-          Alert.alert('Erro', 'Não foi possível abrir o link: ' + baseUrl);
-      }
+    const baseUrl = 'https://motostrada.com.br/cadastro?ref=&inf=0';
+    const supported = await Linking.canOpenURL(baseUrl);
+    if (supported) {
+      await Linking.openURL(baseUrl);
+      navigation.replace('Login', { message: 'Cadastro realizado com sucesso!' });
+    } else {
+      Alert.alert('Erro', 'Não foi possível abrir o link: ' + baseUrl);
+    }
   };
 
   const handleLogin = async (emailBiometria, passwordBiometria) => {
@@ -148,7 +147,7 @@ export default function LoginScreen({ navigation, route }) {
       } else {
         await AsyncStorage.removeItem('token');
       }
-      
+
       await AsyncStorage.setItem('email', email || emailBiometria);
       await AsyncStorage.setItem('password', password || passwordBiometria);
 
@@ -158,9 +157,10 @@ export default function LoginScreen({ navigation, route }) {
         setModalAssinaturaVisible(true)
       }
     } catch (error) {
-      if (error.response && error.response.data) {
-        console.log(error.response.data.errors)
+      if (error.response && error.response.data.errors) {
         setErrors(error.response.data.errors);
+      } else if (error.response && error.response.data.error) {
+        setErrors({email: [error.response.data.error], password: [error.response.data.error]});
       } else {
         console.log('Erro:', error.message);
       }
@@ -193,7 +193,7 @@ export default function LoginScreen({ navigation, route }) {
         value={email}
         onChangeText={setEmail}
       />
-      {errors.email && <Text style={styles.errorText}>{errors.email[0]}</Text>}
+      {errors && errors.email && <Text style={styles.errorText}>{errors.email[0]}</Text>}
 
       <TextInput
         style={styles.input}
@@ -202,7 +202,7 @@ export default function LoginScreen({ navigation, route }) {
         value={password}
         onChangeText={setPassword}
       />
-      {errors.password && <Text style={styles.errorText}>{errors.password[0]}</Text>}
+      {errors && errors.password && <Text style={styles.errorText}>{errors.password[0]}</Text>}
 
       <View style={stylesLogin.registerContainer}>
         <Text style={stylesLogin.registerText}>Não tem uma conta?</Text>
@@ -351,8 +351,8 @@ const stylesLogin = StyleSheet.create({
     width: 150,
     height: 150,
     marginBottom: 40,
-    alignSelf: 'center', 
-    flexShrink: 1,  
+    alignSelf: 'center',
+    flexShrink: 1,
   },
   registerContainer: {
     flexDirection: 'row',
