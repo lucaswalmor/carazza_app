@@ -23,22 +23,22 @@ export default function CadastrarPontoScreen({ navigation }) {
     const [images, setImages] = useState([]);
     const [video, setVideo] = useState(null);
     const [form, setForm] = useState({
-        nome: 'Ponto B',
+        nome: '',
         cep: '',
-        rua: 'Rua Izídio Antônio da Silva',
-        bairro: 'Presidente Roosevelt',
-        numero: '147',
-        cidade: 'Uberlândia',
-        estado: 'MG',
-        estado_completo: 'Minas Gerais',
+        rua: '',
+        bairro: '',
+        numero: '',
+        cidade: '',
+        estado: '',
+        estado_completo: '',
         valorMinAlimentacao: '',
         valorMaxAlimentacao: '',
         valorMinHospedagem: '',
         valorMaxHospedagem: '',
-        descricao: 'O loca é historico por tal coisa bla bla bla bla bla bla',
-        informacoesComplementares: 'Ponto bom para comer',
-        horaAbertura: '10:00',
-        horaFechamento: '22:00',
+        descricao: '',
+        informacoesComplementares: '',
+        horaAbertura: '',
+        horaFechamento: '',
     });
 
     const isDisabled = images.length >= 3;

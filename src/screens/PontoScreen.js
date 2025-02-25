@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
@@ -19,8 +19,6 @@ import { useEvent } from 'expo';
 import Toast from '../components/Toast';
 import { useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
-import Botao from '../components/Botao';
-import { colors, fontSize, shadows } from '../assets/css/primeflex';
 import Loader from '../components/Loader';
 
 export default function PontoScreen({ route }) {
@@ -31,12 +29,11 @@ export default function PontoScreen({ route }) {
     const [isLoadingComentario, setIsLoadingComentario] = useState(false);
     const [isLoadingCheckin, setIsLoadingCheckin] = useState(false);
     const [comentario, setComentario] = useState(null);
-    const [videoSource, setVideoSource] = useState(null);
     const [toast, setToast] = useState({ visible: false, message: '', position: 'bottom', severity: '' });
+    const [videoSource, setVideoSource] = useState(null);
 
     const player = useVideoPlayer(videoSource, player => {
         player.loop = true;
-        // player.play();
     });
 
     const { isPlaying } = useEvent(player, 'playingChange', { isPlaying: player.playing });
@@ -57,7 +54,14 @@ export default function PontoScreen({ route }) {
                 },
             });
 
-            setVideoSource(`https://carazza.lksoftware.com.br/public/storage/${response.data.data.video_path}`)
+            const videoPath = response.data.data.video_path;
+
+            if (videoPath) {
+                setVideoSource(`https://api.motostrada.com.br/storage/${videoPath}`);
+            } else {
+                setVideoSource(null);
+            }
+
             setPonto(response.data.data);
         } catch (error) {
             console.error(error);
@@ -167,15 +171,17 @@ export default function PontoScreen({ route }) {
                     </View>
                 ) : (
                     <>
-                        <View style={{}}>
-                            <VideoView
-                                style={styles.video}
-                                player={player}
-                                allowsFullscreen
-                                allowsPictureInPicture
-                                nativeControls={true}
-                            />
-                        </View>
+                        {videoSource && (
+                            <View style={{}}>
+                                <VideoView
+                                    style={styles.video}
+                                    player={player}
+                                    allowsFullscreen
+                                    allowsPictureInPicture
+                                    nativeControls={true}
+                                />
+                            </View>
+                        )}
 
                         {/* Botao de checkin */}
                         {/* <View>

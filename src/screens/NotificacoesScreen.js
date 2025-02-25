@@ -92,7 +92,7 @@ export default function NotificacoesScreen({ navigation }) {
                         keyExtractor={(item) => item.id.toString()}
                         renderItem={renderItem}
                         ListFooterComponent={() => (
-                            <Text style={{ textAlign: 'center', color: '#777', marginTop: 10 }}>Fim das notificações.</Text>
+                            <Text style={{ textAlign: 'center', color: '#777', marginTop: 10, backgroundColor: colors.gray[100], padding: 5, fontStyle: 'italic' }}>Fim das notificações.</Text>
                         )}
                         contentContainerStyle={{ paddingBottom: 20 }}
                     />

@@ -9,48 +9,47 @@ import { Ionicons } from 'react-native-vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CadastrarEventoScreen = ({ navigation }) => {
-    const [nome, setNome] = useState('Encontro Nacional de Harley-Davidson 2024');
-    const [local, setLocal] = useState('Autódromo de Interlagos - SP');
-    const [descricao, setDescricao] = useState('Evento anual para entusiastas da marca');
-    const [dataInicio, setDataInicio] = useState('01/05/2025');
-    const [dataTermino, setDataTermino] = useState('03/05/2025');
-    const [horaInicio, setHoraInicio] = useState('08:00');
-    const [horaTermino, setHoraTermino] = useState('20:00');
+    const [nome, setNome] = useState('');
+    const [local, setLocal] = useState('');
+    const [descricao, setDescricao] = useState('');
+    const [dataInicio, setDataInicio] = useState('');
+    const [dataTermino, setDataTermino] = useState('');
+    const [horaInicio, setHoraInicio] = useState('');
+    const [horaTermino, setHoraTermino] = useState('');
     const [pathLogo, setPathLogo] = useState(null);
     const [pathBanner, setPathBanner] = useState(null);
 
-    const [cep, setCep] = useState('38080-615');
+    const [cep, setCep] = useState('');
     const [rua, setRua] = useState(null);
     const [bairro, setBairro] = useState(null);
-    const [numero, setNumero] = useState('147');
+    const [numero, setNumero] = useState('');
     const [complemento, setComplemento] = useState(null);
     const [estado, setEstado] = useState(null);
     const [estadoCompleto, setEstadoCompleto] = useState(null);
     const [cidade, setCidade] = useState(null);
 
-    const [nomeOrganizador, setNomeOrganizador] = useState('Lucas Steinbach');
-    const [whatsapp, setWhatsapp] = useState('(34) 99202-1394');
-    const [email, setEmail] = useState('lucaswsb52@gmail.com');
-    const [instagram, setInstagram] = useState('@lucassteinbach');
-    const [site, setSite] = useState('ivendas.com.br');
-    const [contatoEmergencia, setContatoEmergencia] = useState('(34) 99202-1394');
+    const [nomeOrganizador, setNomeOrganizador] = useState('');
+    const [whatsapp, setWhatsapp] = useState('');
+    const [email, setEmail] = useState('');
+    const [instagram, setInstagram] = useState('');
+    const [site, setSite] = useState('');
+    const [contatoEmergencia, setContatoEmergencia] = useState('');
 
     const [bolEntradaPaga, setBolEntradaPaga] = useState(false);
-    const [valorEntrada, setValorEntrada] = useState(0);
-    const [linkIngressos, setLinkIngressos] = useState('ivendas.com.br');
+    const [valorEntrada, setValorEntrada] = useState("");
+    const [linkIngressos, setLinkIngressos] = useState('');
     const [lotacaoMaxima, setLotacaoMaxima] = useState(1000);
-    const [regras, setRegras] = useState('Capacete obrigatório, documento da moto em dia');
+    const [regras, setRegras] = useState('');
     const [idadeMinima, setIdadeMinima] = useState(18);
 
     const [bolShowsMusicais, setBolShowsMusicais] = useState(true);
     const [bolFoodTruck, setBolFoodTruck] = useState(true);
     const [bolRotaPasseio, setBolRotaPasseio] = useState(true);
-    const [enderecoInicioPasseio, setEnderecoInicioPasseio] = useState('Praça da Sé, 1');
-    const [enderecoFimPasseio, setEnderecoFimPasseio] = useState('Autódromo de Interlagos');
+    const [enderecoInicioPasseio, setEnderecoInicioPasseio] = useState('');
+    const [enderecoFimPasseio, setEnderecoFimPasseio] = useState('');
     const [bolEstacionamento, setBolEstacionamento] = useState(true);
     const [bolEstacionamentoPago, setBolEstacionamentoPago] = useState(false);
-    const [valorEstacionamento, setValorEstacionamento] = useState("R$ 00,00");
-
+    const [valorEstacionamento, setValorEstacionamento] = useState("");
 
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
@@ -253,10 +252,6 @@ const CadastrarEventoScreen = ({ navigation }) => {
             });
         }
 
-        formData.forEach((value, key) => {
-            console.log(`${key}: ${value}`);
-        });
-
         const token = await AsyncStorage.getItem('token');
 
         try {
@@ -267,7 +262,6 @@ const CadastrarEventoScreen = ({ navigation }) => {
                 },
             });
 
-            console.log(response.data);
         } catch (err) {
             if (err.response && err.response.data) {
                 console.log('Erros de validação:', err.response.data.errors);
@@ -644,7 +638,6 @@ const CadastrarEventoScreen = ({ navigation }) => {
                                                         groupSeparator: ',',
                                                         precision: 2
                                                     }}
-                                                    value={valorEntrada}
                                                     onChangeText={(text) => setValorEntrada(text)}
                                                     style={styles.input}
                                                     keyboardType="numeric"
@@ -683,7 +676,7 @@ const CadastrarEventoScreen = ({ navigation }) => {
                                             <View style={styles.inputView}>
                                                 <TextInput
                                                     style={styles.input}
-                                                    placeholder="Endereço de início (obrigatório)"
+                                                    placeholder="End. de saída, ex: Av Paulista, 266"
                                                     value={enderecoInicioPasseio}
                                                     onChangeText={(text) => setEnderecoInicioPasseio(text)}
                                                 />
@@ -691,7 +684,7 @@ const CadastrarEventoScreen = ({ navigation }) => {
                                             <View style={styles.inputView}>
                                                 <TextInput
                                                     style={styles.input}
-                                                    placeholder="Endereço do destino (obrigatório)"
+                                                    placeholder="End. do destino, ex: Rua Augusta, 111"
                                                     value={enderecoFimPasseio}
                                                     onChangeText={(text) => setEnderecoFimPasseio(text)}
                                                 />
@@ -744,7 +737,6 @@ const CadastrarEventoScreen = ({ navigation }) => {
                                                                 groupSeparator: ',',
                                                                 precision: 2
                                                             }}
-                                                            value={valorEstacionamento}
                                                             onChangeText={(text) => setValorEstacionamento(text)}
                                                             style={styles.input}
                                                             keyboardType="numeric"

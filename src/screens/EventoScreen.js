@@ -4,6 +4,7 @@ import {
     ActivityIndicator,
     Alert,
     Button,
+    FlatList,
     Image,
     Linking,
     ScrollView,
@@ -18,7 +19,7 @@ import Toast from '../components/Toast';
 import { useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
 import Botao from '../components/Botao';
-import { colors, fontSize, shadows } from '../assets/css/primeflex';
+import { colors, display, fontSize, fontWeights, gap, shadows } from '../assets/css/primeflex';
 import Loader from '../components/Loader';
 
 export default function EventoScreen({ route }) {
@@ -343,8 +344,9 @@ export default function EventoScreen({ route }) {
                             {evento.instagram && (
                                 <>
                                     <Text style={styles.infoLabel}>Instagram:</Text>
-                                    <TouchableOpacity onPress={() => Linking.openURL(`https://www.instagram.com/${evento?.instagram}`)}>
-                                        <Text style={[styles.infoText, { color: 'blue', textDecorationLine: 'underline' }]}>
+                                    <TouchableOpacity style={[display.row, display.alignItemsCenter, gap[2]]} onPress={() => Linking.openURL(`https://www.instagram.com/${evento?.instagram}`)}>
+                                        <FontAwesome5 name="instagram" size={16} color="blue" />
+                                        <Text style={[{ color: 'blue', textDecorationLine: 'underline' }]}>
                                             {evento?.instagram}
                                         </Text>
                                     </TouchableOpacity>
@@ -429,6 +431,38 @@ export default function EventoScreen({ route }) {
                                 <Text style={styles.buttonText}>Abrir no Google Maps</Text>
                             </TouchableOpacity>
                         </View>
+
+                        <View style={styles.card}>
+                            <Text style={styles.infoTitle}>Patrocinadores</Text>
+                            {evento?.patrocinadores?.map((item) => (
+                                <View
+                                    key={item.id}
+                                    style={[display.row, display.alignItemsCenter, gap[3], { marginTop: 25 }]}
+                                >
+                                    <Image source={{ uri: item?.path_logo }} style={styles.avatar} />
+                                    <View>
+                                        <Text style={[fontSize['lg'], fontWeights['bold']]}>{item?.nome}</Text>
+
+                                        <TouchableOpacity
+                                            onPress={() => {
+                                                const instagramUrl = `https://instagram.com/${item?.instagram}`;
+                                                Linking.openURL(instagramUrl).catch((err) =>
+                                                    console.error('Erro ao abrir o Instagram', err)
+                                                );
+                                            }}
+                                        >
+                                            <View style={[display.row, display.alignItemsCenter]}>
+                                                <FontAwesome5 name="instagram" size={16} color="blue" />
+                                                <Text style={[{ color: 'blue', textDecorationLine: 'underline', marginLeft: 5 }]}>
+                                                    {item?.instagram}
+                                                </Text>
+                                            </View>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                            ))}
+                        </View>
+
 
                         {/* Card 8: Participação */}
                         <View style={[styles.card, { marginBottom: 100 }]}>

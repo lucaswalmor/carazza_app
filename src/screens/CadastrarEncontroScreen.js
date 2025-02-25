@@ -7,27 +7,27 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function CadastrarEncontroScreen({ navigation }) {
-    const [nome, setNome] = useState('Encontro Nacional de Harley-Davidson 2024');
-    const [descricao, setDescricao] = useState('Encontro anual para entusiastas da marca');
-    const [dataInicio, setDataInicio] = useState('01/05/2025');
-    const [dataTermino, setDataTermino] = useState('03/05/2025');
-    const [horaInicio, setHoraInicio] = useState('08:00');
-    const [horaTermino, setHoraTermino] = useState('20:00');
-    const [local, setLocal] = useState('Autódromo de Interlagos - SP');
+    const [nome, setNome] = useState('');
+    const [descricao, setDescricao] = useState('');
+    const [dataInicio, setDataInicio] = useState('');
+    const [dataTermino, setDataTermino] = useState('');
+    const [horaInicio, setHoraInicio] = useState('');
+    const [horaTermino, setHoraTermino] = useState('');
+    const [local, setLocal] = useState('');
 
-    const [cep, setCep] = useState('38080-615');
+    const [cep, setCep] = useState('');
     const [rua, setRua] = useState(null);
     const [bairro, setBairro] = useState(null);
-    const [numero, setNumero] = useState('147');
+    const [numero, setNumero] = useState('');
     const [cidade, setCidade] = useState(null);
     const [estado, setEstado] = useState(null);
     const [estadoCompleto, setEstadoCompleto] = useState(null);
 
-    const [nomeOrganizador, setNomeOrganizador] = useState('Lucas Steinbach');
-    const [whatsapp, setWhatsapp] = useState('(34) 99202-1394');
-    const [email, setEmail] = useState('lucaswsb52@gmail.com');
-    const [instagram, setInstagram] = useState('@lucassteinbach');
-    const [regras, setRegras] = useState('Capacete obrigatório, documento da moto em dia');
+    const [nomeOrganizador, setNomeOrganizador] = useState('');
+    const [whatsapp, setWhatsapp] = useState('');
+    const [email, setEmail] = useState('');
+    const [instagram, setInstagram] = useState('');
+    const [regras, setRegras] = useState('');
 
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);

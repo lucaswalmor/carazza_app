@@ -172,7 +172,7 @@ export default function PerfilPublicoScreen({ navigation, route }) {
                                                 onPress={seguir}
                                             >
                                                 <Text
-                                                    style={[{ color: colors.alpha[1000], textAlign: 'center' }]}
+                                                    style={[{ color: colors.primary[500], textAlign: 'center' }]}
                                                 >
                                                     Seguir
                                                 </Text>
