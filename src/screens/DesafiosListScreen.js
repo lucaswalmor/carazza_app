@@ -82,21 +82,29 @@ export default function DesafioListScreen({ navigation, route }) {
           <RefreshControl refreshing={isRefreshing} onRefresh={refreshDesafios} />
         }
       >
-        {desafios.map((desafio) => (
-          <TouchableOpacity
-            key={desafio.id ?? `desafio-${index}`}
-            onPress={() => navigateToDesafio(desafio.id)}
-          >
-            <Card
-              content={
-                <View style={[display.row, display.justifyContentBetween, display.alignItemsCenter]}>
-                  <Text style={[{ color: colors.blue[500] }, fontWeights['bold'], fontSize['xl']]}>{desafio.nome}</Text>
-                  <FontAwesome5 name="arrow-right" size={20} style={[{ color: colors.blue[500], marginRight: 8 }]} />
-                </View>
-              }
-            />
-          </TouchableOpacity>
-        ))}
+        {desafios && desafios.length > 0 ? (
+          <>
+            {desafios.map((desafio) => (
+              <TouchableOpacity
+                key={desafio.id ?? `desafio-${index}`}
+                onPress={() => navigateToDesafio(desafio.id)}
+              >
+                <Card
+                  content={
+                    <View style={[display.row, display.justifyContentBetween, display.alignItemsCenter]}>
+                      <Text style={[{ color: colors.blue[500] }, fontWeights['bold'], fontSize['xl']]}>{desafio.nome}</Text>
+                      <FontAwesome5 name="arrow-right" size={20} style={[{ color: colors.blue[500], marginRight: 8 }]} />
+                    </View>
+                  }
+                />
+              </TouchableOpacity>
+            ))}
+          </>
+        ) : (
+          <Text style={{backgroundColor: colors.gray[200], fontStyle: 'italic', padding: 10, textAlign: 'center'}}>
+            No momento não há desafios disponíveis
+          </Text>
+        )}
       </ScrollView>
 
       {toast.visible && (
