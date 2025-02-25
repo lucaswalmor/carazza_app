@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator, TextInput, Alert, SafeAreaView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator, TextInput, Modal, Alert, SafeAreaView, StyleSheet } from 'react-native';
 import { MaskedTextInput } from 'react-native-mask-text';
 import styles from '../assets/css/styles';
 import api from '../services/api';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Toast from '../components/Toast';
 
 export default function CadastrarEncontroScreen({ navigation }) {
     const [nome, setNome] = useState('');
@@ -30,8 +31,10 @@ export default function CadastrarEncontroScreen({ navigation }) {
     const [regras, setRegras] = useState('');
 
     const [errors, setErrors] = useState({});
+    const [modalVisible, setModalVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [currentStep, setCurrentStep] = useState(1);
+    const [toast, setToast] = useState({ visible: false, message: '', position: 'bottom', severity: '' });
 
     const handleNext = () => {
         setCurrentStep((prevStep) => prevStep + 1);
@@ -62,6 +65,13 @@ export default function CadastrarEncontroScreen({ navigation }) {
 
     const backToEncontros = () => {
         navigation.navigate('Main', { screen: 'Tabs', params: { screen: 'Encontros' } });
+    };
+
+    const showToast = (message, position, severity) => {
+        setToast({ visible: true, message, position, severity });
+
+        // Esconde o toast após 3 segundos
+        setTimeout(() => setToast({ ...toast, visible: false }), 3000);
     };
 
     const handleRegister = async () => {
@@ -105,17 +115,67 @@ export default function CadastrarEncontroScreen({ navigation }) {
                 },
             });
 
-            Alert.alert(response.data.message)
+            showToast(response.data.message, 'top', 'success')
+            resetFormFields()
         } catch (err) {
             if (err.response && err.response.data) {
-                console.log('Erros de validação:', err.response.data.errors);
                 setErrors(err.response.data.errors);
+                setModalVisible(true)
             } else {
                 console.log('Erro:', err.message);
             }
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const ValidationErrorModal = ({ visible, onClose, errors }) => {
+        return (
+            <Modal visible={visible} animationType="slide" transparent>
+                <View style={styles.modalCenteredView}>
+                    <View style={styles.modalView}>
+                        <Text style={stylesEventoModal.title}>Corrija os campos a seguir</Text>
+                        <ScrollView style={stylesEventoModal.errorList}>
+                            {Object.keys(errors).map((field, index) => (
+                                <View key={index} style={stylesEventoModal.errorItem}>
+                                    {/* <Text style={[stylesEventoModal.field,]}>{field}:</Text> */}
+                                    {errors[field].map((msg, i) => (
+                                        <Text key={i} style={stylesEventoModal.errorMessage}>- {msg}</Text>
+                                    ))}
+                                </View>
+                            ))}
+                        </ScrollView>
+                        <TouchableOpacity style={stylesEventoModal.closeButton} onPress={onClose}>
+                            <Text style={stylesEventoModal.closeText}>Fechar</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+        );
+    };
+
+    const resetFormFields = () => {
+        setNome("");
+        setDescricao("");
+        setDataInicio("");
+        setDataTermino("");
+        setHoraInicio("");
+        setHoraTermino("");
+        setLocal("");
+
+        setCep("");
+        setRua("");
+        setBairro("");
+        setNumero("");
+        setEstado("");
+        setEstadoCompleto("");
+        setCidade("");
+
+        setNomeOrganizador("");
+        setWhatsapp("");
+        setEmail("");
+        setInstagram("");
+        setRegras("");
     };
 
     return (
@@ -386,6 +446,21 @@ export default function CadastrarEncontroScreen({ navigation }) {
                                     </TouchableOpacity>
                                 )}
                             </View>
+
+                            <ValidationErrorModal
+                                visible={modalVisible}
+                                onClose={() => setModalVisible(false)}
+                                errors={errors}
+                            />
+
+                            {toast.visible && (
+                                <Toast
+                                    message={toast.message}
+                                    position={toast.position}
+                                    onClose={() => setToast({ ...toast, visible: false })}
+                                    severity={toast.severity}
+                                />
+                            )}
                         </View>
                     </ScrollView>
                 </KeyboardAvoidingView>
@@ -393,3 +468,66 @@ export default function CadastrarEncontroScreen({ navigation }) {
         </SafeAreaProvider>
     );
 };
+
+const stylesEventoModal = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#f0f0f0",
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "rgba(0,0,0,0.5)",
+    },
+    modalContent: {
+        width: "80%",
+        backgroundColor: "white",
+        borderRadius: 10,
+        padding: 20,
+        maxHeight: "70%",
+    },
+    title: {
+        fontSize: 18,
+        fontWeight: "bold",
+        marginBottom: 10,
+        textAlign: "center",
+    },
+    errorList: {
+        maxHeight: 300,
+    },
+    errorItem: {
+        marginBottom: 10,
+    },
+    field: {
+        fontSize: 16,
+        fontWeight: "bold",
+        color: "#d9534f",
+    },
+    errorMessage: {
+        fontSize: 14,
+        color: "#333",
+    },
+    closeButton: {
+        marginTop: 15,
+        backgroundColor: "#d9534f",
+        padding: 10,
+        borderRadius: 5,
+        alignItems: "center",
+    },
+    closeText: {
+        color: "white",
+        fontSize: 16,
+    },
+    showButton: {
+        backgroundColor: "#007bff",
+        padding: 12,
+        borderRadius: 5,
+    },
+    buttonText: {
+        color: "white",
+        fontSize: 16,
+    },
+});

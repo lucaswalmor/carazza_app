@@ -230,16 +230,36 @@ export default function EventoScreen({ route }) {
                                 <View>
                                     {evento.bol_entrada_paga ? (
                                         <>
-                                            <Text style={styles.infoLabel}>Organizador:</Text>
+                                            <Text style={styles.infoLabel}>Valor:</Text>
                                             <Text style={styles.infoText}>
-                                                {evento?.nome_organizador}
+                                                {evento?.valor_entrada}
                                             </Text>
                                         </>
                                     ) : null}
                                 </View>
                             </View>
 
-                            {evento.bol_entrada_paga ? (
+                            <View style={[display.row, display.alignItemsCenter, display.justifyContentBetween]}>
+                                {evento && evento.lotacao_maxima ? (
+                                    <View>
+                                        <Text style={styles.infoLabel}>Lotação máxima:</Text>
+                                        <Text style={styles.infoText}>
+                                            {evento?.lotacao_maxima}
+                                        </Text>
+                                    </View>
+                                ) : null}
+
+                                {evento.idade_minima ? (
+                                    <View>
+                                        <Text style={styles.infoLabel}>Idade Mínima:</Text>
+                                        <Text style={styles.infoText}>
+                                            {evento?.idade_minima}
+                                        </Text>
+                                    </View>
+                                ) : null}
+                            </View>
+
+                            {evento && evento.bol_entrada_paga && evento.link_ingressos ? (
                                 <>
                                     <TouchableOpacity onPress={() => Linking.openURL(evento?.link_ingressos)}>
                                         <Text style={[styles.infoText, { color: 'blue', textDecorationLine: 'underline' }]}>
@@ -249,29 +269,11 @@ export default function EventoScreen({ route }) {
                                 </>
                             ) : null}
 
-                            {evento.lotacao_maxima ? (
-                                <>
-                                    <Text style={styles.infoLabel}>Lotação máxima:</Text>
-                                    <Text style={styles.infoText}>
-                                        {evento?.lotacao_maxima}
-                                    </Text>
-                                </>
-                            ) : null}
-
-                            {evento.regras ? (
+                            {evento && evento.regras ? (
                                 <>
                                     <Text style={styles.infoLabel}>Regras:</Text>
                                     <Text style={styles.infoText}>
                                         {evento?.regras}
-                                    </Text>
-                                </>
-                            ) : null}
-
-                            {evento.idade_minima ? (
-                                <>
-                                    <Text style={styles.infoLabel}>Idade Mínima:</Text>
-                                    <Text style={styles.infoText}>
-                                        {evento?.idade_minima}
                                     </Text>
                                 </>
                             ) : null}
@@ -363,38 +365,6 @@ export default function EventoScreen({ route }) {
                                     </TouchableOpacity>
                                 </>
                             )}
-                        </View>
-
-                        {/* Card 6: Rota de passeio */}
-                        <View style={styles.card}>
-                            <View>
-                                {evento.bol_rota_passeio && (
-                                    <>
-                                        <Text style={styles.infoTitle}>Passeio de moto até o evento</Text>
-
-                                        <Text style={styles.infoLabel}>Local de saída:</Text>
-                                        <Text style={styles.infoText}>{evento?.endereco_inicio_passeio}</Text>
-
-                                        <Text style={styles.infoLabel}>Local de Chegada:</Text>
-                                        <Text style={styles.infoText}>{evento?.endereco_fim_passeio}</Text>
-
-                                        <TouchableOpacity
-                                            style={[
-                                                styles.button,
-                                                { flexDirection: 'row', marginBottom: 20 },
-                                            ]}
-                                            onPress={openMapPasseioMapa}>
-                                            <Ionicons
-                                                name="location-outline"
-                                                size={20}
-                                                color="#fff"
-                                                style={{ marginRight: 8 }}
-                                            />
-                                            <Text style={styles.buttonText}>Abrir no Google Maps</Text>
-                                        </TouchableOpacity>
-                                    </>
-                                )}
-                            </View>
                         </View>
 
                         {/* Card 7: Localização */}

@@ -19,6 +19,7 @@ import { useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
 import Botao from '../components/Botao';
 import { colors, fontSize, shadows } from '../assets/css/primeflex';
+import Loader from '../components/Loader';
 
 export default function EncontroScreen({ route }) {
   const { id } = route.params;

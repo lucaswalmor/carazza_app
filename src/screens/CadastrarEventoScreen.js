@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Image, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator, TextInput, Alert, Linking, Switch, Button, SafeAreaView } from 'react-native';
+import { View, Text, TouchableOpacity, Image, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator, TextInput, Modal, Switch, SafeAreaView, StyleSheet } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { MaskedTextInput } from 'react-native-mask-text';
 import styles from '../assets/css/styles';
@@ -7,6 +7,7 @@ import api from '../services/api';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Ionicons } from 'react-native-vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Toast from '../components/Toast';
 
 const CadastrarEventoScreen = ({ navigation }) => {
     const [nome, setNome] = useState('');
@@ -38,24 +39,23 @@ const CadastrarEventoScreen = ({ navigation }) => {
     const [bolEntradaPaga, setBolEntradaPaga] = useState(false);
     const [valorEntrada, setValorEntrada] = useState("");
     const [linkIngressos, setLinkIngressos] = useState('');
-    const [lotacaoMaxima, setLotacaoMaxima] = useState(1000);
+    const [lotacaoMaxima, setLotacaoMaxima] = useState(0);
     const [regras, setRegras] = useState('');
-    const [idadeMinima, setIdadeMinima] = useState(18);
+    const [idadeMinima, setIdadeMinima] = useState(0);
 
     const [bolShowsMusicais, setBolShowsMusicais] = useState(true);
     const [bolFoodTruck, setBolFoodTruck] = useState(true);
-    const [bolRotaPasseio, setBolRotaPasseio] = useState(true);
-    const [enderecoInicioPasseio, setEnderecoInicioPasseio] = useState('');
-    const [enderecoFimPasseio, setEnderecoFimPasseio] = useState('');
     const [bolEstacionamento, setBolEstacionamento] = useState(true);
     const [bolEstacionamentoPago, setBolEstacionamentoPago] = useState(false);
     const [valorEstacionamento, setValorEstacionamento] = useState("");
 
     const [errors, setErrors] = useState({});
+    const [modalVisible, setModalVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [currentStep, setCurrentStep] = useState(1);
 
     const [patrocinadores, setPatrocinadores] = useState([{ nome: '', instagram: '', path_logo: '' }]);
+    const [toast, setToast] = useState({ visible: false, message: '', position: 'bottom', severity: '' });
 
     const addPatrocinador = () => {
         if (patrocinadores.length < 5) {
@@ -168,6 +168,13 @@ const CadastrarEventoScreen = ({ navigation }) => {
         navigation.navigate('Main', { screen: 'Tabs', params: { screen: 'Eventos' } });
     };
 
+    const showToast = (message, position, severity) => {
+        setToast({ visible: true, message, position, severity });
+
+        // Esconde o toast após 3 segundos
+        setTimeout(() => setToast({ ...toast, visible: false }), 3000);
+    };
+
     const handleRegister = async () => {
         setIsLoading(true);
 
@@ -206,9 +213,6 @@ const CadastrarEventoScreen = ({ navigation }) => {
 
         formData.append('bol_shows_musicais', bolShowsMusicais);
         formData.append('bol_foodtrucks', bolFoodTruck);
-        formData.append('bol_rota_passeio', bolRotaPasseio);
-        formData.append('endereco_inicio_passeio', enderecoInicioPasseio);
-        formData.append('endereco_fim_passeio', enderecoFimPasseio);
         formData.append('bol_estacionamento', bolEstacionamento);
         formData.append('bol_estacionamento_pago', bolEstacionamentoPago);
         formData.append('valor_estacionamento', valorEstacionamento);
@@ -262,16 +266,85 @@ const CadastrarEventoScreen = ({ navigation }) => {
                 },
             });
 
+            showToast(response.data.message, 'top', 'success')
+            resetFormFields();
         } catch (err) {
             if (err.response && err.response.data) {
-                console.log('Erros de validação:', err.response.data.errors);
                 setErrors(err.response.data.errors);
+                setModalVisible(true)
             } else {
                 console.log('Erro:', err.message);
             }
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const ValidationErrorModal = ({ visible, onClose, errors }) => {
+        return (
+            <Modal visible={visible} animationType="slide" transparent>
+                <View style={styles.modalCenteredView}>
+                    <View style={styles.modalView}>
+                        <Text style={stylesEventoModal.title}>Corrija os campos a seguir</Text>
+                        <ScrollView style={stylesEventoModal.errorList}>
+                            {Object.keys(errors).map((field, index) => (
+                                <View key={index} style={stylesEventoModal.errorItem}>
+                                    {/* <Text style={[stylesEventoModal.field,]}>{field}:</Text> */}
+                                    {errors[field].map((msg, i) => (
+                                        <Text key={i} style={stylesEventoModal.errorMessage}>- {msg}</Text>
+                                    ))}
+                                </View>
+                            ))}
+                        </ScrollView>
+                        <TouchableOpacity style={stylesEventoModal.closeButton} onPress={onClose}>
+                            <Text style={stylesEventoModal.closeText}>Fechar</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+        );
+    };
+
+    const resetFormFields = () => {
+        setNome("");
+        setLocal("");
+        setDescricao("");
+        setDataInicio("");
+        setDataTermino("");
+        setHoraInicio("");
+        setHoraTermino("");
+
+        setCep("");
+        setRua("");
+        setBairro("");
+        setNumero("");
+        setComplemento("");
+        setEstado("");
+        setEstadoCompleto("");
+        setCidade("");
+
+        setNomeOrganizador("");
+        setWhatsapp("");
+        setEmail("");
+        setInstagram("");
+        setSite("");
+        setContatoEmergencia("");
+
+        setBolEntradaPaga(false);
+        setValorEntrada("");
+        setLinkIngressos("");
+        setLotacaoMaxima("");
+        setRegras("");
+        setIdadeMinima("");
+
+        setBolShowsMusicais(false);
+        setBolFoodTruck(false);
+        setBolEstacionamento(false);
+        setBolEstacionamentoPago(false);
+        setValorEstacionamento("");
+        setPathBanner(null);
+        setPathLogo(null);
+        setPatrocinadores([{ nome: '', instagram: '', path_logo: '' }])
     };
 
     return (
@@ -655,43 +728,6 @@ const CadastrarEventoScreen = ({ navigation }) => {
                                         </>
                                     }
 
-
-
-                                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-                                        <Switch
-                                            trackColor={{ false: '#767577', true: '#81b0ff' }}
-                                            thumbColor={bolRotaPasseio ? '#1d1e22' : '#f4f3f4'}
-                                            ios_backgroundColor="#3e3e3e"
-                                            onValueChange={() => setBolRotaPasseio(previousState => !previousState)}
-                                            value={bolRotaPasseio}
-                                        />
-
-                                        <Text>
-                                            Passeio de moto até o local?
-                                        </Text>
-                                    </View>
-
-                                    {bolRotaPasseio &&
-                                        <>
-                                            <View style={styles.inputView}>
-                                                <TextInput
-                                                    style={styles.input}
-                                                    placeholder="End. de saída, ex: Av Paulista, 266"
-                                                    value={enderecoInicioPasseio}
-                                                    onChangeText={(text) => setEnderecoInicioPasseio(text)}
-                                                />
-                                            </View>
-                                            <View style={styles.inputView}>
-                                                <TextInput
-                                                    style={styles.input}
-                                                    placeholder="End. do destino, ex: Rua Augusta, 111"
-                                                    value={enderecoFimPasseio}
-                                                    onChangeText={(text) => setEnderecoFimPasseio(text)}
-                                                />
-                                            </View>
-                                        </>
-                                    }
-
                                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                                         <Switch
                                             trackColor={{ false: '#767577', true: '#81b0ff' }}
@@ -834,6 +870,21 @@ const CadastrarEventoScreen = ({ navigation }) => {
                                     </TouchableOpacity>
                                 )}
                             </View>
+
+                            <ValidationErrorModal
+                                visible={modalVisible}
+                                onClose={() => setModalVisible(false)}
+                                errors={errors}
+                            />
+
+                            {toast.visible && (
+                                <Toast
+                                    message={toast.message}
+                                    position={toast.position}
+                                    onClose={() => setToast({ ...toast, visible: false })}
+                                    severity={toast.severity}
+                                />
+                            )}
                         </View>
                     </ScrollView>
                 </KeyboardAvoidingView>
@@ -841,5 +892,68 @@ const CadastrarEventoScreen = ({ navigation }) => {
         </SafeAreaProvider>
     );
 };
+
+const stylesEventoModal = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#f0f0f0",
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "rgba(0,0,0,0.5)",
+    },
+    modalContent: {
+        width: "80%",
+        backgroundColor: "white",
+        borderRadius: 10,
+        padding: 20,
+        maxHeight: "70%",
+    },
+    title: {
+        fontSize: 18,
+        fontWeight: "bold",
+        marginBottom: 10,
+        textAlign: "center",
+    },
+    errorList: {
+        maxHeight: 300,
+    },
+    errorItem: {
+        marginBottom: 10,
+    },
+    field: {
+        fontSize: 16,
+        fontWeight: "bold",
+        color: "#d9534f",
+    },
+    errorMessage: {
+        fontSize: 14,
+        color: "#333",
+    },
+    closeButton: {
+        marginTop: 15,
+        backgroundColor: "#d9534f",
+        padding: 10,
+        borderRadius: 5,
+        alignItems: "center",
+    },
+    closeText: {
+        color: "white",
+        fontSize: 16,
+    },
+    showButton: {
+        backgroundColor: "#007bff",
+        padding: 12,
+        borderRadius: 5,
+    },
+    buttonText: {
+        color: "white",
+        fontSize: 16,
+    },
+});
 
 export default CadastrarEventoScreen;

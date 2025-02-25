@@ -139,7 +139,7 @@ export default function DrawerRoutes() {
                     drawerLabel: 'Configurações'
                 }}
             />
-            <Drawer.Screen
+            {/* <Drawer.Screen
                 name="Componentes"
                 component={TodosComponentes}
                 options={{
@@ -148,7 +148,7 @@ export default function DrawerRoutes() {
                     ),
                     drawerLabel: 'Componentes'
                 }}
-            />
+            /> */}
         </Drawer.Navigator>
     );
 }

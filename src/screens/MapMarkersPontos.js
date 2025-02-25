@@ -7,6 +7,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { colors, display, gap } from "../assets/css/primeflex";
 import { useFocusEffect } from "@react-navigation/native";
 import { FontAwesome5 } from '@expo/vector-icons';
+import Loader from "../components/Loader";
 
 export default function MapMarkersPontos({ navigation }) {
     const [markers, setMarkers] = useState([]);

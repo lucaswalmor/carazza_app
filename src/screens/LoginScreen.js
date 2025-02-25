@@ -60,14 +60,20 @@ export default function LoginScreen({ navigation, route }) {
 
   useEffect(() => {
     const getToken = async () => {
-      const token = await AsyncStorage.getItem('token');
-
-      if (token) {
-        navigation.replace('Main');
-      } else {
-        checkBiometricAuth();
+      try {
+        const token = await AsyncStorage.getItem('token');
+        console.log(token)
+        if (token && token !== 'null' && token !== 'undefined' && token.trim() !== '') {
+          navigation.replace('Main');
+        } else {
+          await AsyncStorage.removeItem('token');
+          await AsyncStorage.removeItem('user');
+          checkBiometricAuth();
+        }
+      } catch (error) {
+        console.log('Erro ao recuperar token:', error);
       }
-    }
+    };
 
     getToken();
   }, []);
@@ -105,17 +111,6 @@ export default function LoginScreen({ navigation, route }) {
       }
     } else {
       // Alert.alert('Falha na autenticação biométrica');
-    }
-  };
-
-  const handleRegisterNavigation = async () => {
-    const baseUrl = 'https://motostrada.com.br/cadastro?ref=&inf=0';
-    const supported = await Linking.canOpenURL(baseUrl);
-    if (supported) {
-      await Linking.openURL(baseUrl);
-      navigation.replace('Login', { message: 'Cadastro realizado com sucesso!' });
-    } else {
-      Alert.alert('Erro', 'Não foi possível abrir o link: ' + baseUrl);
     }
   };
 
@@ -160,13 +155,24 @@ export default function LoginScreen({ navigation, route }) {
       if (error.response && error.response.data.errors) {
         setErrors(error.response.data.errors);
       } else if (error.response && error.response.data.error) {
-        setErrors({email: [error.response.data.error], password: [error.response.data.error]});
+        setErrors({ email: [error.response.data.error], password: [error.response.data.error] });
       } else {
         console.log('Erro:', error.message);
       }
       setIsLoading(false);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleRegisterNavigation = async () => {
+    const baseUrl = 'https://motostrada.com.br/cadastro?ref=&inf=0';
+    const supported = await Linking.canOpenURL(baseUrl);
+
+    if (supported) {
+      await Linking.openURL(baseUrl);
+    } else {
+      Alert.alert('Erro', 'Não foi possível abrir o link: ' + baseUrl);
     }
   };
 
