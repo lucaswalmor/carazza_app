@@ -319,7 +319,6 @@ const GPSNavigatorScreen = ({ route }) => {
     if (!location) {
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                {/* <ActivityIndicator size="large" color="#0000ff" /> */}
                 <Loader />
             </View>
         );
@@ -600,7 +599,7 @@ const GPSNavigatorScreen = ({ route }) => {
                                 </Text>
 
                                 <TouchableOpacity onPress={() => calculateRoute()} style={{ marginBottom: 20, flexDirection: 'row' }}>
-                                    <Text style={{ fontSize: 14, color: colors.blue[500] }}>Traçar rota? </Text>
+                                    <Text style={{ fontSize: 14, color: colors.blue[500], padding: 10 }}>Traçar rota? </Text>
                                 </TouchableOpacity>
 
                                 <TouchableOpacity onPress={() => setModalVisible(false)} style={{ marginBottom: 20, flexDirection: 'row' }}>
