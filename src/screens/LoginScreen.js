@@ -62,7 +62,6 @@ export default function LoginScreen({ navigation, route }) {
     const getToken = async () => {
       try {
         const token = await AsyncStorage.getItem('token');
-        console.log(token)
         if (token && token !== 'null' && token !== 'undefined' && token.trim() !== '') {
           navigation.replace('Main');
         } else {

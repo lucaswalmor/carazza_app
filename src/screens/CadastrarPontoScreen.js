@@ -164,6 +164,7 @@ export default function CadastrarPontoScreen({ navigation }) {
 
     const handleCep = async (cep) => {
         if (cep.length != 9) return;
+
         const data = await pesquisacep(cep);
 
         if (data.erro) {
@@ -176,7 +177,7 @@ export default function CadastrarPontoScreen({ navigation }) {
                 estado: data.uf,
                 estado_completo: data.estado,
                 cidade: data.localidade,
-                cep: data.cep,
+                cep: cep,
             });
         }
     };

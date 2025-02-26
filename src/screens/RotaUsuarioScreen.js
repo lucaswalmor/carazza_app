@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     },
     map: {
         width: "100%",
-        height: "84%",
+        height: "80%",
     },
     logo: {
         zIndex: 999,

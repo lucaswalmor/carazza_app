@@ -24,7 +24,7 @@ export default function PerfilScreen({ navigation }) {
         setIsLoading(true)
         try {
             const token = await AsyncStorage.getItem('token');
-            const user = JSON.parse(await AsyncStorage.getItem('user')); ''
+            const user = JSON.parse(await AsyncStorage.getItem('user'));
 
             const response = await api.get(`/user/show/${user.id}`, {
                 headers: {
